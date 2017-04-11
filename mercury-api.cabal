@@ -57,6 +57,24 @@ library
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
 
+  c-sources:           cbits/api/serial_transport_posix.c
+                     , cbits/api/serial_transport_tcp_posix.c
+                     , cbits/api/tmr_strerror.c
+                     , cbits/api/tmr_param.c
+                     , cbits/api/hex_bytes.c
+                     , cbits/api/tm_reader.c
+                     , cbits/api/tm_reader_async.c
+                     , cbits/api/serial_reader.c
+                     -- , cbits/api/tmr_loadsave_configuration.c
+                     , cbits/api/serial_reader_l3.c
+                     , cbits/api/tmr_utils.c
+                     , cbits/api/osdep_posix.c
+                     , cbits/glue/glue.c
+
+  include-dirs:        cbits/api
+
+  cc-options:          -DTMR_ENABLE_SERIAL_READER_ONLY=1
+
   -- Other library packages from which modules are imported.
   build-depends:       base >= 4.6 && < 5
                      , text >= 1.2 && < 1.3
