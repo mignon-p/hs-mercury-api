@@ -72,6 +72,7 @@ library
                      , cbits/glue/glue.c
 
   include-dirs:        cbits/api
+                     , cbits/glue
 
   cc-options:          -DTMR_ENABLE_SERIAL_READER_ONLY=1
 
