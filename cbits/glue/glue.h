@@ -23,4 +23,22 @@ typedef struct ReaderEtc {
     bool destroyed;
 } ReaderEtc;
 
+TMR_Status c_TMR_create (ReaderEtc *reader, const char *deviceUri);
+TMR_Status c_TMR_connect (ReaderEtc *reader);
+TMR_Status c_TMR_destroy (ReaderEtc *reader);
+TMR_Status c_TMR_read (ReaderEtc *reader, uint32_t timeoutMs, int32_t *tagCount);
+TMR_Status c_TMR_hasMoreTags (ReaderEtc *reader);
+TMR_Status c_TMR_getNextTag (ReaderEtc *reader, TMR_TagReadData *tagData);
+TMR_Status c_TMR_executeTagOp (ReaderEtc *reader,
+                               TMR_TagOp *tagop,
+                               TMR_TagFilter *filter,
+                               TMR_uint8List *data);
+TMR_Status c_TMR_paramList (ReaderEtc *reader, TMR_Param *keys, uint32_t *len);
+TMR_Status c_TMR_addTransportListener (ReaderEtc *reader,
+                                       TMR_TransportListener func,
+                                       char *unique);
+TMR_Status c_TMR_removeTransportListener (ReaderEtc *reader,
+                                          const char *unique);
+const char *c_TMR_strerr (ReaderEtc *reader, TMR_Status status);
+
 #endif  /* GLUE_H */

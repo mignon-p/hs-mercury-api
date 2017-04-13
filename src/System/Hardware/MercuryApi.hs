@@ -14,6 +14,55 @@ import Foreign.C
 
 import System.Hardware.MercuryApi.Generated
 
+newtype ReaderEtc = ReaderEtc ()
+newtype Reader = Reader (ForeignPtr ReaderEtc)
+
+newtype TagReadData = TagReadData ()
+
+type RawStatus = Word32
+type RawType = Word32
+type RawParam = CInt
+
+-- Many of these need to be safe because they could call back
+-- into Haskell via the transport listener.
+
+foreign import ccall unsafe "glue.h c_TMR_create"
+    c_TMR_create :: Ptr ReaderEtc
+                 -> CString
+                 -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_connect"
+    c_TMR_connect :: Ptr ReaderEtc
+                  -> IO RawStatus
+
+foreign import ccall unsafe "glue.h c_TMR_destroy"
+    c_TMR_destroy :: Ptr ReaderEtc
+                  -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_read"
+    c_TMR_read :: Ptr ReaderEtc
+               -> Word32
+               -> Ptr Word32
+               -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_hasMoreTags"
+    c_TMR_hasMoreTags :: Ptr ReaderEtc
+                      -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_getNextTag"
+    c_TMR_getNextTag :: Ptr ReaderEtc
+                     -> Ptr TagReadData
+                     -> IO RawStatus
+
+foreign import ccall unsafe "glue.h c_TMR_strerr"
+    c_TMR_strerr :: Ptr ReaderEtc
+                 -> RawStatus
+                 -> IO CString
+
+foreign import ccall unsafe "tm_reader.h TMR_paramName"
+    c_TMR_paramName :: RawParam
+                    -> CString
+
 data MercuryException =
   MercuryException
   { meStatusType :: StatusType
@@ -24,9 +73,6 @@ data MercuryException =
   deriving (Eq, Ord, Show, Read, Typeable)
 
 instance Exception MercuryException
-
-type RawStatus = Word32
-type RawType = Word32
 
 statusGetType :: RawStatus -> RawType
 statusGetType stat = stat `shiftR` 24
@@ -46,14 +92,7 @@ textFromCString cs = do
   bs <- B.packCString cs
   return $ T.decodeUtf8With T.lenientDecode bs
 
-type RawReader = () -- FIXME
-
-foreign import ccall unsafe "tm_reader.h TMR_strerr"
-    c_TMR_strerr :: Ptr RawReader
-                 -> RawStatus
-                 -> IO CString
-
-checkStatus :: Ptr RawReader -> RawStatus -> T.Text -> IO ()
+checkStatus :: Ptr ReaderEtc -> RawStatus -> T.Text -> IO ()
 checkStatus rdr rstat loc = do
   let t = toStatusType $ statusGetType rstat
       stat = toStatus rstat
