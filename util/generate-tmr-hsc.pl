@@ -10,6 +10,9 @@ my @errorTypes = ("SUCCESS_TYPE");
 my @errorCodes = ("SUCCESS");
 my %errorCodes = ("SUCCESS" => "Success!");
 
+my @params = ();
+my %params = ();
+
 my @lines = ();
 
 sub readStatus {
@@ -31,6 +34,27 @@ sub readStatus {
     close F;
 }
 
+sub readParams {
+    open F, "$apiDir/tmr_params.h" or die;
+    my $comment = "";
+    while (<F>) {
+        if (m%^\s*/\*\*\s*(.*?)\s*\*+/%) {
+            $comment = $1;
+        } elsif (/^\s*TMR_(PARAM_[A-Z0-9_]+)/) {
+            unless ($1 eq "PARAM_MIN" or
+                    $1 eq "PARAM_END" or
+                    $1 eq "PARAM_MAX") {
+                push @params, $1;
+                $params{$1} = $comment;
+            }
+            $comment = "";
+        } else {
+            $comment = "";
+        }
+    }
+    close F;
+}
+
 sub emit {
     my ($s) = @_;
     push @lines, $s;
@@ -41,6 +65,7 @@ sub emitHeader {
     emit "module System.Hardware.MercuryApi.Generated where";
     emit "";
     emit "import Data.Word";
+    emit "import Foreign.C.Types";
     emit "";
     emit "#include <tm_reader.h>";
     emit "";
@@ -74,6 +99,13 @@ sub emitTo {
     }
 }
 
+sub emitFrom {
+    my ($func, $prefix, $constructors) = @_;
+    for my $con (@$constructors) {
+        emit "$func $con = #{const $prefix$con}";
+    }
+}
+
 sub emitStatus {
     emit "data StatusType =";
     emitEnum (\@errorTypes, {});
@@ -98,8 +130,34 @@ sub emitStatus {
     emit "";
 }
 
+sub emitParams {
+    emit "data Param =";
+    emitEnum (\@params, \%params);
+    emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
+    emit "";
+
+    emit "toParam :: CInt -> Param";
+    emitTo ("toParam", "TMR_", \@params);
+    emit "toParam _ = PARAM_NONE";
+    emit "";
+
+    emit "fromParam :: Param -> CInt";
+    emitFrom ("fromParam", "TMR_", \@params);
+    emit "";
+
+    emit "paramMin :: CInt";
+    emit "paramMin = #{const TMR_PARAM_MIN}";
+    emit "";
+
+    emit "paramMax :: CInt";
+    emit "paramMax = #{const TMR_PARAM_MAX}";
+    emit "";
+}
+
 readStatus();
+readParams();
 
 emitHeader();
 emitStatus();
+emitParams();
 dumpOutput();
