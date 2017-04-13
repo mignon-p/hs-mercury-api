@@ -5,6 +5,7 @@ module System.Hardware.MercuryApi where
 import Control.Applicative
 import Control.Exception
 import qualified Data.ByteString as B
+import qualified Data.HashMap.Strict as H
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.Text.Encoding.Error as T
@@ -12,6 +13,7 @@ import Data.Typeable
 import Data.Word
 import Foreign
 import Foreign.C
+import System.IO.Unsafe
 
 import System.Hardware.MercuryApi.Generated
 
@@ -60,6 +62,7 @@ foreign import ccall unsafe "glue.h c_TMR_strerr"
                  -> RawStatus
                  -> IO CString
 
+-- This is a pure function, because it returns a string literal
 foreign import ccall unsafe "tm_reader.h TMR_paramName"
     c_TMR_paramName :: RawParam
                     -> CString
@@ -123,3 +126,26 @@ checkStatus rdr rstat loc = do
                   , meLocation = loc
                   }
         throwIO exc
+
+paramList :: [(Param, T.Text)]
+paramList = map f [minBound..maxBound]
+  where
+    f p = (p, unsafePerformIO $ textFromCString $ c_TMR_paramName $ fromParam p)
+
+paramMap :: H.HashMap Param T.Text
+paramMap = H.fromList paramList
+
+paramMapReverse :: H.HashMap T.Text Param
+paramMapReverse = H.fromList $ map swap paramList
+  where swap (x, y) = (y, x)
+
+-- | Return the string name (e. g. \"\/reader\/read\/plan\")
+-- corresponding to a 'Param'.
+paramName :: Param -> T.Text
+paramName p = paramMap H.! p -- all possible keys are in the map, so can't fail
+
+-- | Return the 'Param' corresponding to a string name
+-- (e. g. \"\/reader\/read\/plan\").  Returns 'PARAM_NONE' if no such
+-- parameter exists.
+paramID :: T.Text -> Param
+paramID name = H.lookupDefault PARAM_NONE name paramMapReverse
