@@ -20,7 +20,7 @@ sub readStatus {
             push @errorTypes, $1;
         } elsif (m%^/\*\*(.*?)\s+\*/%) {
             $comment = $1;
-        } elsif (/^#define TMR_(ERROR_[A-Z_]+)\s+/) {
+        } elsif (/^#define TMR_(ERROR_[A-Z0-9_]+)\s+/) {
             push @errorCodes, $1;
             $errorCodes{$1} = $comment;
             $comment = "";
