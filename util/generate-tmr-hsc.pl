@@ -4,11 +4,16 @@ use FindBin;
 
 my $rootDir = "$FindBin::Bin/..";
 my $apiDir = "$rootDir/cbits/api";
+my $glueDir = "$rootDir/cbits/glue";
 my $outputFile = "$rootDir/src/System/Hardware/MercuryApi/Generated.hsc";
 
 my @errorTypes = ("SUCCESS_TYPE");
 my @errorCodes = ("SUCCESS");
 my %errorCodes = ("SUCCESS" => "Success!");
+my @glueTypes = ();
+my %glueTypes = ();
+my @glueCodes = ();
+my %glueCodes = ();
 
 my @params = ();
 my %params = ();
@@ -55,6 +60,27 @@ sub readParams {
     close F;
 }
 
+sub readGlue {
+    open F, "$glueDir/glue.h" or die;
+    my $comment = "";
+    while (<F>) {
+        if (/^#define (ERROR_TYPE_[A-Z]+)/) {
+            push @glueTypes, $1;
+            $glueTypes{$1} = $comment;
+            $comment = "";
+        } elsif (m%^/\*\*\s*(.*?)\s*\*/%) {
+            $comment = $1;
+        } elsif (/^#define (ERROR_[A-Z0-9_]+)\s+/) {
+            push @glueCodes, $1;
+            $glueCodes{$1} = $comment;
+            $comment = "";
+        } else {
+            $comment = "";
+        }
+    }
+    close F;
+}
+
 sub emit {
     my ($s) = @_;
     push @lines, $s;
@@ -68,6 +94,7 @@ sub emitHeader {
     emit "import Foreign.C.Types";
     emit "";
     emit "#include <tm_reader.h>";
+    emit "#include <glue.h>";
     emit "";
 }
 
@@ -79,9 +106,8 @@ sub dumpOutput {
     close F;
 }
 
-sub emitEnum {
-    my ($constructors, $comments) = @_;
-    my $sep = " ";
+sub emitEnum1 {
+    my ($constructors, $comments, $sep) = @_;
     for my $con (@$constructors) {
         my $comment = "";
         if (exists $comments->{$con} and $comments->{$con} ne "") {
@@ -90,6 +116,16 @@ sub emitEnum {
         emit "  $sep $con$comment";
         $sep = "|";
     }
+}
+
+sub emitEnum {
+    my ($constructors, $comments) = @_;
+    emitEnum1 ($constructors, $comments, " ");
+}
+
+sub emitEnumCont {
+    my ($constructors, $comments) = @_;
+    emitEnum1 ($constructors, $comments, "|");
 }
 
 sub emitTo {
@@ -109,23 +145,27 @@ sub emitFrom {
 sub emitStatus {
     emit "data StatusType =";
     emitEnum (\@errorTypes, {});
+    emitEnumCont (\@glueTypes, \%glueTypes);
     emit "  | ERROR_TYPE_UNKNOWN -- ^ Not a recognized status type";
     emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
     emit "";
 
     emit "toStatusType :: Word32 -> StatusType";
     emitTo ("toStatusType", "TMR_", \@errorTypes);
+    emitTo ("toStatusType", "",     \@glueTypes);
     emit "toStatusType _ = ERROR_TYPE_UNKNOWN";
     emit "";
 
     emit "data Status =";
     emitEnum (\@errorCodes, \%errorCodes);
+    emitEnumCont (\@glueCodes, \%glueCodes);
     emit "  | ERROR_UNKNOWN Word32 -- ^ C API returned an unrecognized status code";
     emit "  deriving (Eq, Ord, Show, Read)";
     emit "";
 
     emit "toStatus :: Word32 -> Status";
     emitTo ("toStatus", "TMR_", \@errorCodes);
+    emitTo ("toStatus", "",     \@glueCodes);
     emit "toStatus x = ERROR_UNKNOWN x";
     emit "";
 }
@@ -156,6 +196,7 @@ sub emitParams {
 
 readStatus();
 readParams();
+readGlue();
 
 emitHeader();
 emitStatus();

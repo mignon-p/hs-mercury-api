@@ -5,6 +5,7 @@ import Data.Word
 import Foreign.C.Types
 
 #include <tm_reader.h>
+#include <glue.h>
 
 data StatusType =
     SUCCESS_TYPE
@@ -12,6 +13,7 @@ data StatusType =
   | ERROR_TYPE_CODE
   | ERROR_TYPE_MISC
   | ERROR_TYPE_LLRP
+  | ERROR_TYPE_BINDING -- ^ An error which originates from the Haskell binding, not the underlying C library.
   | ERROR_TYPE_UNKNOWN -- ^ Not a recognized status type
   deriving (Eq, Ord, Show, Read, Bounded, Enum)
 
@@ -21,6 +23,7 @@ toStatusType #{const TMR_ERROR_TYPE_COMM} = ERROR_TYPE_COMM
 toStatusType #{const TMR_ERROR_TYPE_CODE} = ERROR_TYPE_CODE
 toStatusType #{const TMR_ERROR_TYPE_MISC} = ERROR_TYPE_MISC
 toStatusType #{const TMR_ERROR_TYPE_LLRP} = ERROR_TYPE_LLRP
+toStatusType #{const ERROR_TYPE_BINDING} = ERROR_TYPE_BINDING
 toStatusType _ = ERROR_TYPE_UNKNOWN
 
 data Status =
@@ -122,6 +125,7 @@ data Status =
   | ERROR_LLRP_UNDEFINED_VALUE
   | ERROR_LLRP_READER_ERROR
   | ERROR_LLRP_READER_CONNECTION_LOST
+  | ERROR_ALREADY_DESTROYED -- ^ Attempt to use reader after it was destroyed.
   | ERROR_UNKNOWN Word32 -- ^ C API returned an unrecognized status code
   deriving (Eq, Ord, Show, Read)
 
@@ -224,6 +228,7 @@ toStatus #{const TMR_ERROR_LLRP_INVALID_RFMODE} = ERROR_LLRP_INVALID_RFMODE
 toStatus #{const TMR_ERROR_LLRP_UNDEFINED_VALUE} = ERROR_LLRP_UNDEFINED_VALUE
 toStatus #{const TMR_ERROR_LLRP_READER_ERROR} = ERROR_LLRP_READER_ERROR
 toStatus #{const TMR_ERROR_LLRP_READER_CONNECTION_LOST} = ERROR_LLRP_READER_CONNECTION_LOST
+toStatus #{const ERROR_ALREADY_DESTROYED} = ERROR_ALREADY_DESTROYED
 toStatus x = ERROR_UNKNOWN x
 
 data Param =
