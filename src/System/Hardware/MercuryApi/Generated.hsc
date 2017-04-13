@@ -499,3 +499,5 @@ paramMin = #{const TMR_PARAM_MIN}
 paramMax :: CInt
 paramMax = #{const TMR_PARAM_MAX}
 
+sizeofReaderEtc :: Int
+sizeofReaderEtc = #{size ReaderEtc}

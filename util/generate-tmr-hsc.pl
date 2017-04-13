@@ -200,6 +200,11 @@ sub emitParams {
     emit "";
 }
 
+sub emitSizeOf {
+    emit "sizeofReaderEtc :: Int";
+    emit "sizeofReaderEtc = #{size ReaderEtc}";
+}
+
 readStatus();
 readParams();
 readGlue();
@@ -207,4 +212,6 @@ readGlue();
 emitHeader();
 emitStatus();
 emitParams();
+emitSizeOf();
+
 dumpOutput();

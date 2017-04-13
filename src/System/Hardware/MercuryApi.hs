@@ -1,4 +1,4 @@
-{-# LANGUAGE ForeignFunctionInterface, DeriveDataTypeable #-}
+{-# LANGUAGE ForeignFunctionInterface, DeriveDataTypeable, OverloadedStrings #-}
 
 module System.Hardware.MercuryApi where
 
@@ -41,6 +41,9 @@ foreign import ccall safe "glue.h c_TMR_connect"
 foreign import ccall unsafe "glue.h c_TMR_destroy"
     c_TMR_destroy :: Ptr ReaderEtc
                   -> IO RawStatus
+
+foreign import ccall unsafe "glue.h &c_TMR_destroy"
+    p_TMR_destroy :: FunPtr (Ptr ReaderEtc -> IO ())
 
 foreign import ccall safe "glue.h c_TMR_read"
     c_TMR_read :: Ptr ReaderEtc
@@ -149,3 +152,16 @@ paramName p = paramMap H.! p -- all possible keys are in the map, so can't fail
 -- parameter exists.
 paramID :: T.Text -> Param
 paramID name = H.lookupDefault PARAM_NONE name paramMapReverse
+
+-- | Create a new 'Reader' with the specified URI.  The reader is
+-- not contacted at this point.
+create :: T.Text -- ^ a reader URI, such as @tmr:\/\/\/dev\/ttyUSB0@
+       -> IO Reader
+create deviceUri = do
+  B.useAsCString (textToBS deviceUri) $ \cs -> do
+    fp <- mallocForeignPtrBytes sizeofReaderEtc
+    withForeignPtr fp $ \p -> do
+      status <- c_TMR_create p cs
+      checkStatus p status "create"
+    addForeignPtrFinalizer p_TMR_destroy fp
+    return $ Reader fp
