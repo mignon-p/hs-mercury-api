@@ -91,3 +91,13 @@ library
 
   -- Base language which the package is written in.
   default-language:    Haskell2010
+
+
+executable tmr-params
+  main-is:             tmr-params.hs
+  build-depends:       base >= 4.6 && < 5
+                     , mercury-api
+                     , text >= 1.2 && < 1.3
+  hs-source-dirs:      examples
+  default-language:    Haskell2010
+  ghc-options:         -threaded

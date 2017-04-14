@@ -1,6 +1,18 @@
 {-# LANGUAGE ForeignFunctionInterface, DeriveDataTypeable, OverloadedStrings #-}
 
-module System.Hardware.MercuryApi where
+module System.Hardware.MercuryApi
+  ( Reader
+  , Param (..)
+  , MercuryException (..)
+  , StatusType (..)
+  , Status (..)
+  , create
+  , connect
+  , destroy
+  , paramList
+  , paramName
+  , paramID
+  ) where
 
 import Control.Applicative
 import Control.Exception
@@ -190,6 +202,7 @@ connect rdr = withReaderEtc rdr "connect" c_TMR_connect
 destroy :: Reader -> IO ()
 destroy rdr = withReaderEtc rdr "destroy" c_TMR_destroy
 
+-- | Get a list of parameters supported by the reader.
 paramList :: Reader -> IO [Param]
 paramList rdr = do
   let maxParams = paramMax + 1
