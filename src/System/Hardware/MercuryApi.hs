@@ -60,6 +60,12 @@ foreign import ccall safe "glue.h c_TMR_getNextTag"
                      -> Ptr TagReadData
                      -> IO RawStatus
 
+foreign import ccall safe "glue.h c_TMR_paramList"
+    c_TMR_paramList :: Ptr ReaderEtc
+                    -> Ptr RawParam
+                    -> Ptr Word32
+                    -> IO RawStatus
+
 foreign import ccall unsafe "glue.h c_TMR_strerr"
     c_TMR_strerr :: Ptr ReaderEtc
                  -> RawStatus
@@ -130,16 +136,16 @@ checkStatus rdr rstat loc = do
                   }
         throwIO exc
 
-paramList :: [(Param, T.Text)]
-paramList = map f [minBound..maxBound]
+paramPairs :: [(Param, T.Text)]
+paramPairs = map f [minBound..maxBound]
   where
     f p = (p, unsafePerformIO $ textFromCString $ c_TMR_paramName $ fromParam p)
 
 paramMap :: H.HashMap Param T.Text
-paramMap = H.fromList paramList
+paramMap = H.fromList paramPairs
 
 paramMapReverse :: H.HashMap T.Text Param
-paramMapReverse = H.fromList $ map swap paramList
+paramMapReverse = H.fromList $ map swap paramPairs
   where swap (x, y) = (y, x)
 
 -- | Return the string name (e. g. \"\/reader\/read\/plan\")
@@ -165,3 +171,32 @@ create deviceUri = do
       checkStatus p status "create"
     addForeignPtrFinalizer p_TMR_destroy fp
     return $ Reader fp
+
+withReaderEtc :: Reader -> T.Text -> (Ptr ReaderEtc -> IO RawStatus) -> IO ()
+withReaderEtc (Reader fp) location func = do
+  withForeignPtr fp $ \p -> do
+    status <- func p
+    checkStatus p status location
+
+-- | Establishes the connection to the reader at the URI specified in
+-- the 'create' call.  The existence of a reader at the address is
+-- verified and the reader is brought into a state appropriate for
+-- performing RF operations.
+connect :: Reader -> IO ()
+connect rdr = withReaderEtc rdr "connect" c_TMR_connect
+
+-- | Closes the connection to the reader and releases any resources
+-- that have been consumed by the reader structure.
+destroy :: Reader -> IO ()
+destroy rdr = withReaderEtc rdr "destroy" c_TMR_destroy
+
+paramList :: Reader -> IO [Param]
+paramList rdr = do
+  let maxParams = paramMax + 1
+  alloca $ \nParams -> do
+    poke nParams (fromIntegral maxParams)
+    allocaArray (fromIntegral maxParams) $ \params -> do
+      withReaderEtc rdr "paramList" $ \p -> c_TMR_paramList p params nParams
+      actual <- peek nParams
+      result <- peekArray (min (fromIntegral actual) (fromIntegral maxParams)) params
+      return $ map toParam result
