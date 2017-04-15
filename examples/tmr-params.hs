@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+import Control.Concurrent
 import Control.Exception
 import Control.Monad
 import qualified Data.Text as T
@@ -24,7 +25,10 @@ createAndConnect uri n = do
   when (doWhat' /= Return) $ TMR.destroy rdr
   case doWhat' of
     Throw -> throw e
-    Retry -> createAndConnect uri (n - 1)
+    Retry -> do
+      print $ TMR.meStatus e
+      threadDelay 1000000
+      createAndConnect uri (n - 1)
     Return -> return rdr
 
 main = do
