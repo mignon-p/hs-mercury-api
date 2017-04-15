@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+import Control.Concurrent
 import Control.Exception
 import Control.Monad
 import qualified Data.Text as T
@@ -11,15 +12,10 @@ repeatedConnect rdr n
   | otherwise = do
       eth <- try (TMR.connect rdr)
       case eth of
-        Left exc ->
-          case TMR.meStatus exc of
-            TMR.ERROR_TIMEOUT -> do
-              print (TMR.meStatus exc)
-              repeatedConnect rdr (n - 1)
-            TMR.ERROR_DEVICE_RESET -> do
-              print (TMR.meStatus exc)
-              repeatedConnect rdr (n - 1)
-            _ -> throwIO exc
+        Left exc -> do
+          print (TMR.meStatus exc)
+	  threadDelay 100000
+          repeatedConnect rdr (n - 1)
         _ -> return ()
 
 main = do
