@@ -25,7 +25,7 @@ import Data.Typeable
 import Data.Word
 import Foreign
 import Foreign.C
-import System.IO.Unsafe
+import qualified System.IO.Unsafe as U
 
 import System.Hardware.MercuryApi.Generated
 
@@ -151,7 +151,7 @@ checkStatus rdr rstat loc = do
 paramPairs :: [(Param, T.Text)]
 paramPairs = map f [minBound..maxBound]
   where
-    f p = (p, unsafePerformIO $ textFromCString $ c_TMR_paramName $ fromParam p)
+    f p = (p, U.unsafePerformIO $ textFromCString $ c_TMR_paramName $ fromParam p)
 
 paramMap :: H.HashMap Param T.Text
 paramMap = H.fromList paramPairs

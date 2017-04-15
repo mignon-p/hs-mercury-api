@@ -7,7 +7,7 @@
 #include "tm_reader.h"
 
 /** An error which originates from the Haskell binding, not the underlying C library. */
-#define ERROR_TYPE_BINDING 255L
+#define ERROR_TYPE_BINDING 127L
 
 #define ERROR_BINDING(x)                TMR_STATUS_MAKE(ERROR_TYPE_BINDING, (x))
 
