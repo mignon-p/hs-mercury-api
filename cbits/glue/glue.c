@@ -47,22 +47,6 @@ TMR_Status c_TMR_connect (ReaderEtc *reader)
         return TMR_connect (&reader->reader);
 }
 
-void c_TMR_clearConfirmedParams (ReaderEtc *reader)
-{
-    if (!reader->destroyed &&
-        reader->reader.readerType == TMR_READER_TYPE_SERIAL) {
-
-        TMR_SR_SerialReader *sr;
-        int i;
-
-        sr = &reader->reader.u.serialReader;
-        for (i = 0; i < TMR_PARAMWORDS; i++) {
-            sr->paramConfirmed[i] = 0;
-            sr->paramPresent[i] = 0;
-        }
-    }
-}
-
 TMR_Status c_TMR_destroy (ReaderEtc *reader)
 {
     if (reader->destroyed) {

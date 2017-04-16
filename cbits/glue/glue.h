@@ -29,7 +29,6 @@ typedef struct ReaderEtc {
 
 TMR_Status c_TMR_create (ReaderEtc *reader, const char *deviceUri);
 TMR_Status c_TMR_connect (ReaderEtc *reader);
-void c_TMR_clearConfirmedParams (ReaderEtc *reader);
 TMR_Status c_TMR_destroy (ReaderEtc *reader);
 TMR_Status c_TMR_read (ReaderEtc *reader, uint32_t timeoutMs, int32_t *tagCount);
 TMR_Status c_TMR_hasMoreTags (ReaderEtc *reader);

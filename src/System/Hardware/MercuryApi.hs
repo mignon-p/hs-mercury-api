@@ -10,7 +10,6 @@ module System.Hardware.MercuryApi
   , TransportListenerId
   , create
   , connect
-  , connectRepeatedly
   , destroy
   , paramList
   , paramName
@@ -66,9 +65,6 @@ foreign import ccall unsafe "glue.h c_TMR_create"
 foreign import ccall safe "glue.h c_TMR_connect"
     c_TMR_connect :: Ptr ReaderEtc
                   -> IO RawStatus
-
-foreign import ccall unsafe "glue.h c_TMR_clearConfirmedParams"
-    c_TMR_clearConfirmedParams :: Ptr ReaderEtc -> IO ()
 
 foreign import ccall unsafe "glue.h c_TMR_destroy"
     c_TMR_destroy :: Ptr ReaderEtc
@@ -242,25 +238,6 @@ withReaderEtc (Reader fp) location func = do
 -- performing RF operations.
 connect :: Reader -> IO ()
 connect rdr = withReaderEtc rdr "connect" c_TMR_connect
-
-connectRepeatedly :: Reader -> Int -> IO ()
-connectRepeatedly rdr nAttempts =
-  withReaderEtc rdr "connectRepeatedly" (conRep nAttempts)
-  where
-    conRep n p = do
-      status <- c_TMR_connect p
-      let retry = case toStatus status of
-                    ERROR_TIMEOUT -> True
-                    ERROR_DEVICE_RESET -> True
-                    _ -> False
-      if retry && n > 1
-        then do
-        print $ toStatus status
-        c_TMR_clearConfirmedParams p
-        threadDelay 10000
-        conRep (n - 1) p
-        else
-        return status
 
 -- | Closes the connection to the reader and releases any resources
 -- that have been consumed by the reader structure.
