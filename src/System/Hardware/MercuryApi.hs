@@ -6,6 +6,8 @@ module System.Hardware.MercuryApi
   , MercuryException (..)
   , StatusType (..)
   , Status (..)
+  , TransportListener
+  , TransportListenerId
   , create
   , connect
   , connectRepeatedly
@@ -13,6 +15,8 @@ module System.Hardware.MercuryApi
   , paramList
   , paramName
   , paramID
+  , addTransportListener
+  , removeTransportListener
   ) where
 
 import Control.Applicative
@@ -20,6 +24,7 @@ import Control.Concurrent
 import Control.Exception
 import qualified Data.ByteString as B
 import qualified Data.HashMap.Strict as H
+import Data.IORef
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.Text.Encoding.Error as T
@@ -43,12 +48,12 @@ cFalse, cTrue :: CBool
 cFalse = 0
 cTrue = 1
 
-toBool :: CBool -> Bool
-toBool b = b /= cFalse
+type RawTransportListener =
+  CBool -> Word32 -> Ptr Word8 -> Word32 -> Ptr () -> IO ()
 
-fromBool :: Bool -> CBool
-fromBool False = cFalse
-fromBool True = cTrue
+type TransportListener = Bool -> B.ByteString -> Word32 -> IO ()
+
+newtype TransportListenerId = TransportListenerId Integer
 
 -- Many of these need to be safe because they could call back
 -- into Haskell via the transport listener.
@@ -92,6 +97,22 @@ foreign import ccall safe "glue.h c_TMR_paramList"
                     -> Ptr RawParam
                     -> Ptr Word32
                     -> IO RawStatus
+
+foreign import ccall "wrapper"
+    wrapTransportListener :: RawTransportListener
+                          -> IO (FunPtr RawTransportListener)
+
+-- takes ownership of the FunPtr and the CString
+foreign import ccall unsafe "glue.h c_TMR_addTransportListener"
+    c_TMR_addTransportListener :: Ptr ReaderEtc
+                               -> FunPtr RawTransportListener
+                               -> CString
+                               -> IO RawStatus
+
+foreign import ccall unsafe "glue.h c_TMR_removeTransportListener"
+    c_TMR_removeTransportListener :: Ptr ReaderEtc
+                                  -> CString
+                                  -> IO RawStatus
 
 foreign import ccall unsafe "glue.h c_TMR_strerr"
     c_TMR_strerr :: Ptr ReaderEtc
@@ -162,6 +183,16 @@ checkStatus rdr rstat loc = do
                   , meLocation = loc
                   }
         throwIO exc
+
+uniqueCounter :: IORef Integer
+uniqueCounter = U.unsafePerformIO $ newIORef 0
+
+newUnique :: IO Integer
+newUnique = atomicModifyIORef' uniqueCounter f
+  where f x = (x + 1, x)
+
+castToCStringLen :: Integral a => a -> Ptr Word8 -> CStringLen
+castToCStringLen len ptr = (castPtr ptr, fromIntegral len)
 
 paramPairs :: [(Param, T.Text)]
 paramPairs = map f [minBound..maxBound]
@@ -247,3 +278,23 @@ paramList rdr = do
       actual <- peek nParams
       result <- peekArray (min (fromIntegral actual) (fromIntegral maxParams)) params
       return $ map toParam result
+
+callTransportListener :: TransportListener -> RawTransportListener
+callTransportListener listener tx dataLen dataPtr timeout _ = do
+  bs <- B.packCStringLen (castToCStringLen dataLen dataPtr)
+  listener (toBool tx) bs timeout
+
+addTransportListener :: Reader -> TransportListener -> IO TransportListenerId
+addTransportListener rdr listener = do
+  unique <- newUnique
+  funPtr <- wrapTransportListener (callTransportListener listener)
+  cs <- newCAString (show unique)
+  withReaderEtc rdr "addTransportListener" $
+    \p -> c_TMR_addTransportListener p funPtr cs
+  return (TransportListenerId unique)
+
+removeTransportListener :: Reader -> TransportListenerId -> IO ()
+removeTransportListener rdr (TransportListenerId unique) = do
+  withCAString (show unique) $ \cs -> do
+    withReaderEtc rdr "removeTransportListener" $
+      \p -> c_TMR_removeTransportListener p cs
