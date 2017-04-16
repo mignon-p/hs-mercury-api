@@ -96,6 +96,9 @@ sub emitHeader {
     emit "";
     emit "#include <tm_reader.h>";
     emit "#include <glue.h>";
+    emit "#include <stdbool.h>";
+    emit "";
+    emit "type CBool = #{type bool}";
     emit "";
 }
 

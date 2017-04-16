@@ -39,6 +39,17 @@ newtype TagReadData = TagReadData ()
 type RawStatus = Word32
 type RawType = Word32
 
+cFalse, cTrue :: CBool
+cFalse = 0
+cTrue = 1
+
+toBool :: CBool -> Bool
+toBool b = b /= cFalse
+
+fromBool :: Bool -> CBool
+fromBool False = cFalse
+fromBool True = cTrue
+
 -- Many of these need to be safe because they could call back
 -- into Haskell via the transport listener.
 

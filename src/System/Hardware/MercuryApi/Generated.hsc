@@ -7,6 +7,9 @@ import Foreign.C.Types
 
 #include <tm_reader.h>
 #include <glue.h>
+#include <stdbool.h>
+
+type CBool = #{type bool}
 
 data StatusType =
     SUCCESS_TYPE
