@@ -232,6 +232,8 @@ toStatus #{const TMR_ERROR_LLRP_READER_CONNECTION_LOST} = ERROR_LLRP_READER_CONN
 toStatus #{const ERROR_ALREADY_DESTROYED} = ERROR_ALREADY_DESTROYED
 toStatus x = ERROR_UNKNOWN x
 
+type RawParam = #{type TMR_Param}
+
 data Param =
     PARAM_NONE -- ^ No such parameter - used as a return value from TMR_paramID().
   | PARAM_BAUDRATE -- ^ "/reader/baudRate", uint32_t
@@ -322,7 +324,7 @@ instance Hashable Param where
   hash = fromEnum
   salt `hashWithSalt` p = salt `hashWithSalt` fromEnum p
 
-toParam :: CInt -> Param
+toParam :: RawParam -> Param
 toParam #{const TMR_PARAM_NONE} = PARAM_NONE
 toParam #{const TMR_PARAM_BAUDRATE} = PARAM_BAUDRATE
 toParam #{const TMR_PARAM_PROBEBAUDRATES} = PARAM_PROBEBAUDRATES
@@ -408,7 +410,7 @@ toParam #{const TMR_PARAM_METADATAFLAG} = PARAM_METADATAFLAG
 toParam #{const TMR_PARAM_LICENSED_FEATURES} = PARAM_LICENSED_FEATURES
 toParam _ = PARAM_NONE
 
-fromParam :: Param -> CInt
+fromParam :: Param -> RawParam
 fromParam PARAM_NONE = #{const TMR_PARAM_NONE}
 fromParam PARAM_BAUDRATE = #{const TMR_PARAM_BAUDRATE}
 fromParam PARAM_PROBEBAUDRATES = #{const TMR_PARAM_PROBEBAUDRATES}
@@ -493,10 +495,7 @@ fromParam PARAM_TRIGGER_READ_GPI = #{const TMR_PARAM_TRIGGER_READ_GPI}
 fromParam PARAM_METADATAFLAG = #{const TMR_PARAM_METADATAFLAG}
 fromParam PARAM_LICENSED_FEATURES = #{const TMR_PARAM_LICENSED_FEATURES}
 
-paramMin :: CInt
-paramMin = #{const TMR_PARAM_MIN}
-
-paramMax :: CInt
+paramMax :: RawParam
 paramMax = #{const TMR_PARAM_MAX}
 
 sizeofReaderEtc :: Int

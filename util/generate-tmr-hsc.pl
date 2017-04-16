@@ -172,6 +172,9 @@ sub emitStatus {
 }
 
 sub emitParams {
+    emit "type RawParam = #{type TMR_Param}";
+    emit "";
+
     emit "data Param =";
     emitEnum (\@params, \%params);
     emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
@@ -182,20 +185,16 @@ sub emitParams {
     emit "  salt `hashWithSalt` p = salt `hashWithSalt` fromEnum p";
     emit "";
 
-    emit "toParam :: CInt -> Param";
+    emit "toParam :: RawParam -> Param";
     emitTo ("toParam", "TMR_", \@params);
     emit "toParam _ = PARAM_NONE";
     emit "";
 
-    emit "fromParam :: Param -> CInt";
+    emit "fromParam :: Param -> RawParam";
     emitFrom ("fromParam", "TMR_", \@params);
     emit "";
 
-    emit "paramMin :: CInt";
-    emit "paramMin = #{const TMR_PARAM_MIN}";
-    emit "";
-
-    emit "paramMax :: CInt";
+    emit "paramMax :: RawParam";
     emit "paramMax = #{const TMR_PARAM_MAX}";
     emit "";
 }
