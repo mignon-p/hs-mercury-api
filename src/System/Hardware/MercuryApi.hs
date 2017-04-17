@@ -35,7 +35,6 @@ import qualified System.IO.Unsafe as U
 
 import System.Hardware.MercuryApi.Generated
 
-newtype ReaderEtc = ReaderEtc ()
 newtype Reader = Reader (ForeignPtr ReaderEtc)
 
 newtype TagReadData = TagReadData ()
@@ -120,12 +119,17 @@ foreign import ccall unsafe "tm_reader.h TMR_paramName"
     c_TMR_paramName :: RawParam
                     -> CString
 
+-- | Represents any error that can occur in a MercuryApi call,
+-- except for those which can be represented by 'IOException'.
 data MercuryException =
   MercuryException
-  { meStatusType :: StatusType
-  , meStatus     :: Status
-  , meMessage    :: T.Text
-  , meLocation   :: T.Text
+  { meStatusType :: StatusType -- ^ general category of error
+  , meStatus     :: Status     -- ^ the specific error
+  , meMessage    :: T.Text     -- ^ the error message
+  , meLocation   :: T.Text     -- ^ function where the error occurred
+  , meParam      :: T.Text     -- ^ more information, such as the parameter
+                               -- in 'paramGet' or 'paramSet'
+  , meUri        :: T.Text     -- ^ URI of the reader
   }
   deriving (Eq, Ord, Show, Read, Typeable)
 
@@ -157,8 +161,13 @@ textToBS = T.encodeUtf8
 textFromCString :: CString -> IO T.Text
 textFromCString cs = textFromBS <$> B.packCString cs
 
-checkStatus :: Ptr ReaderEtc -> RawStatus -> T.Text -> IO ()
-checkStatus rdr rstat loc = do
+checkStatus' :: Ptr ReaderEtc
+             -> RawStatus
+             -> T.Text
+             -> T.Text
+             -> IO T.Text
+             -> IO ()
+checkStatus' rdr rstat loc param getUri = do
   let t = toStatusType $ statusGetType rstat
       stat = toStatus rstat
   case t of
@@ -172,13 +181,20 @@ checkStatus rdr rstat loc = do
         else do
         cstr <- c_TMR_strerr rdr rstat
         msg <- textFromCString cstr
+        uri <- getUri
         let exc = MercuryException
                   { meStatusType = t
                   , meStatus = stat
                   , meMessage = msg
                   , meLocation = loc
+                  , meParam = param
+                  , meUri = uri
                   }
         throwIO exc
+
+checkStatus :: Ptr ReaderEtc -> RawStatus -> T.Text -> T.Text -> IO ()
+checkStatus rdr rstat loc param =
+  checkStatus' rdr rstat loc param (textFromCString $ uriPtr rdr)
 
 uniqueCounter :: IORef Integer
 uniqueCounter = U.unsafePerformIO $ newIORef 0
@@ -222,27 +238,31 @@ create deviceUri = do
     fp <- mallocForeignPtrBytes sizeofReaderEtc
     withForeignPtr fp $ \p -> do
       status <- c_TMR_create p cs
-      checkStatus p status "create"
+      checkStatus' p status "create" "" (return deviceUri)
     addForeignPtrFinalizer p_TMR_destroy fp
     return $ Reader fp
 
-withReaderEtc :: Reader -> T.Text -> (Ptr ReaderEtc -> IO RawStatus) -> IO ()
-withReaderEtc (Reader fp) location func = do
+withReaderEtc :: Reader
+              -> T.Text
+              -> T.Text
+              -> (Ptr ReaderEtc -> IO RawStatus)
+              -> IO ()
+withReaderEtc (Reader fp) location param func = do
   withForeignPtr fp $ \p -> do
     status <- func p
-    checkStatus p status location
+    checkStatus p status location param
 
 -- | Establishes the connection to the reader at the URI specified in
 -- the 'create' call.  The existence of a reader at the address is
 -- verified and the reader is brought into a state appropriate for
 -- performing RF operations.
 connect :: Reader -> IO ()
-connect rdr = withReaderEtc rdr "connect" c_TMR_connect
+connect rdr = withReaderEtc rdr "connect" "" c_TMR_connect
 
 -- | Closes the connection to the reader and releases any resources
 -- that have been consumed by the reader structure.
 destroy :: Reader -> IO ()
-destroy rdr = withReaderEtc rdr "destroy" c_TMR_destroy
+destroy rdr = withReaderEtc rdr "destroy" "" c_TMR_destroy
 
 -- | Get a list of parameters supported by the reader.
 paramList :: Reader -> IO [Param]
@@ -251,7 +271,7 @@ paramList rdr = do
   alloca $ \nParams -> do
     poke nParams (fromIntegral maxParams)
     allocaArray (fromIntegral maxParams) $ \params -> do
-      withReaderEtc rdr "paramList" $ \p -> c_TMR_paramList p params nParams
+      withReaderEtc rdr "paramList" "" $ \p -> c_TMR_paramList p params nParams
       actual <- peek nParams
       result <- peekArray (min (fromIntegral actual) (fromIntegral maxParams)) params
       return $ map toParam result
@@ -266,12 +286,12 @@ addTransportListener rdr listener = do
   unique <- newUnique
   funPtr <- wrapTransportListener (callTransportListener listener)
   cs <- newCAString (show unique)
-  withReaderEtc rdr "addTransportListener" $
+  withReaderEtc rdr "addTransportListener" "" $
     \p -> c_TMR_addTransportListener p funPtr cs
   return (TransportListenerId unique)
 
 removeTransportListener :: Reader -> TransportListenerId -> IO ()
 removeTransportListener rdr (TransportListenerId unique) = do
   withCAString (show unique) $ \cs -> do
-    withReaderEtc rdr "removeTransportListener" $
+    withReaderEtc rdr "removeTransportListener" "" $
       \p -> c_TMR_removeTransportListener p cs

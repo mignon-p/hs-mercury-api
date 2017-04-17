@@ -3,13 +3,21 @@ module System.Hardware.MercuryApi.Generated where
 
 import Data.Hashable
 import Data.Word
-import Foreign.C.Types
+import Foreign
+import Foreign.C
 
 #include <tm_reader.h>
 #include <glue.h>
 #include <stdbool.h>
 
 type CBool = #{type bool}
+newtype ReaderEtc = ReaderEtc ()
+
+sizeofReaderEtc :: Int
+sizeofReaderEtc = #{size ReaderEtc}
+
+uriPtr :: Ptr ReaderEtc -> CString
+uriPtr = #{ptr ReaderEtc, reader.uri}
 
 data StatusType =
     SUCCESS_TYPE
@@ -501,5 +509,3 @@ fromParam PARAM_LICENSED_FEATURES = #{const TMR_PARAM_LICENSED_FEATURES}
 paramMax :: RawParam
 paramMax = #{const TMR_PARAM_MAX}
 
-sizeofReaderEtc :: Int
-sizeofReaderEtc = #{size ReaderEtc}

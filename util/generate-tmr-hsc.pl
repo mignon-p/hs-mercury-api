@@ -92,13 +92,21 @@ sub emitHeader {
     emit "";
     emit "import Data.Hashable";
     emit "import Data.Word";
-    emit "import Foreign.C.Types";
+    emit "import Foreign";
+    emit "import Foreign.C";
     emit "";
     emit "#include <tm_reader.h>";
     emit "#include <glue.h>";
     emit "#include <stdbool.h>";
     emit "";
     emit "type CBool = #{type bool}";
+    emit "newtype ReaderEtc = ReaderEtc ()";
+    emit "";
+    emit "sizeofReaderEtc :: Int";
+    emit "sizeofReaderEtc = #{size ReaderEtc}";
+    emit "";
+    emit "uriPtr :: Ptr ReaderEtc -> CString";
+    emit "uriPtr = #{ptr ReaderEtc, reader.uri}";
     emit "";
 }
 
@@ -202,11 +210,6 @@ sub emitParams {
     emit "";
 }
 
-sub emitSizeOf {
-    emit "sizeofReaderEtc :: Int";
-    emit "sizeofReaderEtc = #{size ReaderEtc}";
-}
-
 readStatus();
 readParams();
 readGlue();
@@ -214,6 +217,5 @@ readGlue();
 emitHeader();
 emitStatus();
 emitParams();
-emitSizeOf();
 
 dumpOutput();
