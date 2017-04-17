@@ -281,7 +281,13 @@ callTransportListener listener tx dataLen dataPtr timeout _ = do
   bs <- B.packCStringLen (castToCStringLen dataLen dataPtr)
   listener (toBool tx) bs timeout
 
-addTransportListener :: Reader -> TransportListener -> IO TransportListenerId
+-- | Add a listener to the list of functions that will be called for
+-- each message sent to or recieved from the reader.
+addTransportListener :: Reader                 -- ^ The reader to operate on.
+                     -> TransportListener      -- ^ The listener to call.
+                     -> IO TransportListenerId -- ^ A unique identifier which
+                                               -- can be used to remove the
+                                               -- listener later.
 addTransportListener rdr listener = do
   unique <- newUnique
   funPtr <- wrapTransportListener (callTransportListener listener)
@@ -290,7 +296,12 @@ addTransportListener rdr listener = do
     \p -> c_TMR_addTransportListener p funPtr cs
   return (TransportListenerId unique)
 
-removeTransportListener :: Reader -> TransportListenerId -> IO ()
+-- | Remove a listener from the list of functions that will be called
+-- for each message sent to or recieved from the reader.
+removeTransportListener :: Reader              -- ^ The reader to operate on.
+                        -> TransportListenerId -- ^ The return value of a call
+                                               -- to 'addTransportListener'.
+                        -> IO ()
 removeTransportListener rdr (TransportListenerId unique) = do
   withCAString (show unique) $ \cs -> do
     withReaderEtc rdr "removeTransportListener" "" $
