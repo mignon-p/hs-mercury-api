@@ -5,6 +5,7 @@ import Control.Exception
 import Control.Monad
 import qualified Data.ByteString as B
 import qualified Data.Text as T
+import Data.Word
 import qualified System.Hardware.MercuryApi as TMR
 import Text.Printf
 
@@ -24,6 +25,9 @@ main = do
   rdr <- TMR.create "tmr:///dev/ttyUSB0"
   putStrLn "addTransportListener"
   TMR.addTransportListener rdr listener
+  putStrLn "paramGet"
+  timeout <- TMR.paramGet rdr TMR.PARAM_TRANSPORTTIMEOUT :: IO Word32
+  print timeout
   putStrLn "connect"
   TMR.connect rdr
   putStrLn "paramList"

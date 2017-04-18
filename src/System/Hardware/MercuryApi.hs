@@ -11,6 +11,8 @@ module System.Hardware.MercuryApi
   , create
   , connect
   , destroy
+  , paramSet
+  , paramGet
   , paramList
   , paramName
   , paramID
