@@ -23,6 +23,15 @@ my @lines = ();
 
 my $nyi = "(Not yet implemented)";
 
+# Additional statuses of type ERROR_TYPE_BINDING.  These statuses are thrown
+# only from Haskell code, not C code, so they don't have a numeric code.
+my %haskellCodes = (
+    "ERROR_UNIMPLEMENTED_PARAM" =>
+    "The given parameter is not yet implemented in the Haskell binding.",
+    "ERROR_INVALID_PARAM_TYPE" =>
+    "The parameter value was not of the type expected."
+    );
+
 my %toHaskellType = (
     "int8_t"   => "Int8",
     "int16_t"  => "Int16",
@@ -204,6 +213,7 @@ sub emitStatus {
     emit "data Status =";
     emitEnum (\@errorCodes, \%errorCodes);
     emitEnumCont (\@glueCodes, \%glueCodes);
+    emitEnumCont ([sort keys %haskellCodes], \%haskellCodes);
     emit "  | ERROR_UNKNOWN Word32 -- ^ C API returned an unrecognized status code";
     emit "  deriving (Eq, Ord, Show, Read)";
     emit "";
@@ -267,6 +277,23 @@ sub emitParamTypes {
         }
     }
     emit "paramTypeDisplay _ = \"$nyi\"";
+    emit "";
+
+    emit "class ParamValue a where";
+    emit "  pType :: a -> ParamType";
+    emit "  pGet :: (Ptr () -> IO ()) -> IO a";
+    emit "  pSet :: a -> (Ptr () -> IO ()) -> IO ()";
+    emit "";
+
+    foreach my $paramType (sort values %toHaskellType) {
+        if ($paramType =~ /^\w+$/) {
+            emit "instance ParamValue $paramType where";
+            emit "  pType _ = ParamType$paramType";
+            emit '  pGet f = alloca $ \p -> f (castPtr p) >> peek p';
+            emit '  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)';
+            emit "";
+        }
+    }
 }
 
 readStatus();

@@ -21,9 +21,11 @@ module System.Hardware.MercuryApi
 import Control.Applicative
 import Control.Concurrent
 import Control.Exception
+import Control.Monad
 import qualified Data.ByteString as B
 import qualified Data.HashMap.Strict as H
 import Data.IORef
+import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.Text.Encoding.Error as T
@@ -86,6 +88,18 @@ foreign import ccall safe "glue.h c_TMR_getNextTag"
     c_TMR_getNextTag :: Ptr ReaderEtc
                      -> Ptr TagReadData
                      -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_paramSet"
+    c_TMR_paramSet :: Ptr ReaderEtc
+                   -> RawParam
+                   -> Ptr ()
+                   -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_paramGet"
+    c_TMR_paramGet :: Ptr ReaderEtc
+                   -> RawParam
+                   -> Ptr ()
+                   -> IO RawStatus
 
 foreign import ccall safe "glue.h c_TMR_paramList"
     c_TMR_paramList :: Ptr ReaderEtc
@@ -263,6 +277,61 @@ connect rdr = withReaderEtc rdr "connect" "" c_TMR_connect
 -- that have been consumed by the reader structure.
 destroy :: Reader -> IO ()
 destroy rdr = withReaderEtc rdr "destroy" "" c_TMR_destroy
+
+throwBinding :: Reader -> (Status, T.Text) -> T.Text -> T.Text -> IO ()
+throwBinding (Reader fp) (status, msg) loc param = do
+  uri <- withForeignPtr fp (textFromCString . uriPtr)
+  throwIO $ MercuryException
+    { meStatusType = ERROR_TYPE_BINDING
+    , meStatus = status
+    , meMessage = msg
+    , meLocation = loc
+    , meParam = param
+    , meUri = uri
+    }
+
+unimplementedParam :: (Status, T.Text)
+unimplementedParam =
+  ( ERROR_UNIMPLEMENTED_PARAM
+  , "The given parameter is not yet implemented in the Haskell binding."
+  )
+
+invalidParam :: ParamType -> ParamType -> (Status, T.Text)
+invalidParam expected actual =
+  ( ERROR_INVALID_PARAM_TYPE
+  , "Expected " <> paramTypeDisplay expected <>
+    " but got " <> paramTypeDisplay actual
+  )
+
+paramSet :: ParamValue a => Reader -> Param -> a -> IO ()
+paramSet rdr param value = do
+  let pt = paramType param
+      pt' = pType value
+      rp = fromParam param
+      pName = T.pack $ show param
+  when (pt == ParamTypeUnimplemented) $
+    throwBinding rdr unimplementedParam "paramSet" pName
+  when (pt /= pt') $
+    throwBinding rdr (invalidParam pt pt') "paramSet" pName
+  pSet value $ \pp -> withReaderEtc rdr "paramSet" pName $
+                      \p -> c_TMR_paramSet p rp pp
+
+withReturnType :: (a -> IO a) -> IO a
+withReturnType f = f undefined
+
+paramGet :: ParamValue a => Reader -> Param -> IO a
+paramGet rdr param = withReturnType $ \returnType -> do
+  let pt = paramType param
+      pt' = pType returnType
+      rp = fromParam param
+      pName = T.pack $ show param
+  when (pt == ParamTypeUnimplemented) $
+    throwBinding rdr unimplementedParam "paramGet" pName
+  when (pt /= pt') $
+    throwBinding rdr (invalidParam pt pt') "paramGet" pName
+  value <- pGet $ \pp -> withReaderEtc rdr "paramGet" pName $
+                         \p -> c_TMR_paramGet p rp pp
+  return value
 
 -- | Get a list of parameters supported by the reader.
 paramList :: Reader -> IO [Param]

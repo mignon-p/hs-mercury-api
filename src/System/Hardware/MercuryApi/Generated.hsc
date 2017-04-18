@@ -140,6 +140,8 @@ data Status =
   | ERROR_LLRP_READER_ERROR
   | ERROR_LLRP_READER_CONNECTION_LOST
   | ERROR_ALREADY_DESTROYED -- ^ Attempt to use reader after it was destroyed.
+  | ERROR_INVALID_PARAM_TYPE -- ^ The parameter value was not of the type expected.
+  | ERROR_UNIMPLEMENTED_PARAM -- ^ The given parameter is not yet implemented in the Haskell binding.
   | ERROR_UNKNOWN Word32 -- ^ C API returned an unrecognized status code
   deriving (Eq, Ord, Show, Read)
 
@@ -550,3 +552,39 @@ paramTypeDisplay ParamTypeWord16 = "Word16"
 paramTypeDisplay ParamTypeWord32 = "Word32"
 paramTypeDisplay ParamTypeWord8 = "Word8"
 paramTypeDisplay _ = "(Not yet implemented)"
+
+class ParamValue a where
+  pType :: a -> ParamType
+  pGet :: (Ptr () -> IO ()) -> IO a
+  pSet :: a -> (Ptr () -> IO ()) -> IO ()
+
+instance ParamValue Int16 where
+  pType _ = ParamTypeInt16
+  pGet f = alloca $ \p -> f (castPtr p) >> peek p
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+
+instance ParamValue Int32 where
+  pType _ = ParamTypeInt32
+  pGet f = alloca $ \p -> f (castPtr p) >> peek p
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+
+instance ParamValue Int8 where
+  pType _ = ParamTypeInt8
+  pGet f = alloca $ \p -> f (castPtr p) >> peek p
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+
+instance ParamValue Word16 where
+  pType _ = ParamTypeWord16
+  pGet f = alloca $ \p -> f (castPtr p) >> peek p
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+
+instance ParamValue Word32 where
+  pType _ = ParamTypeWord32
+  pGet f = alloca $ \p -> f (castPtr p) >> peek p
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+
+instance ParamValue Word8 where
+  pType _ = ParamTypeWord8
+  pGet f = alloca $ \p -> f (castPtr p) >> peek p
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+

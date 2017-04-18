@@ -93,6 +93,24 @@ TMR_Status c_TMR_executeTagOp (ReaderEtc *reader,
         return TMR_executeTagOp (&reader->reader, tagop, filter, data);
 }
 
+TMR_Status c_TMR_paramSet(ReaderEtc *reader,
+                          TMR_Param key,
+                          const void *value)
+{
+    if (reader->destroyed)
+        return ERROR_ALREADY_DESTROYED;
+    else
+        return TMR_paramSet (&reader->reader, key, value);
+}
+
+TMR_Status c_TMR_paramGet(ReaderEtc *reader, TMR_Param key, void *value)
+{
+    if (reader->destroyed)
+        return ERROR_ALREADY_DESTROYED;
+    else
+        return TMR_paramGet (&reader->reader, key, value);
+}
+
 TMR_Status c_TMR_paramList (ReaderEtc *reader, TMR_Param *keys, uint32_t *len)
 {
     if (reader->destroyed)

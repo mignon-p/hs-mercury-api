@@ -37,6 +37,10 @@ TMR_Status c_TMR_executeTagOp (ReaderEtc *reader,
                                TMR_TagOp *tagop,
                                TMR_TagFilter *filter,
                                TMR_uint8List *data);
+TMR_Status c_TMR_paramSet(ReaderEtc *reader,
+                          TMR_Param key,
+                          const void *value);
+TMR_Status c_TMR_paramGet(ReaderEtc *reader, TMR_Param key, void *value);
 TMR_Status c_TMR_paramList (ReaderEtc *reader, TMR_Param *keys, uint32_t *len);
 TMR_Status c_TMR_addTransportListener (ReaderEtc *reader,
                                        TMR_TransportListener func,
