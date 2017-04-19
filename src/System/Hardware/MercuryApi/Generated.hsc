@@ -4,7 +4,12 @@ module System.Hardware.MercuryApi.Generated where
 
 import Control.Applicative
 import Data.Hashable
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as B
 import Data.Text (Text)
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
+import qualified Data.Text.Encoding.Error as T
 import Data.Word
 import Foreign
 import Foreign.C
@@ -21,6 +26,19 @@ sizeofReaderEtc = #{size ReaderEtc}
 
 uriPtr :: Ptr ReaderEtc -> CString
 uriPtr = #{ptr ReaderEtc, reader.uri}
+
+-- I'm not sure what encoding MercuryApi uses for its strings.
+-- I'm guessing UTF-8 for now, but the encoding is encapsulated in
+-- these two functions (textFromBS and textToBS) so it can be
+-- easily changed.
+textFromBS :: ByteString -> Text
+textFromBS = T.decodeUtf8With T.lenientDecode
+
+textToBS :: Text -> ByteString
+textToBS = T.encodeUtf8
+
+textFromCString :: CString -> IO Text
+textFromCString cs = textFromBS <$> B.packCString cs
 
 data List16 =
   List16
@@ -645,8 +663,29 @@ instance ParamValue Int8 where
 
 instance ParamValue Text where
   pType _ = ParamTypeText
-  pGet f = undefined
-  pSet x f = undefined
+
+  pGet f = do
+    let maxLen = maxBound :: Word16
+    allocaBytes (fromIntegral maxLen) $ \storage -> do
+      let lst = List16
+                { l16_list = castPtr storage
+                , l16_max = maxLen
+                , l16_len = 0 -- unused for TMR_String
+                }
+      with lst $ \p -> do
+        f (castPtr p)
+        textFromCString storage
+
+  pSet x f = do
+    let bs = textToBS x
+    B.useAsCString bs $ \cs -> do
+      let lst = List16
+                { l16_list = castPtr cs
+                , l16_max = 1 + fromIntegral (B.length bs)
+                , l16_len = 0 -- unused for TMR_String
+                }
+      with lst $ \p -> f (castPtr p)
+
 
 instance ParamValue Word16 where
   pType _ = ParamTypeWord16

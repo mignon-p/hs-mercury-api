@@ -164,19 +164,6 @@ statusIsErrno _ _ = False
 statusGetErrno :: RawStatus -> Errno
 statusGetErrno rstat = Errno $ fromIntegral $ rstat .&. (bit errnoBit - 1)
 
--- I'm not sure what encoding MercuryApi uses for its strings.
--- I'm guessing UTF-8 for now, but the encoding is encapsulated in
--- these two functions (textFromBS and textToBS) so it can be
--- easily changed.
-textFromBS :: B.ByteString -> T.Text
-textFromBS = T.decodeUtf8With T.lenientDecode
-
-textToBS :: T.Text -> B.ByteString
-textToBS = T.encodeUtf8
-
-textFromCString :: CString -> IO T.Text
-textFromCString cs = textFromBS <$> B.packCString cs
-
 checkStatus' :: Ptr ReaderEtc
              -> RawStatus
              -> T.Text

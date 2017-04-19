@@ -135,7 +135,12 @@ sub emitHeader {
     emit "";
     emit "import Control.Applicative";
     emit "import Data.Hashable";
+    emit "import Data.ByteString (ByteString)";
+    emit "import qualified Data.ByteString as B";
     emit "import Data.Text (Text)";
+    emit "import qualified Data.Text as T";
+    emit "import qualified Data.Text.Encoding as T";
+    emit "import qualified Data.Text.Encoding.Error as T";
     emit "import Data.Word";
     emit "import Foreign";
     emit "import Foreign.C";
@@ -153,6 +158,19 @@ sub emitHeader {
     emit "uriPtr :: Ptr ReaderEtc -> CString";
     emit "uriPtr = #{ptr ReaderEtc, reader.uri}";
     emit "";
+    emit "-- I'm not sure what encoding MercuryApi uses for its strings.";
+    emit "-- I'm guessing UTF-8 for now, but the encoding is encapsulated in";
+    emit '-- these two functions (textFromBS and textToBS) so it can be';
+    emit '-- easily changed.';
+    emit 'textFromBS :: ByteString -> Text';
+    emit 'textFromBS = T.decodeUtf8With T.lenientDecode';
+    emit '';
+    emit 'textToBS :: Text -> ByteString';
+    emit 'textToBS = T.encodeUtf8';
+    emit '';
+    emit 'textFromCString :: CString -> IO Text';
+    emit 'textFromCString cs = textFromBS <$> B.packCString cs';
+    emit '';
 }
 
 sub dumpOutput {
@@ -344,8 +362,29 @@ sub emitParamTypes {
             emit '  pGet f = alloca $ \p -> f (castPtr (p :: Ptr CBool)) >> toBool <$> peek p';
             emit '  pSet x f = alloca $ \p -> poke p (fromBool x :: CBool) >> f (castPtr p)';
         } elsif ($paramType eq "Text") {
-            emit '  pGet f = undefined';
-            emit '  pSet x f = undefined';
+            emit '';
+            emit '  pGet f = do';
+            emit '    let maxLen = maxBound :: Word16';
+            emit '    allocaBytes (fromIntegral maxLen) $ \storage -> do';
+            emit '      let lst = List16';
+            emit '                { l16_list = castPtr storage';
+            emit '                , l16_max = maxLen';
+            emit '                , l16_len = 0 -- unused for TMR_String';
+            emit '                }';
+            emit '      with lst $ \p -> do';
+            emit '        f (castPtr p)';
+            emit '        textFromCString storage';
+            emit '';
+            emit '  pSet x f = do';
+            emit '    let bs = textToBS x';
+            emit '    B.useAsCString bs $ \cs -> do';
+            emit '      let lst = List16';
+            emit '                { l16_list = castPtr cs';
+            emit '                , l16_max = 1 + fromIntegral (B.length bs)';
+            emit '                , l16_len = 0 -- unused for TMR_String';
+            emit '                }';
+            emit '      with lst $ \p -> f (castPtr p)';
+            emit '';
         }
     }
     emit "";
