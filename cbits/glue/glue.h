@@ -27,6 +27,38 @@ typedef struct ReaderEtc {
     bool destroyed;
 } ReaderEtc;
 
+/* Has the same storage layout as the various TMR_*List structs
+ * which use a 16-bit length, such as:
+ * TMR_uint8List
+ * TMR_uint16List
+ * TMR_uint32List
+ * TMR_StatsPerAntennaValuesList
+ * Can also be used for TMR_String, if you ignore len.
+ */
+typedef struct List16 {
+    /** The array of values */
+    void *list;
+    /** The number of entries there is space for in the array */
+    uint16_t max;
+    /** The number of entries in the list - may be larger than max, indicating truncated data. */
+    uint16_t len;
+} List16;
+
+/* Has the same storage layout as the various TMR_*List structs
+ * which use an 8-bit length, such as:
+ * TMR_int8List
+ * TMR_RegionList
+ * TMR_TagProtocolList
+ */
+typedef struct List8 {
+    /** The array of values */
+    void *list;
+    /** The number of entries there is space for in the array */
+    uint8_t max;
+    /** The number of entries in the list - may be larger than max, indicating truncated data. */
+    uint8_t len;
+} List8;
+
 TMR_Status c_TMR_create (ReaderEtc *reader, const char *deviceUri);
 TMR_Status c_TMR_connect (ReaderEtc *reader);
 TMR_Status c_TMR_destroy (ReaderEtc *reader);

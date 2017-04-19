@@ -22,6 +22,44 @@ sizeofReaderEtc = #{size ReaderEtc}
 uriPtr :: Ptr ReaderEtc -> CString
 uriPtr = #{ptr ReaderEtc, reader.uri}
 
+data List16 =
+  List16
+  { l16_list :: Ptr ()
+  , l16_max :: Word16
+  , l16_len :: Word16
+  }
+
+instance Storable List16 where
+  sizeOf _ = #{size List16}
+  alignment _ = 8
+  peek p = List16
+           <$> #{peek List16, list} p
+           <*> #{peek List16, max} p
+           <*> #{peek List16, len} p
+  poke p x = do
+    #{poke List16, list} p (l16_list x)
+    #{poke List16, max} p (l16_max x)
+    #{poke List16, len} p (l16_len x)
+
+data List8 =
+  List8
+  { l8_list :: Ptr ()
+  , l8_max :: Word8
+  , l8_len :: Word8
+  }
+
+instance Storable List8 where
+  sizeOf _ = #{size List8}
+  alignment _ = 8
+  peek p = List8
+           <$> #{peek List8, list} p
+           <*> #{peek List8, max} p
+           <*> #{peek List8, len} p
+  poke p x = do
+    #{poke List8, list} p (l8_list x)
+    #{poke List8, max} p (l8_max x)
+    #{poke List8, len} p (l8_len x)
+
 data StatusType =
     SUCCESS_TYPE
   | ERROR_TYPE_COMM

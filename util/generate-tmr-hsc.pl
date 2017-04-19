@@ -256,6 +256,50 @@ sub emitParams {
     emit "";
 }
 
+sub emitStruct {
+    my ($name, $prefix, $fields, $types) = @_;
+
+    emit "data $name =";
+    emit "  $name";
+    my $sep = "{";
+    foreach my $field (@$fields) {
+        my $type = $types->{$field};
+        emit "  $sep ${prefix}_$field :: $type";
+        $sep = ",";
+    }
+    emit "  }";
+    emit "";
+
+    emit "instance Storable $name where";
+    emit "  sizeOf _ = #{size $name}";
+    emit "  alignment _ = 8"; # because "#alignment" doesn't work for me
+    emit "  peek p = $name";
+    $sep = '<$>';
+    foreach my $field (@$fields) {
+        emit "           $sep #{peek $name, $field} p";
+        $sep = '<*>';
+    }
+    emit "  poke p x = do";
+    foreach my $field (@$fields) {
+        emit "    #{poke $name, $field} p (${prefix}_$field x)";
+    }
+    emit "";
+}
+
+sub emitListStruct {
+    my ($size) = @_;
+
+    my $word = "Word$size";
+    my @fields = ("list", "max", "len");
+    my %fields = ("list" => "Ptr ()", "max" => $word, "len" => $word );
+    emitStruct ("List$size", "l$size", \@fields, \%fields);
+}
+
+sub emitStructs {
+    emitListStruct ("16");
+    emitListStruct ("8");
+}
+
 sub emitParamTypes {
     emit "data ParamType =";
     emitEnum ([map ("ParamType$_", sort values %toHaskellType)], {});
@@ -312,6 +356,7 @@ readParams();
 readGlue();
 
 emitHeader();
+emitStructs();
 emitStatus();
 emitParams();
 emitParamTypes();
