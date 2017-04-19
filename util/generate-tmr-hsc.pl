@@ -19,6 +19,9 @@ my @params = ();
 my %params = ();
 my %paramType = ();
 
+my @regions = ();
+my %regions = ();
+
 my @lines = ();
 
 my $nyi = "(Not yet implemented)";
@@ -118,6 +121,17 @@ sub readGlue {
             $comment = "";
         } else {
             $comment = "";
+        }
+    }
+    close F;
+}
+
+sub readRegion {
+    open F, "$apiDir/tmr_region.h" or die;
+    while (<F>) {
+        if (m%^\s*/\*\*\s*(.*?)\s*\*+/\s*TMR_(REGION_\w+)%) {
+            push @regions, $2;
+            $regions{$2} = $1;
         }
     }
     close F;
@@ -390,14 +404,35 @@ sub emitParamTypes {
     emit "";
 }
 
+sub emitRegion {
+    emit "type RawRegion = #{type TMR_Region}";
+    emit "";
+
+    emit "data Region =";
+    emitEnum (\@regions, \%regions);
+    emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
+    emit "";
+
+    emit "toRegion :: RawRegion -> Region";
+    emitTo ("toRegion", "TMR_", \@regions);
+    emit "toRegion _ = REGION_NONE";
+    emit "";
+
+    emit "fromRegion :: Region -> RawRegion";
+    emitFrom ("fromRegion", "TMR_", \@regions);
+    emit "";
+}
+
 readStatus();
 readParams();
 readGlue();
+readRegion();
 
 emitHeader();
 emitStructs();
 emitStatus();
 emitParams();
 emitParamTypes();
+emitRegion();
 
 dumpOutput();
