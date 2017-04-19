@@ -304,6 +304,67 @@ toStatus #{const TMR_ERROR_LLRP_READER_CONNECTION_LOST} = ERROR_LLRP_READER_CONN
 toStatus #{const ERROR_ALREADY_DESTROYED} = ERROR_ALREADY_DESTROYED
 toStatus x = ERROR_UNKNOWN x
 
+type RawRegion = #{type TMR_Region}
+
+data Region =
+    REGION_NONE -- ^ Unspecified region
+  | REGION_NA -- ^ North America
+  | REGION_EU -- ^ European Union
+  | REGION_KR -- ^ Korea
+  | REGION_IN -- ^ India
+  | REGION_JP -- ^ Japan
+  | REGION_PRC -- ^ People's Republic of China
+  | REGION_EU2 -- ^ European Union 2
+  | REGION_EU3 -- ^ European Union 3
+  | REGION_KR2 -- ^ Korea 2
+  | REGION_PRC2 -- ^ People's Republic of China(840MHZ)
+  | REGION_AU -- ^ Australia
+  | REGION_NZ -- ^ New Zealand !!EXPERIMENTAL!!
+  | REGION_NA2 -- ^ Reduced FCC region
+  | REGION_NA3 -- ^ 5MHZ FCC band
+  | REGION_IS -- ^ Israel
+  | REGION_OPEN -- ^ Open
+  deriving (Eq, Ord, Show, Read, Bounded, Enum)
+
+toRegion :: RawRegion -> Region
+toRegion #{const TMR_REGION_NONE} = REGION_NONE
+toRegion #{const TMR_REGION_NA} = REGION_NA
+toRegion #{const TMR_REGION_EU} = REGION_EU
+toRegion #{const TMR_REGION_KR} = REGION_KR
+toRegion #{const TMR_REGION_IN} = REGION_IN
+toRegion #{const TMR_REGION_JP} = REGION_JP
+toRegion #{const TMR_REGION_PRC} = REGION_PRC
+toRegion #{const TMR_REGION_EU2} = REGION_EU2
+toRegion #{const TMR_REGION_EU3} = REGION_EU3
+toRegion #{const TMR_REGION_KR2} = REGION_KR2
+toRegion #{const TMR_REGION_PRC2} = REGION_PRC2
+toRegion #{const TMR_REGION_AU} = REGION_AU
+toRegion #{const TMR_REGION_NZ} = REGION_NZ
+toRegion #{const TMR_REGION_NA2} = REGION_NA2
+toRegion #{const TMR_REGION_NA3} = REGION_NA3
+toRegion #{const TMR_REGION_IS} = REGION_IS
+toRegion #{const TMR_REGION_OPEN} = REGION_OPEN
+toRegion _ = REGION_NONE
+
+fromRegion :: Region -> RawRegion
+fromRegion REGION_NONE = #{const TMR_REGION_NONE}
+fromRegion REGION_NA = #{const TMR_REGION_NA}
+fromRegion REGION_EU = #{const TMR_REGION_EU}
+fromRegion REGION_KR = #{const TMR_REGION_KR}
+fromRegion REGION_IN = #{const TMR_REGION_IN}
+fromRegion REGION_JP = #{const TMR_REGION_JP}
+fromRegion REGION_PRC = #{const TMR_REGION_PRC}
+fromRegion REGION_EU2 = #{const TMR_REGION_EU2}
+fromRegion REGION_EU3 = #{const TMR_REGION_EU3}
+fromRegion REGION_KR2 = #{const TMR_REGION_KR2}
+fromRegion REGION_PRC2 = #{const TMR_REGION_PRC2}
+fromRegion REGION_AU = #{const TMR_REGION_AU}
+fromRegion REGION_NZ = #{const TMR_REGION_NZ}
+fromRegion REGION_NA2 = #{const TMR_REGION_NA2}
+fromRegion REGION_NA3 = #{const TMR_REGION_NA3}
+fromRegion REGION_IS = #{const TMR_REGION_IS}
+fromRegion REGION_OPEN = #{const TMR_REGION_OPEN}
+
 type RawParam = #{type TMR_Param}
 
 data Param =
@@ -360,7 +421,7 @@ data Param =
   | PARAM_VERSION_SUPPORTEDPROTOCOLS -- ^ "/reader/version/supportedProtocols", (Not yet implemented)
   | PARAM_REGION_HOPTABLE -- ^ "/reader/region/hopTable", (Not yet implemented)
   | PARAM_REGION_HOPTIME -- ^ "/reader/region/hopTime", Word32
-  | PARAM_REGION_ID -- ^ "/reader/region/id", (Not yet implemented)
+  | PARAM_REGION_ID -- ^ "/reader/region/id", Region
   | PARAM_REGION_SUPPORTEDREGIONS -- ^ "/reader/region/supportedRegions", (Not yet implemented)
   | PARAM_REGION_LBT_ENABLE -- ^ "/reader/region/lbt/enable", Bool
   | PARAM_LICENSE_KEY -- ^ "/reader/licenseKey", (Not yet implemented)
@@ -575,6 +636,7 @@ data ParamType =
   | ParamTypeInt16
   | ParamTypeInt32
   | ParamTypeInt8
+  | ParamTypeRegion
   | ParamTypeText
   | ParamTypeWord16
   | ParamTypeWord32
@@ -604,6 +666,7 @@ paramType PARAM_VERSION_SERIAL = ParamTypeText
 paramType PARAM_VERSION_MODEL = ParamTypeText
 paramType PARAM_VERSION_SOFTWARE = ParamTypeText
 paramType PARAM_REGION_HOPTIME = ParamTypeWord32
+paramType PARAM_REGION_ID = ParamTypeRegion
 paramType PARAM_REGION_LBT_ENABLE = ParamTypeBool
 paramType PARAM_RADIO_ENABLESJC = ParamTypeBool
 paramType PARAM_EXTENDEDEPC = ParamTypeBool
@@ -630,6 +693,7 @@ paramTypeDisplay ParamTypeBool = "Bool"
 paramTypeDisplay ParamTypeInt16 = "Int16"
 paramTypeDisplay ParamTypeInt32 = "Int32"
 paramTypeDisplay ParamTypeInt8 = "Int8"
+paramTypeDisplay ParamTypeRegion = "Region"
 paramTypeDisplay ParamTypeText = "Text"
 paramTypeDisplay ParamTypeWord16 = "Word16"
 paramTypeDisplay ParamTypeWord32 = "Word32"
@@ -660,6 +724,11 @@ instance ParamValue Int8 where
   pType _ = ParamTypeInt8
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
   pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+
+instance ParamValue Region where
+  pType _ = ParamTypeRegion
+  pGet f = alloca $ \p -> f (castPtr p) >> toRegion <$> peek p
+  pSet x f = alloca $ \p -> poke p (fromRegion x) >> f (castPtr p)
 
 instance ParamValue Text where
   pType _ = ParamTypeText
@@ -701,65 +770,4 @@ instance ParamValue Word8 where
   pType _ = ParamTypeWord8
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
   pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
-
-type RawRegion = #{type TMR_Region}
-
-data Region =
-    REGION_NONE -- ^ Unspecified region
-  | REGION_NA -- ^ North America
-  | REGION_EU -- ^ European Union
-  | REGION_KR -- ^ Korea
-  | REGION_IN -- ^ India
-  | REGION_JP -- ^ Japan
-  | REGION_PRC -- ^ People's Republic of China
-  | REGION_EU2 -- ^ European Union 2
-  | REGION_EU3 -- ^ European Union 3
-  | REGION_KR2 -- ^ Korea 2
-  | REGION_PRC2 -- ^ People's Republic of China(840MHZ)
-  | REGION_AU -- ^ Australia
-  | REGION_NZ -- ^ New Zealand !!EXPERIMENTAL!!
-  | REGION_NA2 -- ^ Reduced FCC region
-  | REGION_NA3 -- ^ 5MHZ FCC band
-  | REGION_IS -- ^ Israel
-  | REGION_OPEN -- ^ Open
-  deriving (Eq, Ord, Show, Read, Bounded, Enum)
-
-toRegion :: RawRegion -> Region
-toRegion #{const TMR_REGION_NONE} = REGION_NONE
-toRegion #{const TMR_REGION_NA} = REGION_NA
-toRegion #{const TMR_REGION_EU} = REGION_EU
-toRegion #{const TMR_REGION_KR} = REGION_KR
-toRegion #{const TMR_REGION_IN} = REGION_IN
-toRegion #{const TMR_REGION_JP} = REGION_JP
-toRegion #{const TMR_REGION_PRC} = REGION_PRC
-toRegion #{const TMR_REGION_EU2} = REGION_EU2
-toRegion #{const TMR_REGION_EU3} = REGION_EU3
-toRegion #{const TMR_REGION_KR2} = REGION_KR2
-toRegion #{const TMR_REGION_PRC2} = REGION_PRC2
-toRegion #{const TMR_REGION_AU} = REGION_AU
-toRegion #{const TMR_REGION_NZ} = REGION_NZ
-toRegion #{const TMR_REGION_NA2} = REGION_NA2
-toRegion #{const TMR_REGION_NA3} = REGION_NA3
-toRegion #{const TMR_REGION_IS} = REGION_IS
-toRegion #{const TMR_REGION_OPEN} = REGION_OPEN
-toRegion _ = REGION_NONE
-
-fromRegion :: Region -> RawRegion
-fromRegion REGION_NONE = #{const TMR_REGION_NONE}
-fromRegion REGION_NA = #{const TMR_REGION_NA}
-fromRegion REGION_EU = #{const TMR_REGION_EU}
-fromRegion REGION_KR = #{const TMR_REGION_KR}
-fromRegion REGION_IN = #{const TMR_REGION_IN}
-fromRegion REGION_JP = #{const TMR_REGION_JP}
-fromRegion REGION_PRC = #{const TMR_REGION_PRC}
-fromRegion REGION_EU2 = #{const TMR_REGION_EU2}
-fromRegion REGION_EU3 = #{const TMR_REGION_EU3}
-fromRegion REGION_KR2 = #{const TMR_REGION_KR2}
-fromRegion REGION_PRC2 = #{const TMR_REGION_PRC2}
-fromRegion REGION_AU = #{const TMR_REGION_AU}
-fromRegion REGION_NZ = #{const TMR_REGION_NZ}
-fromRegion REGION_NA2 = #{const TMR_REGION_NA2}
-fromRegion REGION_NA3 = #{const TMR_REGION_NA3}
-fromRegion REGION_IS = #{const TMR_REGION_IS}
-fromRegion REGION_OPEN = #{const TMR_REGION_OPEN}
 
