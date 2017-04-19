@@ -40,6 +40,7 @@ my %toHaskellType = (
     "uint8_t"  => "Word8",
     "uint16_t" => "Word16",
     "uint32_t" => "Word32",
+    "TMR_String" => "Text",
     );
 
 sub readStatus {
@@ -298,6 +299,9 @@ sub emitParamTypes {
         } elsif ($paramType eq "Bool") {
             emit '  pGet f = alloca $ \p -> f (castPtr (p :: Ptr CBool)) >> toBool <$> peek p';
             emit '  pSet x f = alloca $ \p -> poke p (fromBool x :: CBool) >> f (castPtr p)';
+        } elsif ($paramType eq "Text") {
+            emit '  pGet f = undefined';
+            emit '  pSet x f = undefined';
         }
     }
     emit "";

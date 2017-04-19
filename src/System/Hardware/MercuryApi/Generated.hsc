@@ -297,10 +297,10 @@ data Param =
   | PARAM_TAGREADDATA_UNIQUEBYDATA -- ^ "/reader/tagReadData/uniqueByData", Bool
   | PARAM_TAGOP_ANTENNA -- ^ "/reader/tagop/antenna", Word8
   | PARAM_TAGOP_PROTOCOL -- ^ "/reader/tagop/protocol", (Not yet implemented)
-  | PARAM_VERSION_HARDWARE -- ^ "/reader/version/hardware", (Not yet implemented)
-  | PARAM_VERSION_SERIAL -- ^ "/reader/version/serial", (Not yet implemented)
-  | PARAM_VERSION_MODEL -- ^ "/reader/version/model", (Not yet implemented)
-  | PARAM_VERSION_SOFTWARE -- ^ "/reader/version/software", (Not yet implemented)
+  | PARAM_VERSION_HARDWARE -- ^ "/reader/version/hardware", Text
+  | PARAM_VERSION_SERIAL -- ^ "/reader/version/serial", Text
+  | PARAM_VERSION_MODEL -- ^ "/reader/version/model", Text
+  | PARAM_VERSION_SOFTWARE -- ^ "/reader/version/software", Text
   | PARAM_VERSION_SUPPORTEDPROTOCOLS -- ^ "/reader/version/supportedProtocols", (Not yet implemented)
   | PARAM_REGION_HOPTABLE -- ^ "/reader/region/hopTable", (Not yet implemented)
   | PARAM_REGION_HOPTIME -- ^ "/reader/region/hopTime", Word32
@@ -313,9 +313,9 @@ data Param =
   | PARAM_EXTENDEDEPC -- ^ "/reader/extendedEpc", Bool
   | PARAM_READER_STATISTICS -- ^ "/reader/statistics", (Not yet implemented)
   | PARAM_READER_STATS -- ^ "/reader/stats", (Not yet implemented)
-  | PARAM_URI -- ^ "/reader/uri", (Not yet implemented)
+  | PARAM_URI -- ^ "/reader/uri", Text
   | PARAM_PRODUCT_GROUP_ID -- ^ "/reader/version/productGroupID", Word16
-  | PARAM_PRODUCT_GROUP -- ^ "/reader/version/productGroup", (Not yet implemented)
+  | PARAM_PRODUCT_GROUP -- ^ "/reader/version/productGroup", Text
   | PARAM_PRODUCT_ID -- ^ "/reader/version/productID", Word16
   | PARAM_TAGREADATA_TAGOPSUCCESSCOUNT -- ^ "/reader/tagReadData/tagopSuccesses", Word16
   | PARAM_TAGREADATA_TAGOPFAILURECOUNT -- ^ "/reader/tagReadData/tagopFailures", Word16
@@ -325,8 +325,8 @@ data Param =
   | PARAM_TAGREADDATA_ENABLEREADFILTER -- ^ "/reader/tagReadData/enableReadFilter", Bool
   | PARAM_TAGREADDATA_READFILTERTIMEOUT -- ^ "/reader/tagReadData/readFilterTimeout", Int32
   | PARAM_TAGREADDATA_UNIQUEBYPROTOCOL -- ^ "/reader/tagReadData/uniqueByProtocol", Bool
-  | PARAM_READER_DESCRIPTION -- ^ "/reader/description", (Not yet implemented)
-  | PARAM_READER_HOSTNAME -- ^ "reader/hostname", (Not yet implemented)
+  | PARAM_READER_DESCRIPTION -- ^ "/reader/description", Text
+  | PARAM_READER_HOSTNAME -- ^ "reader/hostname", Text
   | PARAM_CURRENTTIME -- ^ "/reader/currentTime", (Not yet implemented)
   | PARAM_READER_WRITE_REPLY_TIMEOUT -- ^ "/reader/gen2/writeReplyTimeout", Word16
   | PARAM_READER_WRITE_EARLY_EXIT -- ^ "/reader/gen2/writeEarlyExit", Bool
@@ -519,6 +519,7 @@ data ParamType =
   | ParamTypeInt16
   | ParamTypeInt32
   | ParamTypeInt8
+  | ParamTypeText
   | ParamTypeWord16
   | ParamTypeWord32
   | ParamTypeWord8
@@ -542,11 +543,17 @@ paramType PARAM_TAGREADDATA_REPORTRSSIINDBM = ParamTypeBool
 paramType PARAM_TAGREADDATA_UNIQUEBYANTENNA = ParamTypeBool
 paramType PARAM_TAGREADDATA_UNIQUEBYDATA = ParamTypeBool
 paramType PARAM_TAGOP_ANTENNA = ParamTypeWord8
+paramType PARAM_VERSION_HARDWARE = ParamTypeText
+paramType PARAM_VERSION_SERIAL = ParamTypeText
+paramType PARAM_VERSION_MODEL = ParamTypeText
+paramType PARAM_VERSION_SOFTWARE = ParamTypeText
 paramType PARAM_REGION_HOPTIME = ParamTypeWord32
 paramType PARAM_REGION_LBT_ENABLE = ParamTypeBool
 paramType PARAM_RADIO_ENABLESJC = ParamTypeBool
 paramType PARAM_EXTENDEDEPC = ParamTypeBool
+paramType PARAM_URI = ParamTypeText
 paramType PARAM_PRODUCT_GROUP_ID = ParamTypeWord16
+paramType PARAM_PRODUCT_GROUP = ParamTypeText
 paramType PARAM_PRODUCT_ID = ParamTypeWord16
 paramType PARAM_TAGREADATA_TAGOPSUCCESSCOUNT = ParamTypeWord16
 paramType PARAM_TAGREADATA_TAGOPFAILURECOUNT = ParamTypeWord16
@@ -556,6 +563,8 @@ paramType PARAM_STATUS_ENABLE_TEMPERATUREREPORT = ParamTypeBool
 paramType PARAM_TAGREADDATA_ENABLEREADFILTER = ParamTypeBool
 paramType PARAM_TAGREADDATA_READFILTERTIMEOUT = ParamTypeInt32
 paramType PARAM_TAGREADDATA_UNIQUEBYPROTOCOL = ParamTypeBool
+paramType PARAM_READER_DESCRIPTION = ParamTypeText
+paramType PARAM_READER_HOSTNAME = ParamTypeText
 paramType PARAM_READER_WRITE_REPLY_TIMEOUT = ParamTypeWord16
 paramType PARAM_READER_WRITE_EARLY_EXIT = ParamTypeBool
 paramType _ = ParamTypeUnimplemented
@@ -565,6 +574,7 @@ paramTypeDisplay ParamTypeBool = "Bool"
 paramTypeDisplay ParamTypeInt16 = "Int16"
 paramTypeDisplay ParamTypeInt32 = "Int32"
 paramTypeDisplay ParamTypeInt8 = "Int8"
+paramTypeDisplay ParamTypeText = "Text"
 paramTypeDisplay ParamTypeWord16 = "Word16"
 paramTypeDisplay ParamTypeWord32 = "Word32"
 paramTypeDisplay ParamTypeWord8 = "Word8"
@@ -594,6 +604,11 @@ instance ParamValue Int8 where
   pType _ = ParamTypeInt8
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
   pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+
+instance ParamValue Text where
+  pType _ = ParamTypeText
+  pGet f = undefined
+  pSet x f = undefined
 
 instance ParamValue Word16 where
   pType _ = ParamTypeWord16
