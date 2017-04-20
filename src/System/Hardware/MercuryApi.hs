@@ -3,11 +3,14 @@
 module System.Hardware.MercuryApi
   ( Reader
   , Param (..)
+  , ParamType (..)
+  , ParamValue
   , MercuryException (..)
   , StatusType (..)
   , Status (..)
   , TransportListener
   , TransportListenerId
+  , Region (..)
   , create
   , connect
   , destroy
@@ -16,6 +19,7 @@ module System.Hardware.MercuryApi
   , paramList
   , paramName
   , paramID
+  , paramType
   , addTransportListener
   , removeTransportListener
   ) where

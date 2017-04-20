@@ -29,8 +29,10 @@ stringParams =
   , TMR.PARAM_VERSION_SOFTWARE
   , TMR.PARAM_URI
   , TMR.PARAM_PRODUCT_GROUP
+  {-
   , TMR.PARAM_READER_DESCRIPTION
   , TMR.PARAM_READER_HOSTNAME
+  -}
   ]
 
 main = do
@@ -51,5 +53,8 @@ main = do
     putStrLn $ "paramGet " ++ show param
     txt <- TMR.paramGet rdr param
     T.putStrLn txt
+  putStrLn "paramGet PARAM_REGION_SUPPORTEDREGIONS"
+  regions <- TMR.paramGet rdr TMR.PARAM_REGION_SUPPORTEDREGIONS :: IO [TMR.Region]
+  print regions
   putStrLn "destroy"
   TMR.destroy rdr
