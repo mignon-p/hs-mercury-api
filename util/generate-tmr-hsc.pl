@@ -392,9 +392,24 @@ sub emitStructs {
     emitListFuncs ("8");
 }
 
+sub paramTypeName {
+    my ($t) = @_;
+
+    if ($t =~ /^\[(\w+)\]$/) {
+        return "ParamType${1}List";
+    } else {
+        return "ParamType$t";
+    }
+}
+
 sub emitParamTypes {
+    my %ptn;
+    foreach my $paramType (values %toHaskellType) {
+        $ptn{$paramType} = paramTypeName ($paramType);
+    }
+
     emit "data ParamType =";
-    emitEnum ([map ("ParamType$_", sort values %toHaskellType)], {});
+    emitEnum ([sort values %ptn], {});
     emit "  | ParamTypeUnimplemented";
     emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
     emit "";
@@ -402,8 +417,9 @@ sub emitParamTypes {
     emit "paramType :: Param -> ParamType";
     foreach my $param (@params) {
         my $type = $paramType{$param};
-        if ($type =~ /^\w+$/) {
-            emit "paramType $param = ParamType$type";
+        if (exists $ptn{$type}) {
+            my $name = $ptn{$type};
+            emit "paramType $param = $name";
         }
     }
     emit "paramType _ = ParamTypeUnimplemented";
@@ -411,9 +427,8 @@ sub emitParamTypes {
 
     emit "paramTypeDisplay :: ParamType -> Text";
     foreach my $paramType (sort values %toHaskellType) {
-        if ($paramType =~ /^\w+$/) {
-            emit "paramTypeDisplay ParamType$paramType = \"$paramType\"";
-        }
+        my $name = $ptn{$paramType};
+        emit "paramTypeDisplay $name = \"$paramType\"";
     }
     emit "paramTypeDisplay _ = \"$nyi\"";
     emit "";
@@ -424,11 +439,10 @@ sub emitParamTypes {
     emit "  pSet :: a -> (Ptr () -> IO ()) -> IO (Maybe ErrorTriple)";
 
     foreach my $paramType (sort values %toHaskellType) {
-        if ($paramType =~ /^\w+$/) {
-            emit "";
-            emit "instance ParamValue $paramType where";
-            emit "  pType _ = ParamType$paramType";
-        }
+        my $name = $ptn{$paramType};
+        emit "";
+        emit "instance ParamValue $paramType where";
+        emit "  pType _ = $name";
         if ($paramType =~ /^Int/ or $paramType =~ /^Word/) {
             emit '  pGet f = alloca $ \p -> f (castPtr p) >> peek p';
             emit '  pSet x f = alloca $ \p -> poke p x >> f (castPtr p) >> return Nothing';
