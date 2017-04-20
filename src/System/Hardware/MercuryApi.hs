@@ -267,11 +267,11 @@ connect rdr = withReaderEtc rdr "connect" "" c_TMR_connect
 destroy :: Reader -> IO ()
 destroy rdr = withReaderEtc rdr "destroy" "" c_TMR_destroy
 
-throwBinding :: Reader -> (Status, T.Text) -> T.Text -> T.Text -> IO ()
-throwBinding (Reader fp) (status, msg) loc param = do
+throwBinding :: Reader -> ErrorTriple -> T.Text -> T.Text -> IO ()
+throwBinding (Reader fp) (statusType, status, msg) loc param = do
   uri <- withForeignPtr fp (textFromCString . uriPtr)
   throwIO $ MercuryException
-    { meStatusType = ERROR_TYPE_BINDING
+    { meStatusType = statusType
     , meStatus = status
     , meMessage = msg
     , meLocation = loc
@@ -279,15 +279,17 @@ throwBinding (Reader fp) (status, msg) loc param = do
     , meUri = uri
     }
 
-unimplementedParam :: (Status, T.Text)
+unimplementedParam :: ErrorTriple
 unimplementedParam =
-  ( ERROR_UNIMPLEMENTED_PARAM
+  ( ERROR_TYPE_BINDING
+  , ERROR_UNIMPLEMENTED_PARAM
   , "The given parameter is not yet implemented in the Haskell binding."
   )
 
-invalidParam :: ParamType -> ParamType -> (Status, T.Text)
+invalidParam :: ParamType -> ParamType -> ErrorTriple
 invalidParam expected actual =
-  ( ERROR_INVALID_PARAM_TYPE
+  ( ERROR_TYPE_BINDING
+  , ERROR_INVALID_PARAM_TYPE
   , "Expected " <> paramTypeDisplay expected <>
     " but got " <> paramTypeDisplay actual
   )
@@ -302,8 +304,11 @@ paramSet rdr param value = do
     throwBinding rdr unimplementedParam "paramSet" pName
   when (pt /= pt') $
     throwBinding rdr (invalidParam pt pt') "paramSet" pName
-  pSet value $ \pp -> withReaderEtc rdr "paramSet" pName $
-                      \p -> c_TMR_paramSet p rp pp
+  mErr <- pSet value $ \pp -> withReaderEtc rdr "paramSet" pName $
+                              \p -> c_TMR_paramSet p rp pp
+  case mErr of
+    Nothing -> return ()
+    Just err -> throwBinding rdr err "paramSet" pName
 
 withReturnType :: (a -> IO a) -> IO a
 withReturnType f = f undefined

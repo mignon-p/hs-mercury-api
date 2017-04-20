@@ -359,10 +359,13 @@ sub emitParamTypes {
     emit "paramTypeDisplay _ = \"$nyi\"";
     emit "";
 
+    emit "type ErrorTriple = (StatusType, Status, Text)";
+    emit "";
+
     emit "class ParamValue a where";
     emit "  pType :: a -> ParamType";
     emit "  pGet :: (Ptr () -> IO ()) -> IO a";
-    emit "  pSet :: a -> (Ptr () -> IO ()) -> IO ()";
+    emit "  pSet :: a -> (Ptr () -> IO ()) -> IO (Maybe ErrorTriple)";
 
     foreach my $paramType (sort values %toHaskellType) {
         if ($paramType =~ /^\w+$/) {
@@ -372,13 +375,13 @@ sub emitParamTypes {
         }
         if ($paramType =~ /^Int/ or $paramType =~ /^Word/) {
             emit '  pGet f = alloca $ \p -> f (castPtr p) >> peek p';
-            emit '  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)';
+            emit '  pSet x f = alloca $ \p -> poke p x >> f (castPtr p) >> return Nothing';
         } elsif ($paramType eq "Bool") {
             emit '  pGet f = alloca $ \p -> f (castPtr (p :: Ptr CBool)) >> toBool <$> peek p';
-            emit '  pSet x f = alloca $ \p -> poke p (fromBool x :: CBool) >> f (castPtr p)';
+            emit '  pSet x f = alloca $ \p -> poke p (fromBool x :: CBool) >> f (castPtr p) >> return Nothing';
         } elsif ($paramType eq "Region") {
             emit '  pGet f = alloca $ \p -> f (castPtr p) >> toRegion <$> peek p';
-            emit '  pSet x f = alloca $ \p -> poke p (fromRegion x) >> f (castPtr p)';
+            emit '  pSet x f = alloca $ \p -> poke p (fromRegion x) >> f (castPtr p) >> return Nothing';
         } elsif ($paramType eq "Text") {
             emit '';
             emit '  pGet f = do';
@@ -402,6 +405,7 @@ sub emitParamTypes {
             emit '                , l16_len = 0 -- unused for TMR_String';
             emit '                }';
             emit '      with lst $ \p -> f (castPtr p)';
+            emit '      return Nothing';
             emit '';
         }
     }

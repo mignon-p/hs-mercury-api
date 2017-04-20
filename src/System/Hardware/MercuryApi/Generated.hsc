@@ -700,35 +700,37 @@ paramTypeDisplay ParamTypeWord32 = "Word32"
 paramTypeDisplay ParamTypeWord8 = "Word8"
 paramTypeDisplay _ = "(Not yet implemented)"
 
+type ErrorTriple = (StatusType, Status, Text)
+
 class ParamValue a where
   pType :: a -> ParamType
   pGet :: (Ptr () -> IO ()) -> IO a
-  pSet :: a -> (Ptr () -> IO ()) -> IO ()
+  pSet :: a -> (Ptr () -> IO ()) -> IO (Maybe ErrorTriple)
 
 instance ParamValue Bool where
   pType _ = ParamTypeBool
   pGet f = alloca $ \p -> f (castPtr (p :: Ptr CBool)) >> toBool <$> peek p
-  pSet x f = alloca $ \p -> poke p (fromBool x :: CBool) >> f (castPtr p)
+  pSet x f = alloca $ \p -> poke p (fromBool x :: CBool) >> f (castPtr p) >> return Nothing
 
 instance ParamValue Int16 where
   pType _ = ParamTypeInt16
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
-  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p) >> return Nothing
 
 instance ParamValue Int32 where
   pType _ = ParamTypeInt32
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
-  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p) >> return Nothing
 
 instance ParamValue Int8 where
   pType _ = ParamTypeInt8
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
-  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p) >> return Nothing
 
 instance ParamValue Region where
   pType _ = ParamTypeRegion
   pGet f = alloca $ \p -> f (castPtr p) >> toRegion <$> peek p
-  pSet x f = alloca $ \p -> poke p (fromRegion x) >> f (castPtr p)
+  pSet x f = alloca $ \p -> poke p (fromRegion x) >> f (castPtr p) >> return Nothing
 
 instance ParamValue Text where
   pType _ = ParamTypeText
@@ -754,20 +756,21 @@ instance ParamValue Text where
                 , l16_len = 0 -- unused for TMR_String
                 }
       with lst $ \p -> f (castPtr p)
+      return Nothing
 
 
 instance ParamValue Word16 where
   pType _ = ParamTypeWord16
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
-  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p) >> return Nothing
 
 instance ParamValue Word32 where
   pType _ = ParamTypeWord32
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
-  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p) >> return Nothing
 
 instance ParamValue Word8 where
   pType _ = ParamTypeWord8
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
-  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+  pSet x f = alloca $ \p -> poke p x >> f (castPtr p) >> return Nothing
 
