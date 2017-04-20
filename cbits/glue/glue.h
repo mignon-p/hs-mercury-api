@@ -14,18 +14,24 @@
 /** Attempt to use reader after it was destroyed. */
 #define ERROR_ALREADY_DESTROYED         ERROR_BINDING(1)
 
-typedef struct TransportListenerEtc {
+typedef struct TransportListenerEtc TransportListenerEtc;
+typedef struct ReaderEtc ReaderEtc;
+typedef struct List16 List16;
+typedef struct List8 List8;
+typedef struct ReadPlanEtc ReadPlanEtc;
+
+struct ReaderEtc {
+    TMR_Reader reader;
+    TransportListenerEtc *transportListeners;
+    bool destroyed;
+};
+
+struct TransportListenerEtc {
     TMR_TransportListenerBlock block;
     char *key;
     HsFunPtr funPtr;
     struct TransportListenerEtc *next;
-} TransportListenerEtc;
-
-typedef struct ReaderEtc {
-    TMR_Reader reader;
-    TransportListenerEtc *transportListeners;
-    bool destroyed;
-} ReaderEtc;
+};
 
 /* Has the same storage layout as the various TMR_*List structs
  * which use a 16-bit length, such as:
@@ -35,14 +41,14 @@ typedef struct ReaderEtc {
  * TMR_StatsPerAntennaValuesList
  * Can also be used for TMR_String, if you ignore len.
  */
-typedef struct List16 {
+struct List16 {
     /** The array of values */
     void *list;
     /** The number of entries there is space for in the array */
     uint16_t max;
     /** The number of entries in the list - may be larger than max, indicating truncated data. */
     uint16_t len;
-} List16;
+};
 
 /* Has the same storage layout as the various TMR_*List structs
  * which use an 8-bit length, such as:
@@ -50,23 +56,23 @@ typedef struct List16 {
  * TMR_RegionList
  * TMR_TagProtocolList
  */
-typedef struct List8 {
+struct List8 {
     /** The array of values */
     void *list;
     /** The number of entries there is space for in the array */
     uint8_t max;
     /** The number of entries in the list - may be larger than max, indicating truncated data. */
     uint8_t len;
-} List8;
+};
 
 #define GLUE_MAX_ANTENNAS TMR_SR_MAX_ANTENNA_PORTS
 #define GLUE_MAX_GPIPORTS 32
 
-typedef struct ReadPlanEtc {
+struct ReadPlanEtc {
     TMR_ReadPlan plan;
     uint8_t antennas[GLUE_MAX_ANTENNAS];
     uint8_t gpiPorts[GLUE_MAX_GPIPORTS];
-} ReadPlanEtc;
+};
 
 TMR_Status c_TMR_create (ReaderEtc *reader, const char *deviceUri);
 TMR_Status c_TMR_connect (ReaderEtc *reader);
