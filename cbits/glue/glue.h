@@ -23,6 +23,7 @@ typedef struct ReadPlanEtc ReadPlanEtc;
 struct ReaderEtc {
     TMR_Reader reader;
     TransportListenerEtc *transportListeners;
+    ReadPlanEtc *readPlan;
     bool destroyed;
 };
 

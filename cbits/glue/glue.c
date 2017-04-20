@@ -35,6 +35,7 @@ static void free_all_transport_listeners (ReaderEtc *reader)
 TMR_Status c_TMR_create (ReaderEtc *reader, const char *deviceUri)
 {
     reader->transportListeners = NULL;
+    reader->readPlan = NULL;
     reader->destroyed = false;
     return TMR_create (&reader->reader, deviceUri);
 }
@@ -52,9 +53,13 @@ TMR_Status c_TMR_destroy (ReaderEtc *reader)
     if (reader->destroyed) {
         return ERROR_ALREADY_DESTROYED;
     } else {
+        TMR_Status status;
+
         free_all_transport_listeners (reader);
+        status = TMR_destroy (&reader->reader);
+        free (reader->readPlan);
         reader->destroyed = true;
-        return TMR_destroy (&reader->reader);
+        return status;
     }
 }
 
@@ -99,16 +104,59 @@ TMR_Status c_TMR_paramSet(ReaderEtc *reader,
 {
     if (reader->destroyed)
         return ERROR_ALREADY_DESTROYED;
-    else
-        return TMR_paramSet (&reader->reader, key, value);
+    else {
+        TMR_Status status;
+
+        status = TMR_paramSet (&reader->reader, key, value);
+        if (key == TMR_PARAM_READ_PLAN) {
+            if (status == TMR_SUCCESS) {
+                /* TMR_paramSet appears to only do a shallow copy of the
+                 * read plan, meaning that the internal pointers need to
+                 * stay pointing at valid memory.  We handle this by
+                 * keeping ownership of the ReadPlanEtc, which includes
+                 * space for the lists to point at.
+                 *
+                 * When the read plan is set, we need to free the old
+                 * ReadPlanEtc, and keep a pointer to the new one.
+                 */
+                free (reader->readPlan);
+                reader->readPlan = (ReadPlanEtc *) value;
+            } else {
+                /* If the set fails, we need to free the new ReadPlanEtc. */
+                free ((void*) value);
+            }
+        }
+
+        return status;
+    }
 }
 
 TMR_Status c_TMR_paramGet(ReaderEtc *reader, TMR_Param key, void *value)
 {
     if (reader->destroyed)
         return ERROR_ALREADY_DESTROYED;
-    else
-        return TMR_paramGet (&reader->reader, key, value);
+    else {
+        /* TMR_PARAM_READ_PLAN appears to be write-only, so fulfill the
+         * read from our cached copy. */
+        if (key == TMR_PARAM_READ_PLAN) {
+            TMR_ReadPlan *rp;
+
+            rp = (TMR_ReadPlan *) value;
+            if (reader->readPlan) {
+                /* Shallow copy the ReadPlan, although the pointers will
+                 * still point at parts of the cached ReadPlanEtc. */
+                *rp = reader->readPlan->plan;
+            } else {
+                /* No cached read plan, which means it's initialized to
+                 * the default, which is this: */
+                TMR_RP_init_simple (rp, 0, NULL, TMR_TAG_PROTOCOL_GEN2, 1);
+            }
+
+            return TMR_SUCCESS;
+        } else {
+            return TMR_paramGet (&reader->reader, key, value);
+        }
+    }
 }
 
 TMR_Status c_TMR_paramList (ReaderEtc *reader, TMR_Param *keys, uint32_t *len)
