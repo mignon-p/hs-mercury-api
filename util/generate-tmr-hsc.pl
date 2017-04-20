@@ -482,14 +482,17 @@ sub emitParamTypes {
             emit '  pSet x f = do';
             emit '    let bs = textToBS x';
             emit '    B.useAsCString bs $ \cs -> do';
-            emit '      let lst = List16';
-            emit '                { l16_list = castPtr cs';
-            emit '                , l16_max = 1 + fromIntegral (B.length bs)';
-            emit '                , l16_len = 0 -- unused for TMR_String';
-            emit '                }';
-            emit '      with lst $ \p -> f (castPtr p)';
-            emit '      return Nothing';
-            emit '';
+            emit '      let eth = castLen "Text" (1 + B.length bs)';
+            emit '      case eth of';
+            emit '        Left err -> return $ Just err';
+            emit "        Right len' -> do";
+            emit '          let lst = List16';
+            emit '                    { l16_list = castPtr cs';
+            emit "                    , l16_max = len'";
+            emit '                    , l16_len = 0 -- unused for TMR_String';
+            emit '                    }';
+            emit '          with lst $ \p -> f (castPtr p)';
+            emit '          return Nothing';
         } elsif ($paramType =~ /^\[Int/ or $paramType =~ /^\[Word/) {
             my $size = $listSize{$paramType};
             emit "  pGet = getList$size";

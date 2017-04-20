@@ -845,14 +845,17 @@ instance ParamValue Text where
   pSet x f = do
     let bs = textToBS x
     B.useAsCString bs $ \cs -> do
-      let lst = List16
-                { l16_list = castPtr cs
-                , l16_max = 1 + fromIntegral (B.length bs)
-                , l16_len = 0 -- unused for TMR_String
-                }
-      with lst $ \p -> f (castPtr p)
-      return Nothing
-
+      let eth = castLen "Text" (1 + B.length bs)
+      case eth of
+        Left err -> return $ Just err
+        Right len' -> do
+          let lst = List16
+                    { l16_list = castPtr cs
+                    , l16_max = len'
+                    , l16_len = 0 -- unused for TMR_String
+                    }
+          with lst $ \p -> f (castPtr p)
+          return Nothing
 
 instance ParamValue Word16 where
   pType _ = ParamTypeWord16
