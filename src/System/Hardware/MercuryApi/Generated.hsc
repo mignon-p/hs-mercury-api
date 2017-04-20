@@ -492,7 +492,7 @@ data Param =
   | PARAM_ANTENNA_CONNECTEDPORTLIST -- ^ "/reader/antenna/connectedPortList", [Word8]
   | PARAM_ANTENNA_PORTSWITCHGPOS -- ^ "/reader/antenna/portSwitchGpos", [Word8]
   | PARAM_ANTENNA_SETTLINGTIMELIST -- ^ "/reader/antenna/settlingTimeList", (Not yet implemented)
-  | PARAM_ANTENNA_RETURNLOSS -- ^ "reader/antenna/returnLoss", (Not yet implemented)
+  | PARAM_ANTENNA_RETURNLOSS -- ^ "/reader/antenna/returnLoss", (Not yet implemented)
   | PARAM_ANTENNA_TXRXMAP -- ^ "/reader/antenna/txRxMap", (Not yet implemented)
   | PARAM_GPIO_INPUTLIST -- ^ "/reader/gpio/inputList", [Word8]
   | PARAM_GPIO_OUTPUTLIST -- ^ "/reader/gpio/outputList", [Word8]
@@ -512,7 +512,7 @@ data Param =
   | PARAM_READ_ASYNCOFFTIME -- ^ "/reader/read/asyncOffTime", Word32
   | PARAM_READ_ASYNCONTIME -- ^ "/reader/read/asyncOnTime", Word32
   | PARAM_READ_PLAN -- ^ "/reader/read/plan", (Not yet implemented)
-  | PARAM_RADIO_ENABLEPOWERSAVE -- ^ "/reader/radio/enablePowerSave, bool
+  | PARAM_RADIO_ENABLEPOWERSAVE -- ^ "/reader/radio/enablePowerSave", Bool
   | PARAM_RADIO_POWERMAX -- ^ "/reader/radio/powerMax", Int16
   | PARAM_RADIO_POWERMIN -- ^ "/reader/radio/powerMin", Int16
   | PARAM_RADIO_PORTREADPOWERLIST -- ^ "/reader/radio/portReadPowerList", (Not yet implemented)
@@ -525,7 +525,7 @@ data Param =
   | PARAM_TAGREADDATA_UNIQUEBYANTENNA -- ^ "/reader/tagReadData/uniqueByAntenna", Bool
   | PARAM_TAGREADDATA_UNIQUEBYDATA -- ^ "/reader/tagReadData/uniqueByData", Bool
   | PARAM_TAGOP_ANTENNA -- ^ "/reader/tagop/antenna", Word8
-  | PARAM_TAGOP_PROTOCOL -- ^ "/reader/tagop/protocol", (Not yet implemented)
+  | PARAM_TAGOP_PROTOCOL -- ^ "/reader/tagop/protocol", TagProtocol
   | PARAM_VERSION_HARDWARE -- ^ "/reader/version/hardware", Text
   | PARAM_VERSION_SERIAL -- ^ "/reader/version/serial", Text
   | PARAM_VERSION_MODEL -- ^ "/reader/version/model", Text
@@ -555,11 +555,11 @@ data Param =
   | PARAM_TAGREADDATA_READFILTERTIMEOUT -- ^ "/reader/tagReadData/readFilterTimeout", Int32
   | PARAM_TAGREADDATA_UNIQUEBYPROTOCOL -- ^ "/reader/tagReadData/uniqueByProtocol", Bool
   | PARAM_READER_DESCRIPTION -- ^ "/reader/description", Text
-  | PARAM_READER_HOSTNAME -- ^ "reader/hostname", Text
+  | PARAM_READER_HOSTNAME -- ^ "/reader/hostname", Text
   | PARAM_CURRENTTIME -- ^ "/reader/currentTime", (Not yet implemented)
   | PARAM_READER_WRITE_REPLY_TIMEOUT -- ^ "/reader/gen2/writeReplyTimeout", Word16
   | PARAM_READER_WRITE_EARLY_EXIT -- ^ "/reader/gen2/writeEarlyExit", Bool
-  | PARAM_READER_STATS_ENABLE -- ^ "reader/stats/enable", (Not yet implemented)
+  | PARAM_READER_STATS_ENABLE -- ^ "/reader/stats/enable", (Not yet implemented)
   | PARAM_TRIGGER_READ_GPI -- ^ "/reader/trigger/read/Gpi", [Word8]
   | PARAM_METADATAFLAG -- ^ "/reader/metadataflags", (Not yet implemented)
   | PARAM_LICENSED_FEATURES
@@ -774,6 +774,7 @@ paramType PARAM_GPIO_INPUTLIST = ParamTypeWord8List
 paramType PARAM_GPIO_OUTPUTLIST = ParamTypeWord8List
 paramType PARAM_READ_ASYNCOFFTIME = ParamTypeWord32
 paramType PARAM_READ_ASYNCONTIME = ParamTypeWord32
+paramType PARAM_RADIO_ENABLEPOWERSAVE = ParamTypeBool
 paramType PARAM_RADIO_POWERMAX = ParamTypeInt16
 paramType PARAM_RADIO_POWERMIN = ParamTypeInt16
 paramType PARAM_RADIO_READPOWER = ParamTypeInt32
@@ -784,6 +785,7 @@ paramType PARAM_TAGREADDATA_REPORTRSSIINDBM = ParamTypeBool
 paramType PARAM_TAGREADDATA_UNIQUEBYANTENNA = ParamTypeBool
 paramType PARAM_TAGREADDATA_UNIQUEBYDATA = ParamTypeBool
 paramType PARAM_TAGOP_ANTENNA = ParamTypeWord8
+paramType PARAM_TAGOP_PROTOCOL = ParamTypeTagProtocol
 paramType PARAM_VERSION_HARDWARE = ParamTypeText
 paramType PARAM_VERSION_SERIAL = ParamTypeText
 paramType PARAM_VERSION_MODEL = ParamTypeText
