@@ -59,6 +59,15 @@ typedef struct List8 {
     uint8_t len;
 } List8;
 
+#define GLUE_MAX_ANTENNAS TMR_SR_MAX_ANTENNA_PORTS
+#define GLUE_MAX_GPIPORTS 32
+
+typedef struct ReadPlanEtc {
+    TMR_ReadPlan plan;
+    uint8 antennas[GLUE_MAX_ANTENNAS];
+    uint8 gpiPorts[GLUE_MAX_GPIPORTS];
+}
+
 TMR_Status c_TMR_create (ReaderEtc *reader, const char *deviceUri);
 TMR_Status c_TMR_connect (ReaderEtc *reader);
 TMR_Status c_TMR_destroy (ReaderEtc *reader);
