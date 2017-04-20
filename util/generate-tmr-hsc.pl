@@ -22,6 +22,8 @@ my %paramType = ();
 my @regions = ();
 my %regions = ();
 
+my @tagProtocols = ();
+
 my @lines = ();
 
 my $nyi = "(Not yet implemented)";
@@ -44,12 +46,14 @@ my %toHaskellType = (
     "uint16_t" => "Word16",
     "uint32_t" => "Word32",
     "TMR_Region" => "Region",
+    "TMR_TagProtocol" => "TagProtocol",
     "TMR_String" => "Text",
     "TMR_uint8List"  => "[Word8]",
   # "TMR_uint16List" => "[Word16]",
     "TMR_uint32List" => "[Word32]",
   # "TMR_int8List"   => "[Int8]",
     "TMR_RegionList" => "[Region]",
+    "TMR_TagProtocolList" => "[TagProtocol]",
     );
 
 my %listSize = (
@@ -58,6 +62,7 @@ my %listSize = (
     "[Word32]" => "16",
   # "[Int8]"   => "8",
     "[Region]" => "8",
+    "[TagProtocol]" => "8",
     );
 
 sub readStatus {
@@ -146,6 +151,16 @@ sub readRegion {
         if (m%^\s*/\*\*\s*(.*?)\s*\*+/\s*TMR_(REGION_\w+)%) {
             push @regions, $2;
             $regions{$2} = $1;
+        }
+    }
+    close F;
+}
+
+sub readTagProtocol {
+    open F, "$apiDir/tmr_tag_protocol.h" or die;
+    while (<F>) {
+        if (/^\s+TMR_(TAG_PROTOCOL_\w+)/) {
+            push @tagProtocols, $1;
         }
     }
     close F;
@@ -465,6 +480,9 @@ sub emitParamTypes {
         } elsif ($paramType eq "Region") {
             emit '  pGet f = alloca $ \p -> f (castPtr p) >> toRegion <$> peek p';
             emit '  pSet x f = alloca $ \p -> poke p (fromRegion x) >> f (castPtr p) >> return Nothing';
+        } elsif ($paramType eq "TagProtocol") {
+            emit '  pGet f = alloca $ \p -> f (castPtr p) >> toTagProtocol <$> peek p';
+            emit '  pSet x f = alloca $ \p -> poke p (fromTagProtocol x) >> f (castPtr p) >> return Nothing';
         } elsif ($paramType eq "Text") {
             emit '';
             emit '  pGet f = do';
@@ -501,6 +519,10 @@ sub emitParamTypes {
             my $size = $listSize{$paramType};
             emit "  pGet f = map toRegion <\$> getList$size f";
             emit "  pSet x f = setList$size \"$paramType\" (map fromRegion x) f";
+        } elsif ($paramType eq "[TagProtocol]") {
+            my $size = $listSize{$paramType};
+            emit "  pGet f = map toTagProtocol <\$> getList$size f";
+            emit "  pSet x f = setList$size \"$paramType\" (map fromTagProtocol x) f";
         }
     }
     emit "";
@@ -525,15 +547,36 @@ sub emitRegion {
     emit "";
 }
 
+sub emitTagProtocol {
+    emit "type RawTagProtocol = #{type TMR_TagProtocol}";
+    emit "";
+
+    emit "data TagProtocol =";
+    emitEnum (\@tagProtocols, {});
+    emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
+    emit "";
+
+    emit "toTagProtocol :: RawTagProtocol -> TagProtocol";
+    emitTo ("toTagProtocol", "TMR_", \@tagProtocols);
+    emit "toTagProtocol _ = TAG_PROTOCOL_NONE";
+    emit "";
+
+    emit "fromTagProtocol :: TagProtocol -> RawTagProtocol";
+    emitFrom ("fromTagProtocol", "TMR_", \@tagProtocols);
+    emit "";
+}
+
 readStatus();
 readParams();
 readGlue();
 readRegion();
+readTagProtocol();
 
 emitHeader();
 emitStructs();
 emitStatus();
 emitRegion();
+emitTagProtocol();
 emitParams();
 emitParamTypes();
 

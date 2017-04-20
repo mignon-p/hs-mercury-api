@@ -446,6 +446,37 @@ fromRegion REGION_NA3 = #{const TMR_REGION_NA3}
 fromRegion REGION_IS = #{const TMR_REGION_IS}
 fromRegion REGION_OPEN = #{const TMR_REGION_OPEN}
 
+type RawTagProtocol = #{type TMR_TagProtocol}
+
+data TagProtocol =
+    TAG_PROTOCOL_NONE
+  | TAG_PROTOCOL_ISO180006B
+  | TAG_PROTOCOL_GEN2
+  | TAG_PROTOCOL_ISO180006B_UCODE
+  | TAG_PROTOCOL_IPX64
+  | TAG_PROTOCOL_IPX256
+  | TAG_PROTOCOL_ATA
+  deriving (Eq, Ord, Show, Read, Bounded, Enum)
+
+toTagProtocol :: RawTagProtocol -> TagProtocol
+toTagProtocol #{const TMR_TAG_PROTOCOL_NONE} = TAG_PROTOCOL_NONE
+toTagProtocol #{const TMR_TAG_PROTOCOL_ISO180006B} = TAG_PROTOCOL_ISO180006B
+toTagProtocol #{const TMR_TAG_PROTOCOL_GEN2} = TAG_PROTOCOL_GEN2
+toTagProtocol #{const TMR_TAG_PROTOCOL_ISO180006B_UCODE} = TAG_PROTOCOL_ISO180006B_UCODE
+toTagProtocol #{const TMR_TAG_PROTOCOL_IPX64} = TAG_PROTOCOL_IPX64
+toTagProtocol #{const TMR_TAG_PROTOCOL_IPX256} = TAG_PROTOCOL_IPX256
+toTagProtocol #{const TMR_TAG_PROTOCOL_ATA} = TAG_PROTOCOL_ATA
+toTagProtocol _ = TAG_PROTOCOL_NONE
+
+fromTagProtocol :: TagProtocol -> RawTagProtocol
+fromTagProtocol TAG_PROTOCOL_NONE = #{const TMR_TAG_PROTOCOL_NONE}
+fromTagProtocol TAG_PROTOCOL_ISO180006B = #{const TMR_TAG_PROTOCOL_ISO180006B}
+fromTagProtocol TAG_PROTOCOL_GEN2 = #{const TMR_TAG_PROTOCOL_GEN2}
+fromTagProtocol TAG_PROTOCOL_ISO180006B_UCODE = #{const TMR_TAG_PROTOCOL_ISO180006B_UCODE}
+fromTagProtocol TAG_PROTOCOL_IPX64 = #{const TMR_TAG_PROTOCOL_IPX64}
+fromTagProtocol TAG_PROTOCOL_IPX256 = #{const TMR_TAG_PROTOCOL_IPX256}
+fromTagProtocol TAG_PROTOCOL_ATA = #{const TMR_TAG_PROTOCOL_ATA}
+
 type RawParam = #{type TMR_Param}
 
 data Param =
@@ -499,7 +530,7 @@ data Param =
   | PARAM_VERSION_SERIAL -- ^ "/reader/version/serial", Text
   | PARAM_VERSION_MODEL -- ^ "/reader/version/model", Text
   | PARAM_VERSION_SOFTWARE -- ^ "/reader/version/software", Text
-  | PARAM_VERSION_SUPPORTEDPROTOCOLS -- ^ "/reader/version/supportedProtocols", (Not yet implemented)
+  | PARAM_VERSION_SUPPORTEDPROTOCOLS -- ^ "/reader/version/supportedProtocols", [TagProtocol]
   | PARAM_REGION_HOPTABLE -- ^ "/reader/region/hopTable", [Word32]
   | PARAM_REGION_HOPTIME -- ^ "/reader/region/hopTime", Word32
   | PARAM_REGION_ID -- ^ "/reader/region/id", Region
@@ -719,6 +750,8 @@ data ParamType =
   | ParamTypeInt8
   | ParamTypeRegion
   | ParamTypeRegionList
+  | ParamTypeTagProtocol
+  | ParamTypeTagProtocolList
   | ParamTypeText
   | ParamTypeWord16
   | ParamTypeWord32
@@ -755,6 +788,7 @@ paramType PARAM_VERSION_HARDWARE = ParamTypeText
 paramType PARAM_VERSION_SERIAL = ParamTypeText
 paramType PARAM_VERSION_MODEL = ParamTypeText
 paramType PARAM_VERSION_SOFTWARE = ParamTypeText
+paramType PARAM_VERSION_SUPPORTEDPROTOCOLS = ParamTypeTagProtocolList
 paramType PARAM_REGION_HOPTABLE = ParamTypeWord32List
 paramType PARAM_REGION_HOPTIME = ParamTypeWord32
 paramType PARAM_REGION_ID = ParamTypeRegion
@@ -788,11 +822,13 @@ paramTypeDisplay ParamTypeInt16 = "Int16"
 paramTypeDisplay ParamTypeInt32 = "Int32"
 paramTypeDisplay ParamTypeInt8 = "Int8"
 paramTypeDisplay ParamTypeRegion = "Region"
+paramTypeDisplay ParamTypeTagProtocol = "TagProtocol"
 paramTypeDisplay ParamTypeText = "Text"
 paramTypeDisplay ParamTypeWord16 = "Word16"
 paramTypeDisplay ParamTypeWord32 = "Word32"
 paramTypeDisplay ParamTypeWord8 = "Word8"
 paramTypeDisplay ParamTypeRegionList = "[Region]"
+paramTypeDisplay ParamTypeTagProtocolList = "[TagProtocol]"
 paramTypeDisplay ParamTypeWord32List = "[Word32]"
 paramTypeDisplay ParamTypeWord8List = "[Word8]"
 paramTypeDisplay _ = "(Not yet implemented)"
@@ -826,6 +862,11 @@ instance ParamValue Region where
   pType _ = ParamTypeRegion
   pGet f = alloca $ \p -> f (castPtr p) >> toRegion <$> peek p
   pSet x f = alloca $ \p -> poke p (fromRegion x) >> f (castPtr p) >> return Nothing
+
+instance ParamValue TagProtocol where
+  pType _ = ParamTypeTagProtocol
+  pGet f = alloca $ \p -> f (castPtr p) >> toTagProtocol <$> peek p
+  pSet x f = alloca $ \p -> poke p (fromTagProtocol x) >> f (castPtr p) >> return Nothing
 
 instance ParamValue Text where
   pType _ = ParamTypeText
@@ -876,6 +917,11 @@ instance ParamValue [Region] where
   pType _ = ParamTypeRegionList
   pGet f = map toRegion <$> getList8 f
   pSet x f = setList8 "[Region]" (map fromRegion x) f
+
+instance ParamValue [TagProtocol] where
+  pType _ = ParamTypeTagProtocolList
+  pGet f = map toTagProtocol <$> getList8 f
+  pSet x f = setList8 "[TagProtocol]" (map fromTagProtocol x) f
 
 instance ParamValue [Word32] where
   pType _ = ParamTypeWord32List
