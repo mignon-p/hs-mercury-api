@@ -503,7 +503,7 @@ data Param =
   | PARAM_REGION_HOPTABLE -- ^ "/reader/region/hopTable", [Word32]
   | PARAM_REGION_HOPTIME -- ^ "/reader/region/hopTime", Word32
   | PARAM_REGION_ID -- ^ "/reader/region/id", Region
-  | PARAM_REGION_SUPPORTEDREGIONS -- ^ "/reader/region/supportedRegions", (Not yet implemented)
+  | PARAM_REGION_SUPPORTEDREGIONS -- ^ "/reader/region/supportedRegions", [Region]
   | PARAM_REGION_LBT_ENABLE -- ^ "/reader/region/lbt/enable", Bool
   | PARAM_LICENSE_KEY -- ^ "/reader/licenseKey", [Word8]
   | PARAM_USER_CONFIG -- ^ "/reader/userConfig", (Not yet implemented)
@@ -718,6 +718,7 @@ data ParamType =
   | ParamTypeInt32
   | ParamTypeInt8
   | ParamTypeRegion
+  | ParamTypeRegionList
   | ParamTypeText
   | ParamTypeWord16
   | ParamTypeWord32
@@ -757,6 +758,7 @@ paramType PARAM_VERSION_SOFTWARE = ParamTypeText
 paramType PARAM_REGION_HOPTABLE = ParamTypeWord32List
 paramType PARAM_REGION_HOPTIME = ParamTypeWord32
 paramType PARAM_REGION_ID = ParamTypeRegion
+paramType PARAM_REGION_SUPPORTEDREGIONS = ParamTypeRegionList
 paramType PARAM_REGION_LBT_ENABLE = ParamTypeBool
 paramType PARAM_LICENSE_KEY = ParamTypeWord8List
 paramType PARAM_RADIO_ENABLESJC = ParamTypeBool
@@ -790,6 +792,7 @@ paramTypeDisplay ParamTypeText = "Text"
 paramTypeDisplay ParamTypeWord16 = "Word16"
 paramTypeDisplay ParamTypeWord32 = "Word32"
 paramTypeDisplay ParamTypeWord8 = "Word8"
+paramTypeDisplay ParamTypeRegionList = "[Region]"
 paramTypeDisplay ParamTypeWord32List = "[Word32]"
 paramTypeDisplay ParamTypeWord8List = "[Word8]"
 paramTypeDisplay _ = "(Not yet implemented)"
@@ -865,6 +868,11 @@ instance ParamValue Word8 where
   pType _ = ParamTypeWord8
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
   pSet x f = alloca $ \p -> poke p x >> f (castPtr p) >> return Nothing
+
+instance ParamValue [Region] where
+  pType _ = ParamTypeRegionList
+  pGet f = map toRegion <$> getList8 f
+  pSet x f = setList8 "[Region]" (map fromRegion x) f
 
 instance ParamValue [Word32] where
   pType _ = ParamTypeWord32List

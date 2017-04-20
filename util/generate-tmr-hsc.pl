@@ -49,6 +49,7 @@ my %toHaskellType = (
   # "TMR_uint16List" => "[Word16]",
     "TMR_uint32List" => "[Word32]",
   # "TMR_int8List"   => "[Int8]",
+    "TMR_RegionList" => "[Region]",
     );
 
 my %listSize = (
@@ -56,6 +57,7 @@ my %listSize = (
   # "[Word16]" => "16",
     "[Word32]" => "16",
   # "[Int8]"   => "8",
+    "[Region]" => "8",
     );
 
 sub readStatus {
@@ -492,6 +494,10 @@ sub emitParamTypes {
             my $size = $listSize{$paramType};
             emit "  pGet = getList$size";
             emit "  pSet = setList$size \"$paramType\"";
+        } elsif ($paramType eq "[Region]") {
+            my $size = $listSize{$paramType};
+            emit "  pGet f = map toRegion <\$> getList$size f";
+            emit "  pSet x f = setList$size \"$paramType\" (map fromRegion x) f";
         }
     }
     emit "";
