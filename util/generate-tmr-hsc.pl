@@ -152,6 +152,7 @@ sub emitHeader {
     emit "import Data.Hashable";
     emit "import Data.ByteString (ByteString)";
     emit "import qualified Data.ByteString as B";
+    emit "import Data.Monoid";
     emit "import Data.Text (Text)";
     emit "import qualified Data.Text as T";
     emit "import qualified Data.Text.Encoding as T";
@@ -186,6 +187,28 @@ sub emitHeader {
     emit 'textFromCString :: CString -> IO Text';
     emit 'textFromCString cs = textFromBS <$> B.packCString cs';
     emit '';
+    emit "type ErrorTriple = (StatusType, Status, Text)";
+    emit "";
+    emit "withReturnType' :: (b -> Either a b) -> Either a b";
+    emit "withReturnType' f = f undefined";
+    emit "";
+    emit 'castLen :: (Integral a, Bounded a)';
+    emit '        => Text';
+    emit '        -> Int';
+    emit '        -> Either (StatusType, Status, Text) a';
+    emit "castLen listType x = withReturnType' cl";
+    emit '  where';
+    emit '    tShow = T.pack . show';
+    emit '    cl rt =';
+    emit '      let maxLen = fromIntegral $ maxBound `asTypeOf` rt';
+    emit '      in if x > maxLen';
+    emit '         then Left ( ERROR_TYPE_MISC';
+    emit '                   , ERROR_TOO_BIG';
+    emit '                   , listType <> " had length " <> tShow x <>';
+    emit '                     " but maximum is " <> tShow maxLen';
+    emit '                   )';
+    emit '         else Right $ fromIntegral x';
+    emit "";
 }
 
 sub dumpOutput {
@@ -328,9 +351,45 @@ sub emitListStruct {
     emitStruct ("List$size", "l$size", \@fields, \%fields);
 }
 
+sub emitListFuncs {
+    my ($size) = @_;
+
+    emit "getList$size :: Storable a => (Ptr () -> IO ()) -> IO [a]";
+    emit "getList$size f = do";
+    emit "  let maxLen = maxBound :: Word${size}";
+    emit '  allocaArray (fromIntegral maxLen) $ \storage -> do';
+    emit "    let lst = List${size}";
+    emit "              { l${size}_list = castPtr storage";
+    emit "              , l${size}_max = maxLen";
+    emit "              , l${size}_len = 0";
+    emit '              }';
+    emit '    with lst $ \p -> do';
+    emit '      f (castPtr p)';
+    emit "      lst' <- peek p";
+    emit "      peekArray (fromIntegral (l${size}_len lst')) storage";
+    emit '';
+    emit "setList$size :: Storable a => Text -> [a] -> (Ptr () -> IO ()) -> IO (Maybe ErrorTriple)";
+    emit "setList$size t x f = do";
+    emit '  withArrayLen x $ \len storage -> do';
+    emit '    let eth = castLen t len';
+    emit '    case eth of';
+    emit '      Left err -> return $ Just err';
+    emit "      Right len' -> do";
+    emit "        let lst = List${size}";
+    emit "                  { l${size}_list = castPtr storage";
+    emit "                  , l${size}_max = len'";
+    emit "                  , l${size}_len = len'";
+    emit '                  }';
+    emit '        with lst $ \p -> f (castPtr p)';
+    emit '        return Nothing';
+    emit "";
+}
+
 sub emitStructs {
     emitListStruct ("16");
+    emitListFuncs ("16");
     emitListStruct ("8");
+    emitListFuncs ("8");
 }
 
 sub emitParamTypes {
@@ -357,9 +416,6 @@ sub emitParamTypes {
         }
     }
     emit "paramTypeDisplay _ = \"$nyi\"";
-    emit "";
-
-    emit "type ErrorTriple = (StatusType, Status, Text)";
     emit "";
 
     emit "class ParamValue a where";

@@ -6,6 +6,7 @@ import Control.Applicative
 import Data.Hashable
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
+import Data.Monoid
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
@@ -40,6 +41,28 @@ textToBS = T.encodeUtf8
 textFromCString :: CString -> IO Text
 textFromCString cs = textFromBS <$> B.packCString cs
 
+type ErrorTriple = (StatusType, Status, Text)
+
+withReturnType' :: (b -> Either a b) -> Either a b
+withReturnType' f = f undefined
+
+castLen :: (Integral a, Bounded a)
+        => Text
+        -> Int
+        -> Either (StatusType, Status, Text) a
+castLen listType x = withReturnType' cl
+  where
+    tShow = T.pack . show
+    cl rt =
+      let maxLen = fromIntegral $ maxBound `asTypeOf` rt
+      in if x > maxLen
+         then Left ( ERROR_TYPE_MISC
+                   , ERROR_TOO_BIG
+                   , listType <> " had length " <> tShow x <>
+                     " but maximum is " <> tShow maxLen
+                   )
+         else Right $ fromIntegral x
+
 data List16 =
   List16
   { l16_list :: Ptr ()
@@ -59,6 +82,35 @@ instance Storable List16 where
     #{poke List16, max} p (l16_max x)
     #{poke List16, len} p (l16_len x)
 
+getList16 :: Storable a => (Ptr () -> IO ()) -> IO [a]
+getList16 f = do
+  let maxLen = maxBound :: Word16
+  allocaArray (fromIntegral maxLen) $ \storage -> do
+    let lst = List16
+              { l16_list = castPtr storage
+              , l16_max = maxLen
+              , l16_len = 0
+              }
+    with lst $ \p -> do
+      f (castPtr p)
+      lst' <- peek p
+      peekArray (fromIntegral (l16_len lst')) storage
+
+setList16 :: Storable a => Text -> [a] -> (Ptr () -> IO ()) -> IO (Maybe ErrorTriple)
+setList16 t x f = do
+  withArrayLen x $ \len storage -> do
+    let eth = castLen t len
+    case eth of
+      Left err -> return $ Just err
+      Right len' -> do
+        let lst = List16
+                  { l16_list = castPtr storage
+                  , l16_max = len'
+                  , l16_len = len'
+                  }
+        with lst $ \p -> f (castPtr p)
+        return Nothing
+
 data List8 =
   List8
   { l8_list :: Ptr ()
@@ -77,6 +129,35 @@ instance Storable List8 where
     #{poke List8, list} p (l8_list x)
     #{poke List8, max} p (l8_max x)
     #{poke List8, len} p (l8_len x)
+
+getList8 :: Storable a => (Ptr () -> IO ()) -> IO [a]
+getList8 f = do
+  let maxLen = maxBound :: Word8
+  allocaArray (fromIntegral maxLen) $ \storage -> do
+    let lst = List8
+              { l8_list = castPtr storage
+              , l8_max = maxLen
+              , l8_len = 0
+              }
+    with lst $ \p -> do
+      f (castPtr p)
+      lst' <- peek p
+      peekArray (fromIntegral (l8_len lst')) storage
+
+setList8 :: Storable a => Text -> [a] -> (Ptr () -> IO ()) -> IO (Maybe ErrorTriple)
+setList8 t x f = do
+  withArrayLen x $ \len storage -> do
+    let eth = castLen t len
+    case eth of
+      Left err -> return $ Just err
+      Right len' -> do
+        let lst = List8
+                  { l8_list = castPtr storage
+                  , l8_max = len'
+                  , l8_len = len'
+                  }
+        with lst $ \p -> f (castPtr p)
+        return Nothing
 
 data StatusType =
     SUCCESS_TYPE
@@ -699,8 +780,6 @@ paramTypeDisplay ParamTypeWord16 = "Word16"
 paramTypeDisplay ParamTypeWord32 = "Word32"
 paramTypeDisplay ParamTypeWord8 = "Word8"
 paramTypeDisplay _ = "(Not yet implemented)"
-
-type ErrorTriple = (StatusType, Status, Text)
 
 class ParamValue a where
   pType :: a -> ParamType
