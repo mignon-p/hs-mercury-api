@@ -1,8 +1,9 @@
 -- This file is inserted at the top of Generated.hsc by generate-tmr-hsc.pl
-{-# LANGUAGE OverloadedStrings, FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings, FlexibleInstances, DeriveDataTypeable #-}
 module System.Hardware.MercuryApi.Generated where
 
 import Control.Applicative
+import Control.Exception
 import Data.Hashable
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
@@ -11,6 +12,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.Text.Encoding.Error as T
+import Data.Typeable
 import Data.Word
 import Foreign
 import Foreign.C
@@ -41,24 +43,27 @@ textToBS = T.encodeUtf8
 textFromCString :: CString -> IO Text
 textFromCString cs = textFromBS <$> B.packCString cs
 
-type ErrorTriple = (StatusType, Status, Text)
+-- This exception is never seen by the user.  It is caught
+-- internally and turned into a MercuryException (with some added fields).
+data ParamException = ParamException StatusType Status Text
+  deriving (Eq, Ord, Show, Read, Typeable)
 
-withReturnType' :: (b -> Either a b) -> Either a b
-withReturnType' f = f undefined
+instance Exception ParamException
 
-castLen :: (Integral a, Bounded a)
-        => Text
-        -> Int
-        -> Either (StatusType, Status, Text) a
-castLen listType x = withReturnType' cl
-  where
-    tShow = T.pack . show
-    cl rt =
-      let maxLen = fromIntegral $ maxBound `asTypeOf` rt
-      in if x > maxLen
-         then Left ( ERROR_TYPE_MISC
-                   , ERROR_TOO_BIG
-                   , listType <> " had length " <> tShow x <>
-                     " but maximum is " <> tShow maxLen
-                   )
-         else Right $ fromIntegral x
+castLen' :: Integral a => a -> Text -> Int -> IO a
+castLen' bound description x = do
+  let tShow = T.pack . show
+      maxLen = fromIntegral bound
+  if x > maxLen
+    then throwIO ( ParamException ERROR_TYPE_MISC ERROR_TOO_BIG $
+                   description <> " had length " <> tShow x <>
+                   " but maximum is " <> tShow maxLen )
+    else return $ fromIntegral x
+
+castLen :: (Integral a, Bounded a) => Text -> Int -> IO a
+castLen = castLen' maxBound
+
+class ParamValue a where
+  pType :: a -> ParamType
+  pGet :: (Ptr () -> IO ()) -> IO a
+  pSet :: a -> (Ptr () -> IO ()) -> IO ()

@@ -271,8 +271,8 @@ connect rdr = withReaderEtc rdr "connect" "" c_TMR_connect
 destroy :: Reader -> IO ()
 destroy rdr = withReaderEtc rdr "destroy" "" c_TMR_destroy
 
-throwBinding :: Reader -> ErrorTriple -> T.Text -> T.Text -> IO ()
-throwBinding (Reader fp) (statusType, status, msg) loc param = do
+throwPE :: Reader -> ParamException -> T.Text -> T.Text -> IO ()
+throwPE (Reader fp) (ParamException statusType status msg) loc param = do
   uri <- withForeignPtr fp (textFromCString . uriPtr)
   throwIO $ MercuryException
     { meStatusType = statusType
@@ -283,20 +283,16 @@ throwBinding (Reader fp) (statusType, status, msg) loc param = do
     , meUri = uri
     }
 
-unimplementedParam :: ErrorTriple
+unimplementedParam :: ParamException
 unimplementedParam =
-  ( ERROR_TYPE_BINDING
-  , ERROR_UNIMPLEMENTED_PARAM
-  , "The given parameter is not yet implemented in the Haskell binding."
-  )
+  ParamException ERROR_TYPE_BINDING ERROR_UNIMPLEMENTED_PARAM
+  "The given parameter is not yet implemented in the Haskell binding."
 
-invalidParam :: ParamType -> ParamType -> ErrorTriple
+invalidParam :: ParamType -> ParamType -> ParamException
 invalidParam expected actual =
-  ( ERROR_TYPE_BINDING
-  , ERROR_INVALID_PARAM_TYPE
-  , "Expected " <> paramTypeDisplay expected <>
-    " but got " <> paramTypeDisplay actual
-  )
+  ParamException ERROR_TYPE_BINDING ERROR_INVALID_PARAM_TYPE
+  ( "Expected " <> paramTypeDisplay expected <>
+    " but got " <> paramTypeDisplay actual )
 
 paramSet :: ParamValue a => Reader -> Param -> a -> IO ()
 paramSet rdr param value = do
@@ -305,14 +301,14 @@ paramSet rdr param value = do
       rp = fromParam param
       pName = T.pack $ show param
   when (pt == ParamTypeUnimplemented) $
-    throwBinding rdr unimplementedParam "paramSet" pName
+    throwPE rdr unimplementedParam "paramSet" pName
   when (pt /= pt') $
-    throwBinding rdr (invalidParam pt pt') "paramSet" pName
-  mErr <- pSet value $ \pp -> withReaderEtc rdr "paramSet" pName $
-                              \p -> c_TMR_paramSet p rp pp
-  case mErr of
-    Nothing -> return ()
-    Just err -> throwBinding rdr err "paramSet" pName
+    throwPE rdr (invalidParam pt pt') "paramSet" pName
+  eth <- try $ pSet value $ \pp -> withReaderEtc rdr "paramSet" pName $
+                                   \p -> c_TMR_paramSet p rp pp
+  case eth of
+    Left err -> throwPE rdr err "paramSet" pName
+    Right _ -> return ()
 
 withReturnType :: (a -> IO a) -> IO a
 withReturnType f = f undefined
@@ -324,12 +320,11 @@ paramGet rdr param = withReturnType $ \returnType -> do
       rp = fromParam param
       pName = T.pack $ show param
   when (pt == ParamTypeUnimplemented) $
-    throwBinding rdr unimplementedParam "paramGet" pName
+    throwPE rdr unimplementedParam "paramGet" pName
   when (pt /= pt') $
-    throwBinding rdr (invalidParam pt pt') "paramGet" pName
-  value <- pGet $ \pp -> withReaderEtc rdr "paramGet" pName $
-                         \p -> c_TMR_paramGet p rp pp
-  return value
+    throwPE rdr (invalidParam pt pt') "paramGet" pName
+  pGet $ \pp -> withReaderEtc rdr "paramGet" pName $
+                \p -> c_TMR_paramGet p rp pp
 
 -- | Get a list of parameters supported by the reader.
 paramList :: Reader -> IO [Param]

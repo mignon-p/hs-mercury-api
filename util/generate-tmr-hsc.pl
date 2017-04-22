@@ -185,6 +185,9 @@ sub emitHeader {
     }
 
     close F;
+
+    emit "";
+    emit "-- end of code inserted from util/header.hsc";
     emit "";
 }
 
@@ -345,20 +348,16 @@ sub emitListFuncs {
     emit "      lst' <- peek p";
     emit "      peekArray (fromIntegral (l${size}_len lst')) storage";
     emit '';
-    emit "setList$size :: Storable a => Text -> [a] -> (Ptr () -> IO ()) -> IO (Maybe ErrorTriple)";
+    emit "setList$size :: Storable a => Text -> [a] -> (Ptr () -> IO ()) -> IO ()";
     emit "setList$size t x f = do";
     emit '  withArrayLen x $ \len storage -> do';
-    emit '    let eth = castLen t len';
-    emit '    case eth of';
-    emit '      Left err -> return $ Just err';
-    emit "      Right len' -> do";
-    emit "        let lst = List${size}";
-    emit "                  { l${size}_list = castPtr storage";
-    emit "                  , l${size}_max = len'";
-    emit "                  , l${size}_len = len'";
-    emit '                  }';
-    emit '        with lst $ \p -> f (castPtr p)';
-    emit '        return Nothing';
+    emit "    len' <- castLen t len";
+    emit "    let lst = List${size}";
+    emit "              { l${size}_list = castPtr storage";
+    emit "              , l${size}_max = len'";
+    emit "              , l${size}_len = len'";
+    emit '              }';
+    emit '    with lst $ \p -> f (castPtr p)';
     emit "";
 }
 
@@ -408,12 +407,6 @@ sub emitParamTypes {
         emit "paramTypeDisplay $name = \"$paramType\"";
     }
     emit "paramTypeDisplay _ = \"$nyi\"";
-    emit "";
-
-    emit "class ParamValue a where";
-    emit "  pType :: a -> ParamType";
-    emit "  pGet :: (Ptr () -> IO ()) -> IO a";
-    emit "  pSet :: a -> (Ptr () -> IO ()) -> IO (Maybe ErrorTriple)";
 
     foreach my $paramType (sort values %toHaskellType) {
         my $name = $ptn{$paramType};
@@ -422,16 +415,16 @@ sub emitParamTypes {
         emit "  pType _ = $name";
         if ($paramType =~ /^Int/ or $paramType =~ /^Word/) {
             emit '  pGet f = alloca $ \p -> f (castPtr p) >> peek p';
-            emit '  pSet x f = alloca $ \p -> poke p x >> f (castPtr p) >> return Nothing';
+            emit '  pSet x f = alloca $ \p -> poke p x >> f (castPtr p)';
         } elsif ($paramType eq "Bool") {
             emit '  pGet f = alloca $ \p -> f (castPtr (p :: Ptr CBool)) >> toBool <$> peek p';
-            emit '  pSet x f = alloca $ \p -> poke p (fromBool x :: CBool) >> f (castPtr p) >> return Nothing';
+            emit '  pSet x f = alloca $ \p -> poke p (fromBool x :: CBool) >> f (castPtr p)';
         } elsif ($paramType eq "Region") {
             emit '  pGet f = alloca $ \p -> f (castPtr p) >> toRegion <$> peek p';
-            emit '  pSet x f = alloca $ \p -> poke p (fromRegion x) >> f (castPtr p) >> return Nothing';
+            emit '  pSet x f = alloca $ \p -> poke p (fromRegion x) >> f (castPtr p)';
         } elsif ($paramType eq "TagProtocol") {
             emit '  pGet f = alloca $ \p -> f (castPtr p) >> toTagProtocol <$> peek p';
-            emit '  pSet x f = alloca $ \p -> poke p (fromTagProtocol x) >> f (castPtr p) >> return Nothing';
+            emit '  pSet x f = alloca $ \p -> poke p (fromTagProtocol x) >> f (castPtr p)';
         } elsif ($paramType eq "Text") {
             emit '';
             emit '  pGet f = do';
@@ -449,17 +442,13 @@ sub emitParamTypes {
             emit '  pSet x f = do';
             emit '    let bs = textToBS x';
             emit '    B.useAsCString bs $ \cs -> do';
-            emit '      let eth = castLen "Text" (1 + B.length bs)';
-            emit '      case eth of';
-            emit '        Left err -> return $ Just err';
-            emit "        Right len' -> do";
-            emit '          let lst = List16';
-            emit '                    { l16_list = castPtr cs';
-            emit "                    , l16_max = len'";
-            emit '                    , l16_len = 0 -- unused for TMR_String';
-            emit '                    }';
-            emit '          with lst $ \p -> f (castPtr p)';
-            emit '          return Nothing';
+            emit "      len' <- castLen \"Text\" (1 + B.length bs)";
+            emit '      let lst = List16';
+            emit '                { l16_list = castPtr cs';
+            emit "                , l16_max = len'";
+            emit '                , l16_len = 0 -- unused for TMR_String';
+            emit '                }';
+            emit '      with lst $ \p -> f (castPtr p)';
         } elsif ($paramType =~ /^\[Int/ or $paramType =~ /^\[Word/) {
             my $size = $listSize{$paramType};
             emit "  pGet = getList$size";
