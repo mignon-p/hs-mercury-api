@@ -24,6 +24,16 @@ import Foreign.C
 type CBool = #{type bool}
 newtype ReaderEtc = ReaderEtc ()
 
+cFalse, cTrue :: CBool
+cFalse = 0
+cTrue = 1
+
+toBool' :: CBool -> Bool
+toBool' = toBool
+
+fromBool' :: Bool -> CBool
+fromBool' = fromBool
+
 sizeofReaderEtc :: Int
 sizeofReaderEtc = #{size ReaderEtc}
 
@@ -67,6 +77,73 @@ class ParamValue a where
   pType :: a -> ParamType
   pGet :: (Ptr () -> IO ()) -> IO a
   pSet :: a -> (Ptr () -> IO ()) -> IO ()
+
+data ReadPlan =
+  SimpleReadPlan
+  { rpWeight :: Word32
+  , rpEnableAutonomousRead :: Bool
+  , rpAntennas :: [Word8]
+  , rpProtocol :: TagProtocol
+  , rpUseFastSearch :: Bool
+  , rpStopOnCount :: Maybe Word32
+  , rpTriggerRead :: Maybe [Word8]
+  } deriving (Eq, Ord, Show, Read)
+
+antennasInfo :: Ptr ReadPlan -> (Ptr List8, Word8, Ptr Word8, Text)
+antennasInfo rp =
+  ( #{ptr ReadPlanEtc, plan.u.simple.antennas} rp
+  , #{const GLUE_MAX_ANTENNAS}
+  , #{ptr ReadPlanEtc, antennas} rp
+  , "rpAntennas"
+  )
+
+gpiListInfo :: Ptr ReadPlan -> (Ptr List8, Word8, Ptr Word8, Text)
+gpiListInfo rp =
+  ( #{ptr ReadPlanEtc, plan.u.simple.triggerRead.gpiList} rp
+  , #{const GLUE_MAX_GPIPORTS}
+  , #{ptr ReadPlanEtc, gpiPorts} rp
+  , "rpTriggerRead"
+  )
+
+readPlanTypeSimple :: #{type TMR_ReadPlanType}
+readPlanTypeSimple = #{const TMR_READ_PLAN_TYPE_SIMPLE}
+
+pokeList8 :: (Ptr List8, Word8, Ptr Word8, Text) -> [Word8] -> IO ()
+pokeList8 (lp, maxLen, storage, name) ws = do
+  len <- castLen' maxLen name (length ws)
+  poke lp $ List8
+    { l8_list = castPtr storage
+    , l8_max = maxLen
+    , l8_len = len
+    }
+  pokeArray storage ws
+
+instance Storable ReadPlan where
+  sizeOf _ = #{size ReadPlanEtc}
+  alignment _ = 8
+
+  poke p x = do
+    #{poke ReadPlanEtc, plan.type} p readPlanTypeSimple
+    #{poke ReadPlanEtc, plan.weight} p (rpWeight x)
+    #{poke ReadPlanEtc, plan.enableAutonomousRead} p
+      (fromBool' $ rpEnableAutonomousRead x)
+    pokeList8 (antennasInfo p) (rpAntennas x)
+    #{poke ReadPlanEtc, plan.u.simple.protocol} p
+      (fromTagProtocol $ rpProtocol x)
+    #{poke ReadPlanEtc, plan.u.simple.useFastSearch} p
+      (fromBool' $ rpUseFastSearch x)
+    let (stop, nTags) = case rpStopOnCount x of
+                          Nothing -> (cFalse, 0)
+                          Just n -> (cTrue, n)
+    #{poke ReadPlanEtc, plan.u.simple.stopOnCount.stopNTriggerStatus} p stop
+    #{poke ReadPlanEtc, plan.u.simple.stopOnCount.noOfTags} p nTags
+    let (enable, ports) = case rpTriggerRead x of
+                            Nothing -> (cFalse, [])
+                            Just ps -> (cTrue, ps)
+    #{poke ReadPlanEtc, plan.u.simple.triggerRead.enable} p enable
+    pokeList8 (gpiListInfo p) ports
+
+  peek p = undefined
 
 -- end of code inserted from util/header.hsc
 
