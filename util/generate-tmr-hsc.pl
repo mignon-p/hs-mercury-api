@@ -26,6 +26,7 @@ my %regions = ();
 my @tagProtocols = ();
 
 my @metadataFlags = ();
+my %tagDataStructs = ();
 
 my @lines = ();
 
@@ -40,6 +41,7 @@ my %haskellCodes = (
     "The parameter value was not of the type expected."
     );
 
+# toHaskellType should only contain types needed as param types
 my %toHaskellType = (
     "bool"     => "Bool",
     "int8_t"   => "Int8",
@@ -59,6 +61,12 @@ my %toHaskellType = (
   # "TMR_int8List"   => "[Int8]",
     "TMR_RegionList" => "[Region]",
     "TMR_TagProtocolList" => "[TagProtocol]",
+    );
+
+# toHaskellType2 may contain other types not needed as param types
+my %toHaskellType2 = (
+    %toHaskellType,
+    "TMR_GEN2_TagData" => "GEN2_TagData",
     );
 
 my %listSize = (
@@ -171,8 +179,35 @@ sub readTagProtocol {
     close F;
 }
 
+sub readStructs {
+    my ($file, $structs) = @_;
+
+    my $structName = undef;
+    my $comment = "";
+
+    open F, $file or die;
+    while (<F>) {
+        if (/^typedef struct (\w+)/) {
+            $structName = $1;
+            $comment = "";
+        } elsif (/^\}/) {
+            $structName = undef;
+        } elsif (m%^\s+/\*+\s*(.*?)\s*\*+/%) {
+            $comment = $1;
+        } elsif (/^\s+(\w+)\s+(\w+)[\w\[\]]*?;/ and defined $structName) {
+            my ($fieldName, $type) = ($2, $1);
+            push @{$structs->{$structName}{'fields'}}, $fieldName;
+            $structs->{$structName}{'type'}{$fieldName} = $type;
+            $structs->{$structName}{'comment'}{$fieldName} = $comment;
+            $comment = "";
+        }
+    }
+    close F;
+}
+
 sub readTagData {
-    open F, "$apiDir/tmr_tag_data.h" or die;
+    my $file = "$apiDir/tmr_tag_data.h";
+    open F, $file or die;
     while (<F>) {
         if (/^\s+TMR_TRD_(METADATA_FLAG_\w+)\s*=/) {
             my $flag = $1;
@@ -183,6 +218,8 @@ sub readTagData {
         }
     }
     close F;
+
+    readStructs ($file, \%tagDataStructs);
 }
 
 sub emit {
@@ -379,11 +416,72 @@ sub emitListFuncs {
     emit "";
 }
 
+sub convertStruct {
+    my ($cStruct, $fieldOrder, $fields) = @_;
+
+    foreach my $field (@{$cStruct->{'fields'}}) {
+        push @$fieldOrder, $field;
+
+        my $cType = $cStruct->{'type'}{$field};
+        my $comment = $cStruct->{'comment'}{$field};
+
+        my $hsType = "undefined";
+        if (exists $toHaskellType2{$cType}) {
+            $hsType = $toHaskellType2{$cType};
+       }
+
+        my %info = (
+            "c" => [$field],
+            "type" => $hsType,
+            "comment" => $comment,
+            "marshall" => ["peek", "poke"]
+            );
+
+        $fields->{$field} = \%info;
+    }
+}
+
+sub emitStruct2 {
+    my ($hType, $prefix, $cType, $fields, $info) = @_;
+
+    emit "data $hType =";
+    emit "  $hType";
+    my $sep = "{";
+    foreach my $field (@$fields) {
+        if (exists $info->{$field}) {
+            my $fieldType = $info->{$field}{"type"};
+            my $comment = $info->{$field}{"comment"};
+            my $ufield = ucfirst ($field);
+            $comment = " -- ^ $comment" if ($comment ne "");
+            emit "  $sep $prefix$ufield :: $fieldType$comment";
+            $sep = ",";
+        }
+    }
+    emit "  }";
+    emit "";
+}
+
+sub emitTagData {
+    my $cName = "TMR_TagData";
+    my $cStruct = $tagDataStructs{$cName};
+
+    my @fieldOrder;
+    my %fields;
+
+    convertStruct ($cStruct, \@fieldOrder, \%fields);
+
+    # TODO
+
+    emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
+}
+
 sub emitStructs {
     emitListStruct ("16");
     emitListFuncs ("16");
     emitListStruct ("8");
     emitListFuncs ("8");
+
+    # emitTagData();
 }
 
 sub paramTypeName {
