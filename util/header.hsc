@@ -78,15 +78,21 @@ class ParamValue a where
   pGet :: (Ptr () -> IO ()) -> IO a
   pSet :: a -> (Ptr () -> IO ()) -> IO ()
 
+-- | A ReadPlan structure specifies the antennas, protocols, and filters
+-- to use for a search (read).
+--
+-- Currently, only @SimpleReadPlan@ is supported, and @filter@ and @tagop@
+-- are not supported.
 data ReadPlan =
   SimpleReadPlan
-  { rpWeight :: Word32
-  , rpEnableAutonomousRead :: Bool
-  , rpAntennas :: [Word8]
-  , rpProtocol :: TagProtocol
-  , rpUseFastSearch :: Bool
-  , rpStopOnCount :: Maybe Word32
-  , rpTriggerRead :: Maybe [Word8]
+  { rpWeight        :: Word32        -- ^ The relative weight of this read plan
+  , rpEnableAutonomousRead :: Bool   -- ^ Option for Autonomous read
+  , rpAntennas      :: [Word8]       -- ^ The list of antennas to read on
+  , rpProtocol      :: TagProtocol   -- ^ The protocol to use for reading
+  , rpUseFastSearch :: Bool          -- ^ Option to use the FastSearch
+  , rpStopOnCount   :: Maybe Word32  -- ^ Number of tags to be read
+  , rpTriggerRead   :: Maybe [Word8] -- ^ The list of GPI ports which should be
+                                     -- used to trigger the read
   } deriving (Eq, Ord, Show, Read)
 
 antennasInfo :: Ptr ReadPlan -> (Ptr List8, Word8, Ptr Word8, Text)
