@@ -459,6 +459,29 @@ sub emitStruct2 {
     }
     emit "  }";
     emit "";
+
+    emit "instance Storable $hType where";
+    emit "  sizeOf _ = #{size $cType}";
+    emit "  alignment _ = 8"; # because "#alignment" doesn't work for me
+    emit "  peek p = do";
+    foreach my $field (@$fields) {
+        my $c = $info->{$field}{"c"};
+        foreach my $cField (@$c) {
+            my $ufield = ucfirst ($cField);
+            emit "    p$ufield <- #{ptr $cType, $cField} p";
+        }
+    }
+    emit "    $hType";
+    $sep = '<$>';
+    foreach my $field (@$fields) {
+        my $c = $info->{$field}{"c"};
+        my $marshall = $info->{$field}{"marshall"}[0];
+        my @ptrs = map ("p$_", map (ucfirst, @$c));
+        emit ("      $sep $marshall " . join (" ", @ptrs));
+        $sep = '<*>';
+    }
+    emit '  poke p x = error "poke not implemented"';
+    emit "";
 }
 
 sub emitTagData {
