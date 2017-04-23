@@ -13,6 +13,7 @@ module System.Hardware.MercuryApi
   , Region (..)
   , TagProtocol (..)
   , ReadPlan (..)
+  , apiVersion
   , create
   , connect
   , destroy

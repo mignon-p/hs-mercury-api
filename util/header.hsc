@@ -21,6 +21,10 @@ import Foreign.C
 #include <glue.h>
 #include <stdbool.h>
 
+-- | Version number of the Mercury API C library.
+apiVersion :: Text
+apiVersion = #{const_str TMR_VERSION}
+
 type CBool = #{type bool}
 newtype ReaderEtc = ReaderEtc ()
 

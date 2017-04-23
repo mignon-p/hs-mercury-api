@@ -4,6 +4,7 @@ import Control.Concurrent
 import Control.Exception
 import Control.Monad
 import qualified Data.ByteString as B
+import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Word
@@ -36,6 +37,7 @@ stringParams =
   ]
 
 main = do
+  T.putStrLn $ "API version: " <> TMR.apiVersion
   putStrLn "create"
   rdr <- TMR.create "tmr:///dev/ttyUSB0"
   putStrLn "addTransportListener"
