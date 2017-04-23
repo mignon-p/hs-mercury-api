@@ -155,11 +155,11 @@ instance Storable ReadPlan where
     protocol <- #{peek ReadPlanEtc, plan.u.simple.protocol} p
     useFastSearch <- #{peek ReadPlanEtc, plan.u.simple.useFastSearch} p
     stop <- #{peek ReadPlanEtc, plan.u.simple.stopOnCount.stopNTriggerStatus} p
-    stopOnCount <- if stop
+    stopOnCount <- if toBool' stop
                    then Just <$> #{peek ReadPlanEtc, plan.u.simple.stopOnCount.noOfTags} p
                    else return Nothing
     enable <- #{peek ReadPlanEtc, plan.u.simple.triggerRead.enable} p
-    triggerRead <- if enable
+    triggerRead <- if toBool' enable
                    then Just <$> peekList8 (gpiListInfo p)
                    else return Nothing
     return $ SimpleReadPlan
