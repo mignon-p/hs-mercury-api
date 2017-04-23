@@ -25,6 +25,8 @@ my %regions = ();
 
 my @tagProtocols = ();
 
+my @metadataFlags = ();
+
 my @lines = ();
 
 my $nyi = "(Not yet implemented)";
@@ -163,6 +165,20 @@ sub readTagProtocol {
     while (<F>) {
         if (/^\s+TMR_(TAG_PROTOCOL_\w+)/) {
             push @tagProtocols, $1;
+        }
+    }
+    close F;
+}
+
+sub readTagData {
+    open F, "$apiDir/tmr_tag_data.h" or die;
+    while (<F>) {
+        if (/^\s+TMR_TRD_(METADATA_FLAG_\w+)\s*=/) {
+            my $flag = $1;
+            if ($flag ne "METADATA_FLAG_NONE" and
+                $flag ne "METADATA_FLAG_ALL") {
+                push @metadataFlags, $flag;
+            }
         }
     }
     close F;
@@ -510,17 +526,33 @@ sub emitTagProtocol {
     emit "";
 }
 
+sub emitMetadataFlags {
+    emit "type RawMetadataFlag = #{type TMR_TRD_MetadataFlag}";
+    emit "";
+
+    emit "data MetadataFlag =";
+    emitEnum (\@metadataFlags, {});
+    emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
+    emit "";
+
+    emit "fromMetadataFlag :: MetadataFlag -> RawMetadataFlag";
+    emitFrom ("fromMetadataFlag", "TMR_TRD_", \@metadataFlags);
+    emit "";
+}
+
 readStatus();
 readParams();
 readGlue();
 readRegion();
 readTagProtocol();
+readTagData();
 
 emitHeader();
 emitStructs();
 emitStatus();
 emitRegion();
 emitTagProtocol();
+emitMetadataFlags();
 emitParams();
 emitParamTypes();
 
