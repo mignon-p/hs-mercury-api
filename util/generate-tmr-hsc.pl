@@ -48,6 +48,7 @@ my %toHaskellType = (
     "uint32_t" => "Word32",
     "TMR_Region" => "Region",
     "TMR_TagProtocol" => "TagProtocol",
+    "TMR_ReadPlan"    => "ReadPlan",
     "TMR_String" => "Text",
     "TMR_uint8List"  => "[Word8]",
   # "TMR_uint16List" => "[Word16]",
@@ -425,6 +426,11 @@ sub emitParamTypes {
         } elsif ($paramType eq "TagProtocol") {
             emit '  pGet f = alloca $ \p -> f (castPtr p) >> toTagProtocol <$> peek p';
             emit '  pSet x f = alloca $ \p -> poke p (fromTagProtocol x) >> f (castPtr p)';
+        } elsif ($paramType eq "ReadPlan") {
+            emit '  pGet f = alloca $ \p -> f (castPtr p) >> peek p';
+            # Unlike all the other cases, in this case we transfer ownership
+            # to the C code, which will free it later.
+            emit '  pSet x f = bracketOnError (new x) free (f . castPtr)';
         } elsif ($paramType eq "Text") {
             emit '';
             emit '  pGet f = do';

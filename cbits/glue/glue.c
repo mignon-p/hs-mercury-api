@@ -121,9 +121,6 @@ TMR_Status c_TMR_paramSet(ReaderEtc *reader,
                  */
                 free (reader->readPlan);
                 reader->readPlan = (ReadPlanEtc *) value;
-            } else {
-                /* If the set fails, we need to free the new ReadPlanEtc. */
-                free ((void*) value);
             }
         }
 

@@ -614,7 +614,7 @@ data Param =
   | PARAM_ISO180006B_DELIMITER -- ^ "/reader/iso180006b/delimiter", (Not yet implemented)
   | PARAM_READ_ASYNCOFFTIME -- ^ "/reader/read/asyncOffTime", Word32
   | PARAM_READ_ASYNCONTIME -- ^ "/reader/read/asyncOnTime", Word32
-  | PARAM_READ_PLAN -- ^ "/reader/read/plan", (Not yet implemented)
+  | PARAM_READ_PLAN -- ^ "/reader/read/plan", ReadPlan
   | PARAM_RADIO_ENABLEPOWERSAVE -- ^ "/reader/radio/enablePowerSave", Bool
   | PARAM_RADIO_POWERMAX -- ^ "/reader/radio/powerMax", Int16
   | PARAM_RADIO_POWERMIN -- ^ "/reader/radio/powerMin", Int16
@@ -851,6 +851,7 @@ data ParamType =
   | ParamTypeInt16
   | ParamTypeInt32
   | ParamTypeInt8
+  | ParamTypeReadPlan
   | ParamTypeRegion
   | ParamTypeRegionList
   | ParamTypeTagProtocol
@@ -877,6 +878,7 @@ paramType PARAM_GPIO_INPUTLIST = ParamTypeWord8List
 paramType PARAM_GPIO_OUTPUTLIST = ParamTypeWord8List
 paramType PARAM_READ_ASYNCOFFTIME = ParamTypeWord32
 paramType PARAM_READ_ASYNCONTIME = ParamTypeWord32
+paramType PARAM_READ_PLAN = ParamTypeReadPlan
 paramType PARAM_RADIO_ENABLEPOWERSAVE = ParamTypeBool
 paramType PARAM_RADIO_POWERMAX = ParamTypeInt16
 paramType PARAM_RADIO_POWERMIN = ParamTypeInt16
@@ -926,6 +928,7 @@ paramTypeDisplay ParamTypeBool = "Bool"
 paramTypeDisplay ParamTypeInt16 = "Int16"
 paramTypeDisplay ParamTypeInt32 = "Int32"
 paramTypeDisplay ParamTypeInt8 = "Int8"
+paramTypeDisplay ParamTypeReadPlan = "ReadPlan"
 paramTypeDisplay ParamTypeRegion = "Region"
 paramTypeDisplay ParamTypeTagProtocol = "TagProtocol"
 paramTypeDisplay ParamTypeText = "Text"
@@ -957,6 +960,11 @@ instance ParamValue Int8 where
   pType _ = ParamTypeInt8
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
   pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+
+instance ParamValue ReadPlan where
+  pType _ = ParamTypeReadPlan
+  pGet f = alloca $ \p -> f (castPtr p) >> peek p
+  pSet x f = bracketOnError (new x) free (f . castPtr)
 
 instance ParamValue Region where
   pType _ = ParamTypeRegion
