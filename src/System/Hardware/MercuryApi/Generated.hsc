@@ -7,6 +7,7 @@ import Control.Exception
 import Data.Hashable
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
+import Data.Maybe
 import Data.Monoid
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -181,6 +182,15 @@ instance Storable ReadPlan where
       , rpStopOnCount = stopOnCount
       , rpTriggerRead = triggerRead
       }
+
+packFlags :: [MetadataFlag] -> RawMetadataFlag
+packFlags flags = sum $ map fromMetadataFlag flags
+
+unpackFlags :: RawMetadataFlag -> [MetadataFlag]
+unpackFlags x = mapMaybe f [minBound..maxBound]
+  where f flag = if (x .&. fromMetadataFlag flag) == 0
+                 then Nothing
+                 else Just flag
 
 -- end of code inserted from util/header.hsc
 
@@ -699,7 +709,7 @@ data Param =
   | PARAM_READER_WRITE_EARLY_EXIT -- ^ "/reader/gen2/writeEarlyExit", Bool
   | PARAM_READER_STATS_ENABLE -- ^ "/reader/stats/enable", (Not yet implemented)
   | PARAM_TRIGGER_READ_GPI -- ^ "/reader/trigger/read/Gpi", [Word8]
-  | PARAM_METADATAFLAG -- ^ "/reader/metadataflags", (Not yet implemented)
+  | PARAM_METADATAFLAG -- ^ "/reader/metadataflags", [MetadataFlag]
   | PARAM_LICENSED_FEATURES
   deriving (Eq, Ord, Show, Read, Bounded, Enum)
 
@@ -886,6 +896,7 @@ data ParamType =
   | ParamTypeInt16
   | ParamTypeInt32
   | ParamTypeInt8
+  | ParamTypeMetadataFlagList
   | ParamTypeReadPlan
   | ParamTypeRegion
   | ParamTypeRegionList
@@ -956,6 +967,7 @@ paramType PARAM_READER_HOSTNAME = ParamTypeText
 paramType PARAM_READER_WRITE_REPLY_TIMEOUT = ParamTypeWord16
 paramType PARAM_READER_WRITE_EARLY_EXIT = ParamTypeBool
 paramType PARAM_TRIGGER_READ_GPI = ParamTypeWord8List
+paramType PARAM_METADATAFLAG = ParamTypeMetadataFlagList
 paramType _ = ParamTypeUnimplemented
 
 paramTypeDisplay :: ParamType -> Text
@@ -970,6 +982,7 @@ paramTypeDisplay ParamTypeText = "Text"
 paramTypeDisplay ParamTypeWord16 = "Word16"
 paramTypeDisplay ParamTypeWord32 = "Word32"
 paramTypeDisplay ParamTypeWord8 = "Word8"
+paramTypeDisplay ParamTypeMetadataFlagList = "[MetadataFlag]"
 paramTypeDisplay ParamTypeRegionList = "[Region]"
 paramTypeDisplay ParamTypeTagProtocolList = "[TagProtocol]"
 paramTypeDisplay ParamTypeWord32List = "[Word32]"
@@ -1051,6 +1064,11 @@ instance ParamValue Word8 where
   pType _ = ParamTypeWord8
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
   pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+
+instance ParamValue [MetadataFlag] where
+  pType _ = ParamTypeMetadataFlagList
+  pGet f = alloca $ \p -> f (castPtr p) >> unpackFlags <$> peek p
+  pSet x f = alloca $ \p -> poke p (packFlags x) >> f (castPtr p)
 
 instance ParamValue [Region] where
   pType _ = ParamTypeRegionList

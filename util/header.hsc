@@ -7,6 +7,7 @@ import Control.Exception
 import Data.Hashable
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
+import Data.Maybe
 import Data.Monoid
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -181,3 +182,12 @@ instance Storable ReadPlan where
       , rpStopOnCount = stopOnCount
       , rpTriggerRead = triggerRead
       }
+
+packFlags :: [MetadataFlag] -> RawMetadataFlag
+packFlags flags = sum $ map fromMetadataFlag flags
+
+unpackFlags :: RawMetadataFlag -> [MetadataFlag]
+unpackFlags x = mapMaybe f [minBound..maxBound]
+  where f flag = if (x .&. fromMetadataFlag flag) == 0
+                 then Nothing
+                 else Just flag

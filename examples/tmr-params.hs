@@ -67,5 +67,8 @@ main = do
   putStrLn "paramGet PARAM_REGION_ID"
   region <- TMR.paramGet rdr TMR.PARAM_REGION_ID :: IO TMR.Region
   print region
+  putStrLn "paramGet PARAM_METADATAFLAG"
+  meta <- TMR.paramGet rdr TMR.PARAM_METADATAFLAG :: IO [TMR.MetadataFlag]
+  print meta
   putStrLn "destroy"
   TMR.destroy rdr
