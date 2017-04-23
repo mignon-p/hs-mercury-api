@@ -56,5 +56,14 @@ main = do
   putStrLn "paramGet PARAM_REGION_SUPPORTEDREGIONS"
   regions <- TMR.paramGet rdr TMR.PARAM_REGION_SUPPORTEDREGIONS :: IO [TMR.Region]
   print regions
+  putStrLn "paramGet PARAM_VERSION_SUPPORTEDPROTOCOLS"
+  protos <- TMR.paramGet rdr TMR.PARAM_VERSION_SUPPORTEDPROTOCOLS :: IO [TMR.TagProtocol]
+  print protos
+  putStrLn "paramGet PARAM_READ_PLAN"
+  plan <- TMR.paramGet rdr TMR.PARAM_READ_PLAN :: IO TMR.ReadPlan
+  print plan
+  putStrLn "paramGet PARAM_REGION_ID"
+  region <- TMR.paramGet rdr TMR.PARAM_REGION_ID :: IO TMR.Region
+  print region
   putStrLn "destroy"
   TMR.destroy rdr

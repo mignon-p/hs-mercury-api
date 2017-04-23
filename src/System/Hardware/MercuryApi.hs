@@ -11,6 +11,8 @@ module System.Hardware.MercuryApi
   , TransportListener
   , TransportListenerId
   , Region (..)
+  , TagProtocol (..)
+  , ReadPlan (..)
   , create
   , connect
   , destroy
