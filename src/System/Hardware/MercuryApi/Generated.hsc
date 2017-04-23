@@ -118,6 +118,11 @@ pokeList8 (lp, maxLen, storage, name) ws = do
     }
   pokeArray storage ws
 
+peekList8 :: (Ptr List8, Word8, Ptr Word8, Text) -> IO [Word8]
+peekList8 (lp, _, _, _) = do
+  lst <- peek lp
+  peekArray (fromIntegral $ l8_len lst) (castPtr $ l8_list lst)
+
 instance Storable ReadPlan where
   sizeOf _ = #{size ReadPlanEtc}
   alignment _ = 8
@@ -143,7 +148,29 @@ instance Storable ReadPlan where
     #{poke ReadPlanEtc, plan.u.simple.triggerRead.enable} p enable
     pokeList8 (gpiListInfo p) ports
 
-  peek p = undefined
+  peek p = do
+    weight <- #{peek ReadPlanEtc, plan.weight} p
+    enableAutonomousRead <- #{peek ReadPlanEtc, plan.enableAutonomousRead} p
+    antennas <- peekList8 (antennasInfo p)
+    protocol <- #{peek ReadPlanEtc, plan.u.simple.protocol} p
+    useFastSearch <- #{peek ReadPlanEtc, plan.u.simple.useFastSearch} p
+    stop <- #{peek ReadPlanEtc, plan.u.simple.stopOnCount.stopNTriggerStatus} p
+    stopOnCount <- if stop
+                   then Just <$> #{peek ReadPlanEtc, plan.u.simple.stopOnCount.noOfTags} p
+                   else return Nothing
+    enable <- #{peek ReadPlanEtc, plan.u.simple.triggerRead.enable} p
+    triggerRead <- if enable
+                   then Just <$> peekList8 (gpiListInfo p)
+                   else return Nothing
+    return $ SimpleReadPlan
+      { rpWeight = weight
+      , rpEnableAutonomousRead = toBool' enableAutonomousRead
+      , rpAntennas = antennas
+      , rpProtocol = toTagProtocol protocol
+      , rpUseFastSearch = toBool' useFastSearch
+      , rpStopOnCount = stopOnCount
+      , rpTriggerRead = triggerRead
+      }
 
 -- end of code inserted from util/header.hsc
 
