@@ -465,23 +465,38 @@ sub emitStruct2 {
     emit "  alignment _ = 8"; # because "#alignment" doesn't work for me
     emit "  peek p = do";
     foreach my $field (@$fields) {
-        my $c = $info->{$field}{"c"};
-        foreach my $cField (@$c) {
-            my $ufield = ucfirst ($cField);
-            emit "    p$ufield <- #{ptr $cType, $cField} p";
+        if (exists $info->{$field}) {
+            my $c = $info->{$field}{"c"};
+            foreach my $cField (@$c) {
+                my $ufield = ucfirst ($cField);
+                emit "    p$ufield <- #{ptr $cType, $cField} p";
+            }
         }
     }
     emit "    $hType";
     $sep = '<$>';
     foreach my $field (@$fields) {
-        my $c = $info->{$field}{"c"};
-        my $marshall = $info->{$field}{"marshall"}[0];
-        my @ptrs = map ("p$_", map (ucfirst, @$c));
-        emit ("      $sep $marshall " . join (" ", @ptrs));
-        $sep = '<*>';
+        if (exists $info->{$field}) {
+            my $c = $info->{$field}{"c"};
+            my $marshall = $info->{$field}{"marshall"}[0];
+            my @ptrs = map ("p$_", map (ucfirst, @$c));
+            emit ("      $sep $marshall " . join (" ", @ptrs));
+            $sep = '<*>';
+        }
     }
     emit '  poke p x = error "poke not implemented"';
     emit "";
+}
+
+sub byteStringArrayField {
+    my ($fields, $arrayField, $lengthField) = @_;
+
+    my $info = $fields->{$arrayField};
+    $info->{"c"} = [$arrayField, $lengthField];
+    $info->{"type"} = "ByteString";
+    $info->{"marshall"} = ["peekArrayAsByteString", "pokeArrayAsByteString"];
+
+    delete $fields->{$lengthField};
 }
 
 sub emitTagData {
@@ -493,7 +508,7 @@ sub emitTagData {
 
     convertStruct ($cStruct, \@fieldOrder, \%fields);
 
-    # TODO
+    byteStringArrayField (\%fields, "epc", "epcByteCount");
 
     emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
 }
