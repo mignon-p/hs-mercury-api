@@ -513,6 +513,19 @@ sub byteStringArrayField {
     delete $fields->{$lengthField};
 }
 
+sub maybeField {
+    my ($fields, $justField, $conditionField, $condition) = @_;
+
+    my $info = $fields->{$justField};
+    my $oldType = $info->{"type"};
+    my $oldPeek = $info->{"marshall"}[0];
+    my $oldPoke = $info->{"marshall"}[1];
+    $info->{"c"} = [$justField, $conditionField];
+    $info->{"type"} = "Maybe ($oldType)";
+    $info->{"marshall"} = ["(unmarshallMaybe ($oldPeek) ($condition))",
+                           "(marshallMaybe ($oldPoke) ($condition))"];
+}
+
 sub emitTagData {
     my $cName = "TMR_TagData";
     my $cStruct = $tagDataStructs{$cName};
@@ -523,6 +536,8 @@ sub emitTagData {
     convertStruct ($cStruct, \@fieldOrder, \%fields);
 
     byteStringArrayField (\%fields, "epc", "epcByteCount");
+    maybeField (\%fields, "gen2", "protocol",
+                "== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)");
 
     emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
 }
