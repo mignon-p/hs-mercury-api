@@ -299,6 +299,7 @@ setList8 t x f = do
               }
     with lst $ \p -> f (castPtr p)
 
+-- | Gen2-specific per-tag data
 newtype GEN2_TagData =
   GEN2_TagData
   { g2Pc :: (ByteString) -- ^ Tag PC
@@ -316,6 +317,7 @@ instance Storable GEN2_TagData where
 
   poke p x = error "poke not implemented"
 
+-- | A record to represent RFID tags.
 data TagData =
   TagData
   { tdEpc :: !(ByteString) -- ^ Tag EPC

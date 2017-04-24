@@ -557,25 +557,9 @@ sub wrapField {
                            "$oldPoke \$ from$wrapType"];
 }
 
-sub emitTagData {
-    my $cName = "TMR_TagData";
-    my $cStruct = $tagDataStructs{$cName};
-
-    my @fieldOrder;
-    my %fields;
-
-    convertStruct ($cStruct, \@fieldOrder, \%fields);
-
-    byteStringArrayField (\%fields, "epc", "epcByteCount");
-    maybeField (\%fields, "gen2", "protocol",
-                "== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)");
-    ${fields}{"gen2"}{"c"}[0] = "u.gen2";
-    wrapField (\%fields, "protocol", "TagProtocol");
-
-    emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
-}
-
 sub emitGen2 {
+    emit "-- | Gen2-specific per-tag data";
+
     my $cName = "TMR_GEN2_TagData";
     my $cStruct = $gen2Structs{$cName};
 
@@ -587,6 +571,63 @@ sub emitGen2 {
     byteStringArrayField (\%fields, "pc", "pcByteCount");
 
     emitStruct2 ("GEN2_TagData", "g2", $cName, \@fieldOrder, \%fields);
+}
+
+sub emitTagData {
+    emit "-- | A record to represent RFID tags.";
+
+    my $cName = "TMR_TagData";
+    my $cStruct = $tagDataStructs{$cName};
+
+    my @fieldOrder;
+    my %fields;
+
+    convertStruct ($cStruct, \@fieldOrder, \%fields);
+
+    byteStringArrayField (\%fields, "epc", "epcByteCount");
+    maybeField (\%fields, "gen2", "protocol",
+                "== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)");
+    $fields{"gen2"}{"c"}[0] = "u.gen2";
+    wrapField (\%fields, "protocol", "TagProtocol");
+
+    emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
+}
+
+sub deleteUnderscoreFields {
+    my $fields = @_;
+
+    foreach my $field (keys %$fields) {
+        delete $fields->{$field} if ($field =~ /^_/);
+    }
+}
+
+sub emitTagReadData {
+    emit "-- | A record to represent a read of an RFID tag.";
+    emit "-- Provides access to the metadata of the read event,";
+    emit "-- such as the time of the read, the antenna that read the tag,";
+    emit "-- and the number of times the tag was seen by the air protocol.";
+
+    my $cName = "TMR_TagReadData";
+    my $cStruct = $tagDataStructs{$cName};
+
+    my @fieldOrder;
+    my %fields;
+
+    convertStruct ($cStruct, \@fieldOrder, \%fields);
+
+    # delete private fields
+    delete $fields{"isAsyncRead"};
+    delete $fields{"dspMicros"};
+    delete $fields{"reader"};
+    deleteUnderscoreFields (\%fields);
+
+    # fields that need special handling:
+    # metadataFlags as list of flags
+    # gpio/gpioCount as array
+    # timestampLow/timestampHigh merged into one
+    # uint8Lists as bytestrings
+
+    emitStruct2 ("TagReadData", "tr", $cName, \@fieldOrder, \%fields);
 }
 
 sub emitStructs {
