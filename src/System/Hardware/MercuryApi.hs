@@ -1,4 +1,4 @@
-{-# LANGUAGE ForeignFunctionInterface, DeriveDataTypeable, OverloadedStrings #-}
+{-# LANGUAGE ForeignFunctionInterface, DeriveDataTypeable, OverloadedStrings, BangPatterns #-}
 
 module System.Hardware.MercuryApi
   ( Reader
@@ -14,10 +14,15 @@ module System.Hardware.MercuryApi
   , TagProtocol (..)
   , ReadPlan (..)
   , MetadataFlag (..)
+  , TagReadData (..)
+  , GpioPin (..)
+  , TagData (..)
+  , GEN2_TagData (..)
   , apiVersion
   , create
   , connect
   , destroy
+  , read
   , paramSet
   , paramGet
   , paramList
@@ -27,6 +32,8 @@ module System.Hardware.MercuryApi
   , addTransportListener
   , removeTransportListener
   ) where
+
+import Prelude hiding (read)
 
 import Control.Applicative
 import Control.Concurrent
@@ -51,10 +58,6 @@ newtype Reader = Reader (ForeignPtr ReaderEtc)
 
 type RawStatus = Word32
 type RawType = Word32
-
-cFalse, cTrue :: CBool
-cFalse = 0
-cTrue = 1
 
 type RawTransportListener =
   CBool -> Word32 -> Ptr Word8 -> Word32 -> Ptr () -> IO ()
@@ -96,6 +99,10 @@ foreign import ccall safe "glue.h c_TMR_getNextTag"
     c_TMR_getNextTag :: Ptr ReaderEtc
                      -> Ptr TagReadData
                      -> IO RawStatus
+
+foreign import ccall unsafe "tmr_tag_data.h TMR_TRD_init"
+    c_TMR_TRD_init :: Ptr TagReadData
+                   -> IO RawStatus
 
 foreign import ccall safe "glue.h c_TMR_paramSet"
     c_TMR_paramSet :: Ptr ReaderEtc
@@ -272,6 +279,53 @@ connect rdr = withReaderEtc rdr "connect" "" c_TMR_connect
 -- that have been consumed by the reader structure.
 destroy :: Reader -> IO ()
 destroy rdr = withReaderEtc rdr "destroy" "" c_TMR_destroy
+
+hasMoreTags :: Ptr CBool -> Ptr ReaderEtc -> IO RawStatus
+hasMoreTags boolPtr rdrPtr = do
+  status <- c_TMR_hasMoreTags rdrPtr
+  let (moreTags, status') = case toStatus status of
+                              ERROR_NO_TAGS -> (cFalse, 0)
+                              _ -> (cTrue, status)
+  poke boolPtr moreTags
+  return status'
+
+tShow :: Show a => a -> T.Text
+tShow = T.pack . show
+
+readLoop :: Reader
+         -> Word32
+         -> Ptr TagReadData
+         -> Ptr CBool
+         -> Int
+         -> [TagReadData]
+         -> IO [TagReadData]
+readLoop rdr tagCount trdPtr boolPtr !tagNum !trds = do
+  let tagNum' = tagNum + 1
+      progress = "(" <> tShow tagNum' <> " of " <> tShow tagCount <> ")"
+  withReaderEtc rdr "read"
+    ("hasMoreTags " <> progress)
+    (hasMoreTags boolPtr)
+  moreTags <- toBool' <$> peek boolPtr
+  if moreTags
+    then do
+    c_TMR_TRD_init trdPtr -- ignore return value because it is always success
+    withReaderEtc rdr "read" ("getNextTag " <> progress)
+      $ \p -> c_TMR_getNextTag p trdPtr
+    trd <- peek trdPtr
+    readLoop rdr tagCount trdPtr boolPtr tagNum' (trd : trds)
+    else do
+    return $ reverse trds
+
+-- | Search for tags for a fixed duration.
+read :: Reader -- ^ The reader being operated on
+     -> Word32 -- ^ The number of milliseconds to search for tags
+     -> IO [TagReadData]
+read rdr timeoutMs = do
+  alloca $ \tagCountPtr -> do
+    withReaderEtc rdr "read" "read" $ \p -> c_TMR_read p timeoutMs tagCountPtr
+    tagCount <- peek tagCountPtr
+    alloca $ \trdPtr -> alloca $
+                        \boolPtr -> readLoop rdr tagCount trdPtr boolPtr 0 []
 
 throwPE :: Reader -> ParamException -> T.Text -> T.Text -> IO ()
 throwPE (Reader fp) (ParamException statusType status msg) loc param = do
