@@ -350,6 +350,29 @@ instance Storable TagData where
 
   poke p x = error "poke not implemented"
 
+-- | The identity and state of a single GPIO pin.
+data GpioPin =
+  GpioPin
+  { gpId :: !(Word8) -- ^ The ID number of the pin.
+  , gpHigh :: !(Bool) -- ^ Whether the pin is in the high state.
+  , gpOutput :: !(Bool) -- ^ The direction of the pin
+  }
+
+instance Storable GpioPin where
+  sizeOf _ = #{size TMR_GpioPin}
+  alignment _ = 8
+
+  peek p = do
+    let pId = #{ptr TMR_GpioPin, id} p
+        pHigh = #{ptr TMR_GpioPin, high} p
+        pOutput = #{ptr TMR_GpioPin, output} p
+    GpioPin
+      <$> (peek pId)
+      <*> (toBool' <$> peek pHigh)
+      <*> (toBool' <$> peek pOutput)
+
+  poke p x = error "poke not implemented"
+
 data StatusType =
     SUCCESS_TYPE
   | ERROR_TYPE_COMM

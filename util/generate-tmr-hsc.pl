@@ -30,6 +30,7 @@ my @metadataFlags = ();
 
 my %tagDataStructs = ();
 my %gen2Structs = ();
+my %gpioStructs = ();
 
 my @lines = ();
 
@@ -227,6 +228,10 @@ sub readTagData {
 
 sub readGen2 {
     readStructs ("$apiDir/tmr_gen2.h", \%gen2Structs);
+}
+
+sub readGpio {
+    readStructs ("$apiDir/tmr_gpio.h", \%gpioStructs);
 }
 
 sub emit {
@@ -593,6 +598,23 @@ sub emitTagData {
     emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
 }
 
+sub emitGpio {
+    emit "-- | The identity and state of a single GPIO pin.";
+
+    my $cName = "TMR_GpioPin";
+    my $cStruct = $gpioStructs{$cName};
+
+    my @fieldOrder;
+    my %fields;
+
+    convertStruct ($cStruct, \@fieldOrder, \%fields);
+
+    wrapField (\%fields, "high", "toBool'", "fromBool'");
+    wrapField (\%fields, "output", "toBool'", "fromBool'");
+
+    emitStruct2 ("GpioPin", "gp", $cName, \@fieldOrder, \%fields);
+}
+
 sub deleteUnderscoreFields {
     my $fields = @_;
 
@@ -640,6 +662,7 @@ sub emitStructs {
 
     emitGen2();
     emitTagData();
+    emitGpio();
 }
 
 sub paramTypeName {
@@ -807,6 +830,7 @@ readRegion();
 readTagProtocol();
 readTagData();
 readGen2();
+readGpio();
 
 emitHeader();
 emitStructs();
