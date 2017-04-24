@@ -197,6 +197,18 @@ peekArrayAsByteString arrayPtr lenPtr = do
   len <- peek lenPtr
   B.packCStringLen (castPtr arrayPtr, fromIntegral len)
 
+peekMaybe :: (Storable a, Storable b)
+          => (Ptr a -> IO a)
+          -> (b -> Bool)
+          -> Ptr a
+          -> Ptr b
+          -> IO (Maybe a)
+peekMaybe oldPeek cond justP condP = do
+  c <- peek condP
+  if cond c
+    then Just <$> oldPeek justP
+    else return Nothing
+
 -- end of code inserted from util/header.hsc
 
 data List16 =

@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+use Carp;
 use FindBin;
 
 my $utilDir = $FindBin::Bin;
@@ -447,6 +448,14 @@ sub convertStruct {
     }
 }
 
+sub makePfield {
+    my ($f) = @_;
+    croak "undefined argument to makePfield" if (not defined $f);
+    $f =~ s/\W/_/g;
+    my $u = ucfirst ($f);
+    return "p$u";
+}
+
 sub emitStruct2 {
     my ($hType, $prefix, $cType, $fields, $info) = @_;
 
@@ -456,7 +465,11 @@ sub emitStruct2 {
     }
 
     my $data = "data";
-    $data = "newtype" if ($nFields == 1);
+    my $bang = "!";
+    if ($nFields == 1) {
+        $data = "newtype";
+        $bang = "";
+    }
 
     emit "$data $hType =";
     emit "  $hType";
@@ -467,7 +480,7 @@ sub emitStruct2 {
             my $comment = $info->{$field}{"comment"};
             my $ufield = ucfirst ($field);
             $comment = " -- ^ $comment" if ($comment ne "");
-            emit "  $sep $prefix$ufield :: !($fieldType)$comment";
+            emit "  $sep $prefix$ufield :: $bang($fieldType)$comment";
             $sep = ",";
         }
     }
@@ -477,13 +490,20 @@ sub emitStruct2 {
     emit "instance Storable $hType where";
     emit "  sizeOf _ = #{size $cType}";
     emit "  alignment _ = 8"; # because "#alignment" doesn't work for me
+    emit "";
     emit "  peek p = do";
+    my %already;
+    $sep = "let";
     foreach my $field (@$fields) {
         if (exists $info->{$field}) {
             my $c = $info->{$field}{"c"};
             foreach my $cField (@$c) {
-                my $ufield = ucfirst ($cField);
-                emit "    p$ufield <- #{ptr $cType, $cField} p";
+                if (not exists $already{$cField}) {
+                    my $pfield = makePfield ($cField);
+                    emit "    $sep $pfield = #{ptr $cType, $cField} p";
+                    $sep = "   ";
+                    $already{$cField} = 1;
+                }
             }
         }
     }
@@ -493,11 +513,12 @@ sub emitStruct2 {
         if (exists $info->{$field}) {
             my $c = $info->{$field}{"c"};
             my $marshall = $info->{$field}{"marshall"}[0];
-            my @ptrs = map ("p$_", map (ucfirst, @$c));
+            my @ptrs = map { makePfield $_ } @$c;
             emit ("      $sep $marshall " . join (" ", @ptrs));
             $sep = '<*>';
         }
     }
+    emit "";
     emit '  poke p x = error "poke not implemented"';
     emit "";
 }
@@ -522,8 +543,8 @@ sub maybeField {
     my $oldPoke = $info->{"marshall"}[1];
     $info->{"c"} = [$justField, $conditionField];
     $info->{"type"} = "Maybe ($oldType)";
-    $info->{"marshall"} = ["(unmarshallMaybe ($oldPeek) ($condition))",
-                           "(marshallMaybe ($oldPoke) ($condition))"];
+    $info->{"marshall"} = ["peekMaybe ($oldPeek) ($condition)",
+                           "pokeMaybe ($oldPoke) ($condition)"];
 }
 
 sub emitTagData {
@@ -538,6 +559,7 @@ sub emitTagData {
     byteStringArrayField (\%fields, "epc", "epcByteCount");
     maybeField (\%fields, "gen2", "protocol",
                 "== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)");
+    ${fields}{"gen2"}{"c"}[0] = "u.gen2";
 
     emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
 }
