@@ -191,3 +191,8 @@ unpackFlags x = mapMaybe f [minBound..maxBound]
   where f flag = if (x .&. fromMetadataFlag flag) == 0
                  then Nothing
                  else Just flag
+
+peekArrayAsByteString :: Ptr Word8 -> Ptr Word8 -> IO ByteString
+peekArrayAsByteString arrayPtr lenPtr = do
+  len <- peek lenPtr
+  B.packCStringLen (castPtr arrayPtr, fromIntegral len)
