@@ -299,6 +299,49 @@ setList8 t x f = do
               }
     with lst $ \p -> f (castPtr p)
 
+newtype GEN2_TagData =
+  GEN2_TagData
+  { g2Pc :: (ByteString) -- ^ Tag PC
+  }
+
+instance Storable GEN2_TagData where
+  sizeOf _ = #{size TMR_GEN2_TagData}
+  alignment _ = 8
+
+  peek p = do
+    let pPc = #{ptr TMR_GEN2_TagData, pc} p
+        pPcByteCount = #{ptr TMR_GEN2_TagData, pcByteCount} p
+    GEN2_TagData
+      <$> (peekArrayAsByteString pPc pPcByteCount)
+
+  poke p x = error "poke not implemented"
+
+data TagData =
+  TagData
+  { tdEpc :: !(ByteString) -- ^ Tag EPC
+  , tdProtocol :: !(TagProtocol) -- ^ Protocol of the tag
+  , tdCrc :: !(Word16) -- ^ Tag CRC
+  , tdGen2 :: !(Maybe (GEN2_TagData)) -- ^ Gen2-specific tag information
+  }
+
+instance Storable TagData where
+  sizeOf _ = #{size TMR_TagData}
+  alignment _ = 8
+
+  peek p = do
+    let pEpc = #{ptr TMR_TagData, epc} p
+        pEpcByteCount = #{ptr TMR_TagData, epcByteCount} p
+        pProtocol = #{ptr TMR_TagData, protocol} p
+        pCrc = #{ptr TMR_TagData, crc} p
+        pU_gen2 = #{ptr TMR_TagData, u.gen2} p
+    TagData
+      <$> (peekArrayAsByteString pEpc pEpcByteCount)
+      <*> (toTagProtocol <$> peek pProtocol)
+      <*> (peek pCrc)
+      <*> (peekMaybe (peek) (== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)) pU_gen2 pProtocol)
+
+  poke p x = error "poke not implemented"
+
 data StatusType =
     SUCCESS_TYPE
   | ERROR_TYPE_COMM

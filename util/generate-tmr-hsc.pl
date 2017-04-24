@@ -514,7 +514,7 @@ sub emitStruct2 {
             my $c = $info->{$field}{"c"};
             my $marshall = $info->{$field}{"marshall"}[0];
             my @ptrs = map { makePfield $_ } @$c;
-            emit ("      $sep $marshall " . join (" ", @ptrs));
+            emit ("      $sep ($marshall " . join (" ", @ptrs) . ")");
             $sep = '<*>';
         }
     }
@@ -547,6 +547,16 @@ sub maybeField {
                            "pokeMaybe ($oldPoke) ($condition)"];
 }
 
+sub wrapField {
+    my ($fields, $field, $wrapType) = @_;
+
+    my $info = $fields->{$field};
+    my $oldPeek = $info->{"marshall"}[0];
+    my $oldPoke = $info->{"marshall"}[1];
+    $info->{"marshall"} = ["to$wrapType <\$> $oldPeek",
+                           "$oldPoke \$ from$wrapType"];
+}
+
 sub emitTagData {
     my $cName = "TMR_TagData";
     my $cStruct = $tagDataStructs{$cName};
@@ -560,6 +570,7 @@ sub emitTagData {
     maybeField (\%fields, "gen2", "protocol",
                 "== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)");
     ${fields}{"gen2"}{"c"}[0] = "u.gen2";
+    wrapField (\%fields, "protocol", "TagProtocol");
 
     emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
 }
@@ -584,8 +595,8 @@ sub emitStructs {
     emitListStruct ("8");
     emitListFuncs ("8");
 
-    # emitGen2();
-    # emitTagData();
+    emitGen2();
+    emitTagData();
 }
 
 sub paramTypeName {
