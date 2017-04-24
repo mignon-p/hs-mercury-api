@@ -361,7 +361,7 @@ sub emitStruct {
     my $sep = "{";
     foreach my $field (@$fields) {
         my $type = $types->{$field};
-        emit "  $sep ${prefix}_$field :: $type";
+        emit "  $sep ${prefix}_$field :: !($type)";
         $sep = ",";
     }
     emit "  }";
@@ -467,7 +467,7 @@ sub emitStruct2 {
             my $comment = $info->{$field}{"comment"};
             my $ufield = ucfirst ($field);
             $comment = " -- ^ $comment" if ($comment ne "");
-            emit "  $sep $prefix$ufield :: $fieldType$comment";
+            emit "  $sep $prefix$ufield :: !($fieldType)$comment";
             $sep = ",";
         }
     }

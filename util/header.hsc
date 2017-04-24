@@ -90,13 +90,13 @@ class ParamValue a where
 -- are not supported.
 data ReadPlan =
   SimpleReadPlan
-  { rpWeight        :: Word32        -- ^ The relative weight of this read plan
-  , rpEnableAutonomousRead :: Bool   -- ^ Option for Autonomous read
-  , rpAntennas      :: [Word8]       -- ^ The list of antennas to read on
-  , rpProtocol      :: TagProtocol   -- ^ The protocol to use for reading
-  , rpUseFastSearch :: Bool          -- ^ Option to use the FastSearch
-  , rpStopOnCount   :: Maybe Word32  -- ^ Number of tags to be read
-  , rpTriggerRead   :: Maybe [Word8] -- ^ The list of GPI ports which should be
+  { rpWeight        :: !Word32          -- ^ The relative weight of this read plan
+  , rpEnableAutonomousRead :: !Bool     -- ^ Option for Autonomous read
+  , rpAntennas      :: ![Word8]         -- ^ The list of antennas to read on
+  , rpProtocol      :: !TagProtocol     -- ^ The protocol to use for reading
+  , rpUseFastSearch :: !Bool            -- ^ Option to use the FastSearch
+  , rpStopOnCount   :: !(Maybe Word32)  -- ^ Number of tags to be read
+  , rpTriggerRead   :: !(Maybe [Word8]) -- ^ The list of GPI ports which should be
                                      -- used to trigger the read
   } deriving (Eq, Ord, Show, Read)
 
