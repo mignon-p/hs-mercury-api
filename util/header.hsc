@@ -203,6 +203,11 @@ peekArrayAsByteString arrayPtr lenPtr = do
   len <- peek lenPtr
   B.packCStringLen (castPtr arrayPtr, fromIntegral len)
 
+peekListAsByteString :: Ptr List8 -> IO ByteString
+peekListAsByteString listPtr = do
+  lst <- peek listPtr
+  B.packCStringLen (castPtr $ l8_list lst, fromIntegral $ l8_len lst)
+
 peekArrayAsList :: Storable a => Ptr a -> Ptr Word8 -> IO [a]
 peekArrayAsList arrayPtr lenPtr = do
   len <- peek lenPtr

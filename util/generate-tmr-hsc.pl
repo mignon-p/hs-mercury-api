@@ -72,6 +72,7 @@ my %toHaskellType = (
 my %toHaskellType2 = (
     %toHaskellType,
     "TMR_GEN2_TagData" => "GEN2_TagData",
+    "TMR_TagData" => "TagData"
     );
 
 my %listSize = (
@@ -541,6 +542,14 @@ sub byteStringArrayField {
     delete $fields->{$lengthField};
 }
 
+sub byteStringListField {
+    my ($fields, $field) = @_;
+
+    my $info = $fields->{$field};
+    $info->{"type"} = "ByteString";
+    $info->{"marshall"} = ["peekListAsByteString", "pokeListAsByteString"];
+}
+
 sub listArrayField {
     my ($fields, $arrayField, $lengthField, $type) = @_;
 
@@ -695,6 +704,9 @@ sub emitTagReadData {
                   "Absolute time of the read, in milliseconds since 1/1/1970 UTC");
 
     # uint8Lists as bytestrings
+    foreach my $f (qw(data epcMemData tidMemData userMemData reservedMemData)) {
+        byteStringListField (\%fields, $f);
+    }
 
     emitStruct2 ("TagReadData", "tr", $cName, \@fieldOrder, \%fields);
 }
@@ -708,7 +720,7 @@ sub emitStructs {
     emitGen2();
     emitTagData();
     emitGpio();
-    # emitTagReadData();
+    emitTagReadData();
 }
 
 sub paramTypeName {

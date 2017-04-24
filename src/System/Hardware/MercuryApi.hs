@@ -49,8 +49,6 @@ import System.Hardware.MercuryApi.Generated
 
 newtype Reader = Reader (ForeignPtr ReaderEtc)
 
-newtype TagReadData = TagReadData ()
-
 type RawStatus = Word32
 type RawType = Word32
 

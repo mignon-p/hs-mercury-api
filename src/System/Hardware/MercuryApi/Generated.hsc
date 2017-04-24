@@ -203,6 +203,11 @@ peekArrayAsByteString arrayPtr lenPtr = do
   len <- peek lenPtr
   B.packCStringLen (castPtr arrayPtr, fromIntegral len)
 
+peekListAsByteString :: Ptr List8 -> IO ByteString
+peekListAsByteString listPtr = do
+  lst <- peek listPtr
+  B.packCStringLen (castPtr $ l8_list lst, fromIntegral $ l8_len lst)
+
 peekArrayAsList :: Storable a => Ptr a -> Ptr Word8 -> IO [a]
 peekArrayAsList arrayPtr lenPtr = do
   len <- peek lenPtr
@@ -381,6 +386,67 @@ instance Storable GpioPin where
       <$> (peek pId)
       <*> (toBool' <$> peek pHigh)
       <*> (toBool' <$> peek pOutput)
+
+  poke p x = error "poke not implemented"
+
+-- | A record to represent a read of an RFID tag.
+-- Provides access to the metadata of the read event,
+-- such as the time of the read, the antenna that read the tag,
+-- and the number of times the tag was seen by the air protocol.
+data TagReadData =
+  TagReadData
+  { trTag :: !(TagData) -- ^ The tag that was read
+  , trMetadataFlags :: !([MetadataFlag]) -- ^ The set of metadata items below that are valid
+  , trPhase :: !(Word16) -- ^ Tag response phase
+  , trAntenna :: !(Word8) -- ^ Antenna where the tag was read
+  , trGpio :: !([GpioPin]) -- ^ State of GPIO pins at the moment of the tag read
+  , trReadCount :: !(Word32) -- ^ Number of times the tag was read
+  , trRssi :: !(Int32) -- ^ Strength of the signal recieved from the tag
+  , trFrequency :: !(Word32) -- ^ RF carrier frequency the tag was read with
+  , trTimestamp :: !(Word64) -- ^ Absolute time of the read, in milliseconds since 1/1/1970 UTC
+  , trData :: !(ByteString) -- ^ Data read from the tag
+  , trEpcMemData :: !(ByteString) -- ^ Read EPC bank data bytes
+  , trTidMemData :: !(ByteString) -- ^ Read TID bank data bytes
+  , trUserMemData :: !(ByteString) -- ^ Read USER bank data bytes
+  , trReservedMemData :: !(ByteString) -- ^ Read RESERVED bank data bytes
+  }
+
+instance Storable TagReadData where
+  sizeOf _ = #{size TMR_TagReadData}
+  alignment _ = 8
+
+  peek p = do
+    let pTag = #{ptr TMR_TagReadData, tag} p
+        pMetadataFlags = #{ptr TMR_TagReadData, metadataFlags} p
+        pPhase = #{ptr TMR_TagReadData, phase} p
+        pAntenna = #{ptr TMR_TagReadData, antenna} p
+        pGpio = #{ptr TMR_TagReadData, gpio} p
+        pGpioCount = #{ptr TMR_TagReadData, gpioCount} p
+        pReadCount = #{ptr TMR_TagReadData, readCount} p
+        pRssi = #{ptr TMR_TagReadData, rssi} p
+        pFrequency = #{ptr TMR_TagReadData, frequency} p
+        pTimestampLow = #{ptr TMR_TagReadData, timestampLow} p
+        pTimestampHigh = #{ptr TMR_TagReadData, timestampHigh} p
+        pData = #{ptr TMR_TagReadData, data} p
+        pEpcMemData = #{ptr TMR_TagReadData, epcMemData} p
+        pTidMemData = #{ptr TMR_TagReadData, tidMemData} p
+        pUserMemData = #{ptr TMR_TagReadData, userMemData} p
+        pReservedMemData = #{ptr TMR_TagReadData, reservedMemData} p
+    TagReadData
+      <$> (peek pTag)
+      <*> (unpackFlags16 <$> peek pMetadataFlags)
+      <*> (peek pPhase)
+      <*> (peek pAntenna)
+      <*> (peekArrayAsList pGpio pGpioCount)
+      <*> (peek pReadCount)
+      <*> (peek pRssi)
+      <*> (peek pFrequency)
+      <*> (peekSplit64 pTimestampLow pTimestampHigh)
+      <*> (peekListAsByteString pData)
+      <*> (peekListAsByteString pEpcMemData)
+      <*> (peekListAsByteString pTidMemData)
+      <*> (peekListAsByteString pUserMemData)
+      <*> (peekListAsByteString pReservedMemData)
 
   poke p x = error "poke not implemented"
 
