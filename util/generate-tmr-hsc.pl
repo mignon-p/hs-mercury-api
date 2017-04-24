@@ -26,7 +26,9 @@ my %regions = ();
 my @tagProtocols = ();
 
 my @metadataFlags = ();
+
 my %tagDataStructs = ();
+my %gen2Structs = ();
 
 my @lines = ();
 
@@ -220,6 +222,10 @@ sub readTagData {
     close F;
 
     readStructs ($file, \%tagDataStructs);
+}
+
+sub readGen2 {
+    readStructs ("$apiDir/tmr_gen2.h", \%gen2Structs);
 }
 
 sub emit {
@@ -444,7 +450,15 @@ sub convertStruct {
 sub emitStruct2 {
     my ($hType, $prefix, $cType, $fields, $info) = @_;
 
-    emit "data $hType =";
+    my $nFields = 0;
+    foreach my $field (@$fields) {
+        $nFields++ if (exists $info->{$field});
+    }
+
+    my $data = "data";
+    $data = "newtype" if ($nFields == 1);
+
+    emit "$data $hType =";
     emit "  $hType";
     my $sep = "{";
     foreach my $field (@$fields) {
@@ -513,12 +527,27 @@ sub emitTagData {
     emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
 }
 
+sub emitGen2 {
+    my $cName = "TMR_GEN2_TagData";
+    my $cStruct = $gen2Structs{$cName};
+
+    my @fieldOrder;
+    my %fields;
+
+    convertStruct ($cStruct, \@fieldOrder, \%fields);
+
+    byteStringArrayField (\%fields, "pc", "pcByteCount");
+
+    emitStruct2 ("GEN2_TagData", "g2", $cName, \@fieldOrder, \%fields);
+}
+
 sub emitStructs {
     emitListStruct ("16");
     emitListFuncs ("16");
     emitListStruct ("8");
     emitListFuncs ("8");
 
+    # emitGen2();
     # emitTagData();
 }
 
@@ -686,6 +715,7 @@ readGlue();
 readRegion();
 readTagProtocol();
 readTagData();
+readGen2();
 
 emitHeader();
 emitStructs();
