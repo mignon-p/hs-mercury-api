@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+use strict;
 use Carp;
 use FindBin;
 
@@ -484,6 +485,7 @@ sub emitStruct2 {
             my $fieldType = $info->{$field}{"type"};
             my $comment = $info->{$field}{"comment"};
             my $ufield = ucfirst ($field);
+            croak "comment undefined for $field" if (not defined $comment);
             $comment = " -- ^ $comment" if ($comment ne "");
             emit "  $sep $prefix$ufield :: $bang($fieldType)$comment";
             $sep = ",";
@@ -539,6 +541,17 @@ sub byteStringArrayField {
     delete $fields->{$lengthField};
 }
 
+sub listArrayField {
+    my ($fields, $arrayField, $lengthField, $type) = @_;
+
+    my $info = $fields->{$arrayField};
+    $info->{"c"} = [$arrayField, $lengthField];
+    $info->{"type"} = $type;
+    $info->{"marshall"} = ["peekArrayAsList", "pokeArrayAsList"];
+
+    delete $fields->{$lengthField};
+}
+
 sub maybeField {
     my ($fields, $justField, $conditionField, $condition) = @_;
 
@@ -560,6 +573,32 @@ sub wrapField {
     my $oldPoke = $info->{"marshall"}[1];
     $info->{"marshall"} = ["$peekWrap <\$> $oldPeek",
                            "$oldPoke \$ $pokeWrap"];
+}
+
+sub split64Field {
+    my ($fieldOrder, $fields, $field, $comment) = @_;
+
+    my ($lo, $hi) = ("${field}Low", "${field}High");
+
+    my %info;
+    $info{"c"} = [$lo, $hi];
+    $info{"type"} = "Word64";
+    $info{"comment"} = $comment;
+    $info{"marshall"} = ["peekSplit64", "pokeSplit64"];
+
+    delete $fields->{$lo};
+    delete $fields->{$hi};
+    $fields->{$field} = \%info;
+
+    my @newOrder;
+    foreach my $f (@$fieldOrder) {
+        if ($f eq $lo) {
+            push @newOrder, $field;
+        } elsif ($f ne $hi) {
+            push @newOrder, $f;
+        }
+    }
+    @$fieldOrder = @newOrder;
 }
 
 sub emitGen2 {
@@ -616,7 +655,7 @@ sub emitGpio {
 }
 
 sub deleteUnderscoreFields {
-    my $fields = @_;
+    my ($fields) = @_;
 
     foreach my $field (keys %$fields) {
         delete $fields->{$field} if ($field =~ /^_/);
@@ -647,8 +686,14 @@ sub emitTagReadData {
     # metadataFlags as list of flags
     wrapField (\%fields, "metadataFlags", "unpackFlags16", "packFlags16");
     $fields{"metadataFlags"}{"type"} = "[MetadataFlag]";
+
     # gpio/gpioCount as array
+    listArrayField (\%fields, "gpio", "gpioCount", "[GpioPin]");
+
     # timestampLow/timestampHigh merged into one
+    split64Field (\@fieldOrder, \%fields, "timestamp",
+                  "Absolute time of the read, in milliseconds since 1/1/1970 UTC");
+
     # uint8Lists as bytestrings
 
     emitStruct2 ("TagReadData", "tr", $cName, \@fieldOrder, \%fields);
@@ -663,6 +708,7 @@ sub emitStructs {
     emitGen2();
     emitTagData();
     emitGpio();
+    # emitTagReadData();
 }
 
 sub paramTypeName {

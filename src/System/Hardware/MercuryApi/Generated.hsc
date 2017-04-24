@@ -203,6 +203,11 @@ peekArrayAsByteString arrayPtr lenPtr = do
   len <- peek lenPtr
   B.packCStringLen (castPtr arrayPtr, fromIntegral len)
 
+peekArrayAsList :: Storable a => Ptr a -> Ptr Word8 -> IO [a]
+peekArrayAsList arrayPtr lenPtr = do
+  len <- peek lenPtr
+  peekArray (fromIntegral len) arrayPtr
+
 peekMaybe :: (Storable a, Storable b)
           => (Ptr a -> IO a)
           -> (b -> Bool)
@@ -214,6 +219,12 @@ peekMaybe oldPeek cond justP condP = do
   if cond c
     then Just <$> oldPeek justP
     else return Nothing
+
+peekSplit64 :: Ptr Word32 -> Ptr Word32 -> IO Word64
+peekSplit64 pLow pHigh = do
+  lo <- fromIntegral <$> peek pLow
+  hi <- fromIntegral <$> peek pHigh
+  return $ lo .|. (hi `shiftL` 32)
 
 -- end of code inserted from util/header.hsc
 
