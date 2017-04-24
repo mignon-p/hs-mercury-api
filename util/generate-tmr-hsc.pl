@@ -548,13 +548,13 @@ sub maybeField {
 }
 
 sub wrapField {
-    my ($fields, $field, $wrapType) = @_;
+    my ($fields, $field, $peekWrap, $pokeWrap) = @_;
 
     my $info = $fields->{$field};
     my $oldPeek = $info->{"marshall"}[0];
     my $oldPoke = $info->{"marshall"}[1];
-    $info->{"marshall"} = ["to$wrapType <\$> $oldPeek",
-                           "$oldPoke \$ from$wrapType"];
+    $info->{"marshall"} = ["$peekWrap <\$> $oldPeek",
+                           "$oldPoke \$ $pokeWrap"];
 }
 
 sub emitGen2 {
@@ -588,7 +588,7 @@ sub emitTagData {
     maybeField (\%fields, "gen2", "protocol",
                 "== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)");
     $fields{"gen2"}{"c"}[0] = "u.gen2";
-    wrapField (\%fields, "protocol", "TagProtocol");
+    wrapField (\%fields, "protocol", "toTagProtocol", "fromTagProtocol");
 
     emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
 }
@@ -623,6 +623,8 @@ sub emitTagReadData {
 
     # fields that need special handling:
     # metadataFlags as list of flags
+    wrapField (\%fields, "metadataFlags", "unpackFlags16", "packFlags16");
+    $fields{"metadataFlags"}{"type"} = "[MetadataFlag]";
     # gpio/gpioCount as array
     # timestampLow/timestampHigh merged into one
     # uint8Lists as bytestrings

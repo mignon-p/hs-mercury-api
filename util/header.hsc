@@ -192,6 +192,12 @@ unpackFlags x = mapMaybe f [minBound..maxBound]
                  then Nothing
                  else Just flag
 
+packFlags16 :: [MetadataFlag] -> Word16
+packFlags16 = fromIntegral . packFlags
+
+unpackFlags16 :: Word16 -> [MetadataFlag]
+unpackFlags16 = unpackFlags . fromIntegral
+
 peekArrayAsByteString :: Ptr Word8 -> Ptr Word8 -> IO ByteString
 peekArrayAsByteString arrayPtr lenPtr = do
   len <- peek lenPtr
