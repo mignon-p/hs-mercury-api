@@ -492,7 +492,7 @@ sub emitStruct2 {
             $sep = ",";
         }
     }
-    emit "  }";
+    emit "  } deriving (Eq, Ord, Show)";
     emit "";
 
     emit "instance Storable $hType where";

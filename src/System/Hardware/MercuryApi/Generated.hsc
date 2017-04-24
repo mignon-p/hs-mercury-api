@@ -325,7 +325,7 @@ setList8 t x f = do
 newtype GEN2_TagData =
   GEN2_TagData
   { g2Pc :: (ByteString) -- ^ Tag PC
-  }
+  } deriving (Eq, Ord, Show)
 
 instance Storable GEN2_TagData where
   sizeOf _ = #{size TMR_GEN2_TagData}
@@ -346,7 +346,7 @@ data TagData =
   , tdProtocol :: !(TagProtocol) -- ^ Protocol of the tag
   , tdCrc :: !(Word16) -- ^ Tag CRC
   , tdGen2 :: !(Maybe (GEN2_TagData)) -- ^ Gen2-specific tag information
-  }
+  } deriving (Eq, Ord, Show)
 
 instance Storable TagData where
   sizeOf _ = #{size TMR_TagData}
@@ -372,7 +372,7 @@ data GpioPin =
   { gpId :: !(Word8) -- ^ The ID number of the pin.
   , gpHigh :: !(Bool) -- ^ Whether the pin is in the high state.
   , gpOutput :: !(Bool) -- ^ The direction of the pin
-  }
+  } deriving (Eq, Ord, Show)
 
 instance Storable GpioPin where
   sizeOf _ = #{size TMR_GpioPin}
@@ -409,7 +409,7 @@ data TagReadData =
   , trTidMemData :: !(ByteString) -- ^ Read TID bank data bytes
   , trUserMemData :: !(ByteString) -- ^ Read USER bank data bytes
   , trReservedMemData :: !(ByteString) -- ^ Read RESERVED bank data bytes
-  }
+  } deriving (Eq, Ord, Show)
 
 instance Storable TagReadData where
   sizeOf _ = #{size TMR_TagReadData}
