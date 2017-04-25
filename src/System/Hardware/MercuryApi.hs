@@ -31,6 +31,7 @@ module System.Hardware.MercuryApi
   , paramType
   , addTransportListener
   , removeTransportListener
+  , hexListener
   ) where
 
 import Prelude hiding (read)
@@ -50,6 +51,8 @@ import Data.Typeable
 import Data.Word
 import Foreign
 import Foreign.C
+import Text.Printf
+import System.IO
 import qualified System.IO.Unsafe as U
 
 import System.Hardware.MercuryApi.Generated
@@ -424,3 +427,16 @@ removeTransportListener rdr (TransportListenerId unique) = do
   withCAString (show unique) $ \cs -> do
     withReaderEtc rdr "removeTransportListener" "" $
       \p -> c_TMR_removeTransportListener p cs
+
+-- | Given a 'Handle', returns a 'TransportListener' which prints
+-- transport data to that handle in hex.
+hexListener :: Handle -> TransportListener
+hexListener h tx dat _ = lstn dat (prefix tx)
+  where
+    prefix True  = "Sending: "
+    prefix False = "Received:"
+    lstn bs pfx = do
+      let (bs1, bs2) = B.splitAt 16 bs
+          hex = concatMap (printf " %02x") (B.unpack bs1)
+      hPutStrLn h $ pfx ++ hex
+      when (not $ B.null bs2) $ lstn bs2 "         "
