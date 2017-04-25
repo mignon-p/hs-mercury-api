@@ -432,9 +432,13 @@ removeTransportListener rdr (TransportListenerId unique) = do
 -- | Given a 'Handle', returns a 'TransportListener' which prints
 -- transport data to that handle in hex.  If the handle is a terminal,
 -- prints the data in magenta.
-hexListener :: Handle -> TransportListener
-hexListener h tx dat _ = do
+hexListener :: Handle -> IO TransportListener
+hexListener h = do
   useColor <- hSupportsANSI h
+  return (hexListener' h useColor)
+
+hexListener' :: Handle -> Bool -> TransportListener
+hexListener' h useColor tx dat _ = do
   setColors useColor [SetColor Foreground Vivid Magenta]
   lstn dat (prefix tx)
   setColors useColor [Reset]

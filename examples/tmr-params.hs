@@ -31,7 +31,8 @@ main = do
   putStrLn "create"
   rdr <- TMR.create "tmr:///dev/ttyUSB0"
   putStrLn "addTransportListener"
-  TMR.addTransportListener rdr (TMR.hexListener stdout)
+  listener <- TMR.hexListener stdout
+  TMR.addTransportListener rdr listener
   putStrLn "paramGet PARAM_TRANSPORTTIMEOUT"
   timeout <- TMR.paramGet rdr TMR.PARAM_TRANSPORTTIMEOUT :: IO Word32
   print timeout
