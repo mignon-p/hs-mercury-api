@@ -52,6 +52,7 @@ import Data.Word
 import Foreign
 import Foreign.C
 import Text.Printf
+import System.Console.ANSI
 import System.IO
 import qualified System.IO.Unsafe as U
 
@@ -429,10 +430,17 @@ removeTransportListener rdr (TransportListenerId unique) = do
       \p -> c_TMR_removeTransportListener p cs
 
 -- | Given a 'Handle', returns a 'TransportListener' which prints
--- transport data to that handle in hex.
+-- transport data to that handle in hex.  If the handle is a terminal,
+-- prints the data in magenta.
 hexListener :: Handle -> TransportListener
-hexListener h tx dat _ = lstn dat (prefix tx)
+hexListener h tx dat _ = do
+  useColor <- hSupportsANSI h
+  setColors useColor [SetColor Foreground Vivid Magenta]
+  lstn dat (prefix tx)
+  setColors useColor [Reset]
   where
+    setColors False _ = return ()
+    setColors True sgr = hSetSGR h sgr
     prefix True  = "Sending: "
     prefix False = "Received:"
     lstn bs pfx = do
