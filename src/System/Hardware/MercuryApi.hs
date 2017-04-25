@@ -34,6 +34,8 @@ module System.Hardware.MercuryApi
   , addTransportListener
   , removeTransportListener
   , hexListener
+  , bytesToHex
+  , hexToBytes
   ) where
 
 import Prelude hiding (read)
@@ -159,6 +161,19 @@ foreign import ccall unsafe "glue.h c_TMR_strerr"
 foreign import ccall unsafe "tm_reader.h TMR_paramName"
     c_TMR_paramName :: RawParam
                     -> CString
+
+foreign import ccall unsafe "tmr_tag_data.h TMR_hexToBytes"
+    c_TMR_hexToBytes :: CString
+                     -> Ptr Word8
+                     -> Word32
+                     -> Ptr Word32
+                     -> IO RawStatus
+
+foreign import ccall unsafe "tmr_tag_data.h TMR_bytesToHex"
+    c_TMR_bytesToHex :: Ptr Word8
+                     -> Word32
+                     -> CString
+                     -> IO ()
 
 -- | Represents any error that can occur in a MercuryApi call,
 -- except for those which can be represented by 'IOException'.
@@ -480,3 +495,27 @@ hexListener' h useColor tx dat _ = do
           hex = concatMap (printf " %02x") (B.unpack bs1)
       hPutStrLn h $ pfx ++ hex
       when (not $ B.null bs2) $ lstn bs2 "         "
+
+-- | Convert a hexadecimal string into a 'B.ByteString'.  The hex string may
+-- optionally include a "0x" prefix, which will be ignored.  If the input
+-- cannot be parsed as a hex string, returns 'Nothing'.
+hexToBytes :: T.Text -> Maybe B.ByteString
+hexToBytes hex = U.unsafePerformIO $ do
+  let hexBs = textToBS hex
+      hexLen = B.length hexBs
+      bufLen = hexLen `div` 2
+  alloca $ \pLen -> allocaBytes bufLen $ \buf -> B.useAsCString hexBs $ \cs -> do
+    status <- c_TMR_hexToBytes cs buf (fromIntegral bufLen) pLen
+    outLen <- peek pLen
+    if (status == 0)
+      then Just <$> B.packCStringLen (castPtr buf, fromIntegral outLen)
+      else return Nothing
+
+-- | Convert a 'B.ByteString', such as a tag EPC, into a hexadecimal string.
+bytesToHex :: B.ByteString -> T.Text
+bytesToHex bytes = U.unsafePerformIO $ do
+  let bytesLen = B.length bytes
+      bufLen = 1 + bytesLen * 2
+  allocaBytes bufLen $ \buf -> B.useAsCString bytes $ \cs -> do
+    c_TMR_bytesToHex (castPtr cs) (fromIntegral bytesLen) buf
+    textFromBS <$> B.packCString buf
