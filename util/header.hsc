@@ -131,6 +131,8 @@ instance Storable ReadPlan where
     pokeList16 (antennasInfo p) (rpAntennas x)
     #{poke ReadPlanEtc, plan.u.simple.protocol} p
       (fromTagProtocol $ rpProtocol x)
+    #{poke ReadPlanEtc, plan.u.simple.filter} p nullPtr
+    #{poke ReadPlanEtc, plan.u.simple.tagop} p nullPtr
     #{poke ReadPlanEtc, plan.u.simple.useFastSearch} p
       (fromBool' $ rpUseFastSearch x)
     let (stop, nTags) = case rpStopOnCount x of
