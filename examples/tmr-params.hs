@@ -4,6 +4,7 @@ import Control.Concurrent
 import Control.Exception
 import Control.Monad
 import qualified Data.ByteString as B
+import Data.Int
 import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -70,5 +71,23 @@ main = do
   putStrLn "paramGet PARAM_METADATAFLAG"
   meta <- TMR.paramGet rdr TMR.PARAM_METADATAFLAG :: IO [TMR.MetadataFlag]
   print meta
+
+  putStrLn ""
+  putStrLn "paramSet PARAM_REGION_ID"
+  TMR.paramSet rdr TMR.PARAM_REGION_ID TMR.REGION_NA2
+
+  putStrLn "paramSet PARAM_RADIO_READPOWER"
+  TMR.paramSet rdr TMR.PARAM_RADIO_READPOWER (500 :: Int32)
+
+  putStrLn "paramSet PARAM_READ_PLAN"
+  let plan' = plan { rpAntennas = [1] }
+  TMR.paramSet rdr TMR.PARAM_READ_PLAN plan'
+
+  putStrLn ""
+  putStrLn "read"
+  tags <- TMR.read rdr 500
+  print tags
+
+  putStrLn ""
   putStrLn "destroy"
   TMR.destroy rdr
