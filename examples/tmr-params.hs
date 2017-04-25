@@ -83,6 +83,10 @@ main = do
   let plan' = plan { TMR.rpAntennas = [1] }
   TMR.paramSet rdr TMR.PARAM_READ_PLAN plan'
 
+  putStrLn "paramGet PARAM_READ_PLAN"
+  plan'' <- TMR.paramGet rdr TMR.PARAM_READ_PLAN :: IO TMR.ReadPlan
+  print plan''
+
   putStrLn ""
   putStrLn "read"
   tags <- TMR.read rdr 500
