@@ -80,7 +80,7 @@ main = do
   TMR.paramSet rdr TMR.PARAM_RADIO_READPOWER (500 :: Int32)
 
   putStrLn "paramSet PARAM_READ_PLAN"
-  let plan' = plan { rpAntennas = [1] }
+  let plan' = plan { TMR.rpAntennas = [1] }
   TMR.paramSet rdr TMR.PARAM_READ_PLAN plan'
 
   putStrLn ""
