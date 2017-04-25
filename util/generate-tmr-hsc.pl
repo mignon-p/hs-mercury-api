@@ -428,6 +428,22 @@ sub emitListFuncs {
     emit '              }';
     emit '    with lst $ \p -> f (castPtr p)';
     emit "";
+
+    emit "pokeList$size :: Storable a => (Ptr List$size, Word$size, Ptr a, Text) -> [a] -> IO ()";
+    emit "pokeList$size (lp, maxLen, storage, name) ws = do";
+    emit "  len <- castLen' maxLen name (length ws)";
+    emit "  poke lp \$ List$size";
+    emit "    { l${size}_list = castPtr storage";
+    emit "    , l${size}_max = maxLen";
+    emit "    , l${size}_len = len";
+    emit "    }";
+    emit "  pokeArray storage ws";
+    emit "";
+    emit "peekList$size :: Storable a => (Ptr List$size, Word$size, Ptr a, Text) -> IO [a]";
+    emit "peekList$size (lp, _, _, _) = do";
+    emit "  lst <- peek lp";
+    emit "  peekArray (fromIntegral \$ l${size}_len lst) (castPtr \$ l${size}_list lst)";
+    emit "";
 }
 
 sub convertStruct {

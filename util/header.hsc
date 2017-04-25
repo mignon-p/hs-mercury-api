@@ -100,7 +100,7 @@ data ReadPlan =
                                      -- used to trigger the read
   } deriving (Eq, Ord, Show, Read)
 
-antennasInfo :: Ptr ReadPlan -> (Ptr List8, Word8, Ptr Word8, Text)
+antennasInfo :: Ptr ReadPlan -> (Ptr List16, Word16, Ptr Word8, Text)
 antennasInfo rp =
   ( #{ptr ReadPlanEtc, plan.u.simple.antennas} rp
   , #{const GLUE_MAX_ANTENNAS}
@@ -108,7 +108,7 @@ antennasInfo rp =
   , "rpAntennas"
   )
 
-gpiListInfo :: Ptr ReadPlan -> (Ptr List8, Word8, Ptr Word8, Text)
+gpiListInfo :: Ptr ReadPlan -> (Ptr List16, Word16, Ptr Word8, Text)
 gpiListInfo rp =
   ( #{ptr ReadPlanEtc, plan.u.simple.triggerRead.gpiList} rp
   , #{const GLUE_MAX_GPIPORTS}
@@ -119,21 +119,6 @@ gpiListInfo rp =
 readPlanTypeSimple :: #{type TMR_ReadPlanType}
 readPlanTypeSimple = #{const TMR_READ_PLAN_TYPE_SIMPLE}
 
-pokeList8 :: (Ptr List8, Word8, Ptr Word8, Text) -> [Word8] -> IO ()
-pokeList8 (lp, maxLen, storage, name) ws = do
-  len <- castLen' maxLen name (length ws)
-  poke lp $ List8
-    { l8_list = castPtr storage
-    , l8_max = maxLen
-    , l8_len = len
-    }
-  pokeArray storage ws
-
-peekList8 :: (Ptr List8, Word8, Ptr Word8, Text) -> IO [Word8]
-peekList8 (lp, _, _, _) = do
-  lst <- peek lp
-  peekArray (fromIntegral $ l8_len lst) (castPtr $ l8_list lst)
-
 instance Storable ReadPlan where
   sizeOf _ = #{size ReadPlanEtc}
   alignment _ = 8
@@ -143,7 +128,7 @@ instance Storable ReadPlan where
     #{poke ReadPlanEtc, plan.weight} p (rpWeight x)
     #{poke ReadPlanEtc, plan.enableAutonomousRead} p
       (fromBool' $ rpEnableAutonomousRead x)
-    pokeList8 (antennasInfo p) (rpAntennas x)
+    pokeList16 (antennasInfo p) (rpAntennas x)
     #{poke ReadPlanEtc, plan.u.simple.protocol} p
       (fromTagProtocol $ rpProtocol x)
     #{poke ReadPlanEtc, plan.u.simple.useFastSearch} p
@@ -157,12 +142,12 @@ instance Storable ReadPlan where
                             Nothing -> (cFalse, [])
                             Just ps -> (cTrue, ps)
     #{poke ReadPlanEtc, plan.u.simple.triggerRead.enable} p enable
-    pokeList8 (gpiListInfo p) ports
+    pokeList16 (gpiListInfo p) ports
 
   peek p = do
     weight <- #{peek ReadPlanEtc, plan.weight} p
     enableAutonomousRead <- #{peek ReadPlanEtc, plan.enableAutonomousRead} p
-    antennas <- peekList8 (antennasInfo p)
+    antennas <- peekList16 (antennasInfo p)
     protocol <- #{peek ReadPlanEtc, plan.u.simple.protocol} p
     useFastSearch <- #{peek ReadPlanEtc, plan.u.simple.useFastSearch} p
     stop <- #{peek ReadPlanEtc, plan.u.simple.stopOnCount.stopNTriggerStatus} p
@@ -171,7 +156,7 @@ instance Storable ReadPlan where
                    else return Nothing
     enable <- #{peek ReadPlanEtc, plan.u.simple.triggerRead.enable} p
     triggerRead <- if toBool' enable
-                   then Just <$> peekList8 (gpiListInfo p)
+                   then Just <$> peekList16 (gpiListInfo p)
                    else return Nothing
     return $ SimpleReadPlan
       { rpWeight = weight
@@ -203,10 +188,10 @@ peekArrayAsByteString arrayPtr lenPtr = do
   len <- peek lenPtr
   B.packCStringLen (castPtr arrayPtr, fromIntegral len)
 
-peekListAsByteString :: Ptr List8 -> IO ByteString
+peekListAsByteString :: Ptr List16 -> IO ByteString
 peekListAsByteString listPtr = do
   lst <- peek listPtr
-  B.packCStringLen (castPtr $ l8_list lst, fromIntegral $ l8_len lst)
+  B.packCStringLen (castPtr $ l16_list lst, fromIntegral $ l16_len lst)
 
 peekArrayAsList :: Storable a => Ptr a -> Ptr Word8 -> IO [a]
 peekArrayAsList arrayPtr lenPtr = do
