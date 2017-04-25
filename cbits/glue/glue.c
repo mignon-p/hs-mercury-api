@@ -98,6 +98,20 @@ TMR_Status c_TMR_executeTagOp (ReaderEtc *reader,
         return TMR_executeTagOp (&reader->reader, tagop, filter, data);
 }
 
+TMR_Status c_TMR_firmwareLoad (ReaderEtc *reader,
+                               uint8_t *firmwareStart,
+                               uint32_t firmwareSize)
+{
+    if (reader->destroyed)
+        return ERROR_ALREADY_DESTROYED;
+    else {
+        TMR_memoryCookie cookie;
+        cookie.firmwareStart = firmwareStart;
+        cookie.firmwareSize = firmwareSize;
+        return TMR_firmwareLoad (&reader->reader, &cookie, TMR_memoryProvider);
+    }
+}
+
 TMR_Status c_TMR_paramSet(ReaderEtc *reader,
                           TMR_Param key,
                           const void *value)

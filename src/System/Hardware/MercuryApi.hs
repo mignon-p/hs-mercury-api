@@ -23,6 +23,8 @@ module System.Hardware.MercuryApi
   , connect
   , destroy
   , read
+  , firmwareLoad
+  , firmwareLoadFile
   , paramSet
   , paramGet
   , paramList
@@ -107,6 +109,12 @@ foreign import ccall safe "glue.h c_TMR_getNextTag"
 foreign import ccall unsafe "tmr_tag_data.h TMR_TRD_init"
     c_TMR_TRD_init :: Ptr TagReadData
                    -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_firmwareLoad"
+    c_TMR_firmwareLoad :: Ptr ReaderEtc
+                       -> Ptr Word8
+                       -> Word32
+                       -> IO RawStatus
 
 foreign import ccall safe "glue.h c_TMR_paramSet"
     c_TMR_paramSet :: Ptr ReaderEtc
@@ -330,6 +338,26 @@ read rdr timeoutMs = do
     tagCount <- peek tagCountPtr
     alloca $ \trdPtr -> alloca $
                         \boolPtr -> readLoop rdr tagCount trdPtr boolPtr 0 []
+
+-- | Attempts to install firmware on the reader, then restart and reinitialize.
+firmwareLoad :: Reader       -- ^ The reader being operated on
+             -> B.ByteString -- ^ The binary firmware image to install
+             -> IO ()
+firmwareLoad = firmwareLoad' ""
+
+firmwareLoad' :: T.Text -> Reader -> B.ByteString -> IO ()
+firmwareLoad' filename rdr firmware = do
+  B.useAsCStringLen firmware $ \(fwPtr, fwLen) -> do
+    withReaderEtc rdr "firmwareLoad" filename $
+      \p -> c_TMR_firmwareLoad p (castPtr fwPtr) (fromIntegral fwLen)
+
+-- | Like 'firmwareLoad', but loads firmware from a file.
+firmwareLoadFile :: Reader   -- ^ The reader being operated on
+                 -> FilePath -- ^ Name of file containing firmware image
+                 -> IO ()
+firmwareLoadFile rdr filename = do
+  firmware <- B.readFile filename
+  firmwareLoad' (T.pack filename) rdr firmware
 
 throwPE :: Reader -> ParamException -> T.Text -> T.Text -> IO ()
 throwPE (Reader fp) (ParamException statusType status msg) loc param = do

@@ -103,3 +103,14 @@ executable tmr-params
   hs-source-dirs:      examples
   default-language:    Haskell2010
   ghc-options:         -threaded
+
+
+executable tmr-firmware
+  main-is:             tmr-firmware.hs
+  build-depends:       base >= 4.6 && < 5
+                     , bytestring >= 0.10.4 && < 0.11
+                     , mercury-api
+                     , text >= 1.2 && < 1.3
+  hs-source-dirs:      examples
+  default-language:    Haskell2010
+  ghc-options:         -threaded

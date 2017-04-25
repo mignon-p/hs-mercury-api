@@ -85,6 +85,9 @@ TMR_Status c_TMR_executeTagOp (ReaderEtc *reader,
                                TMR_TagOp *tagop,
                                TMR_TagFilter *filter,
                                TMR_uint8List *data);
+TMR_Status c_TMR_firmwareLoad (ReaderEtc *reader,
+                               uint8_t *firmwareStart,
+                               uint32_t firmwareSize);
 TMR_Status c_TMR_paramSet(ReaderEtc *reader,
                           TMR_Param key,
                           const void *value);
