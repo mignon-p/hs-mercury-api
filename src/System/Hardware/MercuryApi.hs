@@ -36,6 +36,9 @@ module System.Hardware.MercuryApi
   , hexListener
   , bytesToHex
   , hexToBytes
+  , displayTimestamp
+  , displayTagData
+  , displayTagReadData
   ) where
 
 import Prelude hiding (read)
@@ -519,3 +522,56 @@ bytesToHex bytes = U.unsafePerformIO $ do
   allocaBytes bufLen $ \buf -> B.useAsCString bytes $ \cs -> do
     c_TMR_bytesToHex (castPtr cs) (fromIntegral bytesLen) buf
     textFromBS <$> B.packCString buf
+
+-- | Convert a 'TagData' to a human-readable list of lines.
+displayTagData :: TagData -> [T.Text]
+displayTagData td =
+  concat
+  [ [ "TagData"
+    , "  epc      = " <> bytesToHex (tdEpc td)
+    , "  protocol = " <> tShow (tdProtocol td)
+    , "  crc      = " <> T.pack (printf "0x%04x" $ tdCrc td)
+    ]
+  , case tdGen2 td of
+      Nothing -> []
+      Just gen2 -> ["  gen2.pc  = " <> bytesToHex (g2Pc gen2)]
+  ]
+
+indent :: [T.Text] -> [T.Text]
+indent = map ("  " <>)
+
+displayTimestamp :: Word64 -> T.Text
+displayTimestamp = tShow
+
+-- | Convert a 'TagReadData' to a human-readable list of lines.
+displayTagReadData :: TagReadData -> [T.Text]
+displayTagReadData trd =
+  concat
+  [ [ "TagReadData" ]
+  , indent (displayTagData $ trTag trd)
+  , [ "  metadataFlags = " <> T.intercalate "|" (map fl $ trMetadataFlags trd)
+    , "  phase = " <> tShow (trPhase trd)
+    , "  antenna = " <> tShow (trAntenna trd)
+    , "  Gpio"
+    ]
+  , map dispGpio (trGpio trd)
+  , [ "  readCount = " <> tShow (trReadCount trd)
+    , "  rssi = " <> tShow (trRssi trd)
+    , "  frequency = " <> tShow (trFrequency trd)
+    , "  timestamp = " <> displayTimestamp (trTimestamp trd)
+    ]
+  , dat "data" (trData trd)
+  , dat "epcMemData" (trEpcMemData trd)
+  , dat "tidMemData" (trTidMemData trd)
+  , dat "userMemData" (trUserMemData trd)
+  , dat "reservedMemData" (trReservedMemData trd)
+  ]
+  where
+    nDrop = T.length "METADATA_FLAG_"
+    fl = T.drop nDrop . tShow
+    dispGpio gpio = "    pin " <> tShow (gpId gpio) <>
+                    (if (gpHigh gpio) then " high" else " low ") <>
+                    (if (gpOutput gpio) then " output" else "  input")
+    dat name bs = if B.null bs
+                  then []
+                  else ["  " <> name <> " = " <> bytesToHex bs]
