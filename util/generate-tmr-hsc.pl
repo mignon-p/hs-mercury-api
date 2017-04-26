@@ -268,12 +268,29 @@ sub dumpOutput {
     close F;
 }
 
+sub escapeHaddock {
+    my ($x) = @_;
+
+    $x =~ s%(['"/\\`@<])%\\$1%g;
+    return $x;
+}
+
+sub makeComment {
+    my ($x) = @_;
+
+    if ($x eq "") {
+        return "";
+    } else {
+        return (" -- ^ " . escapeHaddock ($x));
+    }
+}
+
 sub emitEnum1 {
     my ($constructors, $comments, $sep) = @_;
     for my $con (@$constructors) {
         my $comment = "";
         if (exists $comments->{$con} and $comments->{$con} ne "") {
-            $comment = " -- ^ " . $comments->{$con};
+            $comment = makeComment ($comments->{$con});
         }
         emit "  $sep $con$comment";
         $sep = "|";
@@ -503,7 +520,7 @@ sub emitStruct2 {
             my $comment = $info->{$field}{"comment"};
             my $ufield = ucfirst ($field);
             croak "comment undefined for $field" if (not defined $comment);
-            $comment = " -- ^ $comment" if ($comment ne "");
+            $comment = makeComment ($comment);
             emit "  $sep $prefix$ufield :: $bang($fieldType)$comment";
             $sep = ",";
         }
