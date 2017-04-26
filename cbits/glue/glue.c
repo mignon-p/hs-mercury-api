@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <xlocale.h>
 #include <HsFFI.h>
 
 #include "glue.h"
@@ -234,4 +236,37 @@ const char *c_TMR_strerr (ReaderEtc *reader, TMR_Status status)
         return "Attempt to use reader after it was destroyed";
     else
         return TMR_strerr (tmr, status);
+}
+
+void *c_new_c_locale (void)
+{
+    /* We need to call tzset once before calling localtime_r, and this seems
+     * like a good place to do it. */
+    tzset();
+    /* Allocate a new locale.  We only do this once, so it's okay
+     * that it leaks. */
+    return (void *) newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+}
+
+int c_format_time (char *buf,
+                   size_t len,
+                   const char *fmt,
+                   time_t seconds,
+                   bool local,
+                   void *locale)
+{
+    time_t t;
+    struct tm stm, *stmp;
+
+    t = seconds;
+    if (local)
+        stmp = localtime_r (&t, &stm);
+    else
+        stmp = gmtime_r (&t, &stm);
+
+    if (! stmp)
+        return -1;
+    if (0 == strftime_l (buf, len, fmt, stmp, (locale_t) locale))
+        return -1;
+    return 0;
 }

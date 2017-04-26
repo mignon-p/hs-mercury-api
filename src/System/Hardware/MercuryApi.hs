@@ -37,6 +37,7 @@ module System.Hardware.MercuryApi
   , bytesToHex
   , hexToBytes
   , displayTimestamp
+  , displayLocalTimestamp
   , displayTagData
   , displayTagReadData
   ) where
@@ -76,6 +77,8 @@ type RawTransportListener =
 type TransportListener = Bool -> B.ByteString -> Word32 -> IO ()
 
 newtype TransportListenerId = TransportListenerId Integer
+
+newtype Locale = Locale ()
 
 -- Many of these need to be safe because they could call back
 -- into Haskell via the transport listener.
@@ -177,6 +180,18 @@ foreign import ccall unsafe "tmr_tag_data.h TMR_bytesToHex"
                      -> Word32
                      -> CString
                      -> IO ()
+
+foreign import ccall unsafe "glue.h c_new_c_locale"
+    c_new_c_locale :: IO (Ptr Locale)
+
+foreign import ccall unsafe "glue.h c_format_time"
+    c_format_time :: CString
+                  -> CSize
+                  -> CString
+                  -> CTime
+                  -> CBool
+                  -> Ptr Locale
+                  -> IO CInt
 
 -- | Represents any error that can occur in a MercuryApi call,
 -- except for those which can be represented by 'IOException'.
@@ -540,8 +555,32 @@ displayTagData td =
 indent :: [T.Text] -> [T.Text]
 indent = map ("  " <>)
 
-displayTimestamp :: Word64 -> T.Text
-displayTimestamp = tShow
+cLocale :: Ptr Locale
+{-# NOINLINE cLocale #-}
+cLocale = U.unsafePerformIO $ throwErrnoIfNull "newlocale" c_new_c_locale
+
+formatTimestamp :: Word64 -> CBool -> IO T.Text
+formatTimestamp t local = do
+  let (seconds, millis) = t `divMod` 1000
+      fmt = "%FT%H:%M:%S" ++ printf ".%03d" millis ++ "%z"
+      bufSize = 80
+  withCAString fmt $ \cFmt -> allocaBytes bufSize $ \buf -> do
+    ret <- c_format_time buf (fromIntegral bufSize) cFmt
+           (CTime $ fromIntegral seconds) local cLocale
+    if ret < 0
+      then fail "error formatting time"
+      else textFromCString buf
+
+-- | Convert a timestamp into a human-readable representation in UTC.
+displayTimestamp :: Word64 -- ^ milliseconds since 1\/1\/1970 UTC
+                 -> T.Text
+displayTimestamp t = U.unsafePerformIO $ formatTimestamp t cFalse
+
+-- | Convert a timestamp into a human-readable representation in
+-- the local timezone.
+displayLocalTimestamp :: Word64 -- ^ milliseconds since 1\/1\/1970 UTC
+                      -> IO T.Text
+displayLocalTimestamp t = formatTimestamp t cTrue
 
 -- | Convert a 'TagReadData' to a human-readable list of lines.
 displayTagReadData :: TagReadData -> [T.Text]

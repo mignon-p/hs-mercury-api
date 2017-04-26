@@ -2,6 +2,7 @@
 #define GLUE_H
 
 #include <stdbool.h>
+#include <time.h>
 #include <HsFFI.h>
 
 #include "tm_reader.h"
@@ -99,5 +100,12 @@ TMR_Status c_TMR_addTransportListener (ReaderEtc *reader,
 TMR_Status c_TMR_removeTransportListener (ReaderEtc *reader,
                                           const char *unique);
 const char *c_TMR_strerr (ReaderEtc *reader, TMR_Status status);
+void *c_new_c_locale (void);
+int c_format_time (char *buf,
+                   size_t len,
+                   const char *fmt,
+                   time_t seconds,
+                   bool local,
+                   void *locale);
 
 #endif  /* GLUE_H */
