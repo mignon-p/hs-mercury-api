@@ -528,13 +528,13 @@ displayTagData :: TagData -> [T.Text]
 displayTagData td =
   concat
   [ [ "TagData"
-    , "  epc      = " <> bytesToHex (tdEpc td)
+    , "  epc      = <" <> bytesToHex (tdEpc td) <> ">"
     , "  protocol = " <> tShow (tdProtocol td)
     , "  crc      = " <> T.pack (printf "0x%04x" $ tdCrc td)
     ]
   , case tdGen2 td of
       Nothing -> []
-      Just gen2 -> ["  gen2.pc  = " <> bytesToHex (g2Pc gen2)]
+      Just gen2 -> ["  gen2.pc  = <" <> bytesToHex (g2Pc gen2) <> ">"]
   ]
 
 indent :: [T.Text] -> [T.Text]
@@ -550,20 +550,20 @@ displayTagReadData trd =
   [ [ "TagReadData" ]
   , indent (displayTagData $ trTag trd)
   , [ "  metadataFlags = " <> T.intercalate "|" (map fl $ trMetadataFlags trd)
-    , "  phase = " <> tShow (trPhase trd)
-    , "  antenna = " <> tShow (trAntenna trd)
+    , "  phase         = " <> tShow (trPhase trd)
+    , "  antenna       = " <> tShow (trAntenna trd)
     , "  Gpio"
     ]
   , map dispGpio (trGpio trd)
-  , [ "  readCount = " <> tShow (trReadCount trd)
-    , "  rssi = " <> tShow (trRssi trd)
-    , "  frequency = " <> tShow (trFrequency trd)
-    , "  timestamp = " <> displayTimestamp (trTimestamp trd)
+  , [ "  readCount     = " <> tShow (trReadCount trd)
+    , "  rssi          = " <> tShow (trRssi trd)
+    , "  frequency     = " <> tShow (trFrequency trd)
+    , "  timestamp     = " <> displayTimestamp (trTimestamp trd)
     ]
-  , dat "data" (trData trd)
-  , dat "epcMemData" (trEpcMemData trd)
-  , dat "tidMemData" (trTidMemData trd)
-  , dat "userMemData" (trUserMemData trd)
+  , dat "data         " (trData trd)
+  , dat "epcMemData   " (trEpcMemData trd)
+  , dat "tidMemData   " (trTidMemData trd)
+  , dat "userMemData  " (trUserMemData trd)
   , dat "reservedMemData" (trReservedMemData trd)
   ]
   where
@@ -574,4 +574,4 @@ displayTagReadData trd =
                     (if (gpOutput gpio) then " output" else "  input")
     dat name bs = if B.null bs
                   then []
-                  else ["  " <> name <> " = " <> bytesToHex bs]
+                  else ["  " <> name <> " = <" <> bytesToHex bs <> ">"]
