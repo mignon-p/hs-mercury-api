@@ -190,6 +190,18 @@ peekArrayAsByteString arrayPtr lenPtr = do
   len <- peek lenPtr
   B.packCStringLen (castPtr arrayPtr, fromIntegral len)
 
+pokeArrayAsByteString :: Text
+                      -> Word8
+                      -> Ptr Word8
+                      -> Ptr Word8
+                      -> ByteString
+                      -> IO ()
+pokeArrayAsByteString desc maxLen arrayPtr lenPtr bs = do
+  B.useAsCStringLen bs $ \(cs, len) -> do
+    len' <- castLen' maxLen desc len
+    copyArray arrayPtr (castPtr cs) (fromIntegral len')
+    poke lenPtr len'
+
 peekListAsByteString :: Ptr List16 -> IO ByteString
 peekListAsByteString listPtr = do
   lst <- peek listPtr
@@ -354,7 +366,8 @@ instance Storable GEN2_TagData where
     GEN2_TagData
       <$> (peekArrayAsByteString pPc pPcByteCount)
 
-  poke p x = error "poke not implemented for GEN2_TagData"
+  poke p x = do
+    pokeArrayAsByteString "pc" #{const TMR_GEN2_MAX_PC_BYTE_COUNT} (#{ptr TMR_GEN2_TagData, pc} p) (#{ptr TMR_GEN2_TagData, pcByteCount} p) (g2Pc x)
 
 -- | A record to represent RFID tags.
 data TagData =

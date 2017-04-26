@@ -568,7 +568,7 @@ sub emitStruct2 {
                 my $c = $info->{$field}{"c"};
                 my $marshall = $info->{$field}{"marshall"}[1];
                 my $hField = $prefix . ucfirst ($field);
-                my @ptrs = map ("#{ptr $cType, $_}", @$c);
+                my @ptrs = map ("(#{ptr $cType, $_} p)", @$c);
                 emit ("    $marshall " . join (" ", @ptrs) . " ($hField x)");
             }
         }
@@ -580,12 +580,13 @@ sub emitStruct2 {
 }
 
 sub byteStringArrayField {
-    my ($fields, $arrayField, $lengthField) = @_;
+    my ($fields, $arrayField, $lengthField, $maxLen) = @_;
 
     my $info = $fields->{$arrayField};
     $info->{"c"} = [$arrayField, $lengthField];
     $info->{"type"} = "ByteString";
-    $info->{"marshall"} = ["peekArrayAsByteString", "pokeArrayAsByteString"];
+    $info->{"marshall"} = ["peekArrayAsByteString",
+                           "pokeArrayAsByteString \"$arrayField\" #{const $maxLen}"];
 
     delete $fields->{$lengthField};
 }
@@ -669,9 +670,10 @@ sub emitGen2 {
 
     convertStruct ($cStruct, \@fieldOrder, \%fields);
 
-    byteStringArrayField (\%fields, "pc", "pcByteCount");
+    byteStringArrayField (\%fields, "pc", "pcByteCount",
+                          "TMR_GEN2_MAX_PC_BYTE_COUNT");
 
-    emitStruct2 ("GEN2_TagData", "g2", $cName, \@fieldOrder, \%fields, 0);
+    emitStruct2 ("GEN2_TagData", "g2", $cName, \@fieldOrder, \%fields, 1);
 }
 
 sub emitTagData {
@@ -685,7 +687,8 @@ sub emitTagData {
 
     convertStruct ($cStruct, \@fieldOrder, \%fields);
 
-    byteStringArrayField (\%fields, "epc", "epcByteCount");
+    byteStringArrayField (\%fields, "epc", "epcByteCount",
+                          "TMR_MAX_EPC_BYTE_COUNT");
     maybeField (\%fields, "gen2", "protocol",
                 "== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)");
     $fields{"gen2"}{"c"}[0] = "u.gen2";

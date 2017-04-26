@@ -190,6 +190,18 @@ peekArrayAsByteString arrayPtr lenPtr = do
   len <- peek lenPtr
   B.packCStringLen (castPtr arrayPtr, fromIntegral len)
 
+pokeArrayAsByteString :: Text
+                      -> Word8
+                      -> Ptr Word8
+                      -> Ptr Word8
+                      -> ByteString
+                      -> IO ()
+pokeArrayAsByteString desc maxLen arrayPtr lenPtr bs = do
+  B.useAsCStringLen bs $ \(cs, len) -> do
+    len' <- castLen' maxLen desc len
+    copyArray arrayPtr (castPtr cs) (fromIntegral len')
+    poke lenPtr len'
+
 peekListAsByteString :: Ptr List16 -> IO ByteString
 peekListAsByteString listPtr = do
   lst <- peek listPtr
