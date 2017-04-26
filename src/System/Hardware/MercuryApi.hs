@@ -543,13 +543,13 @@ displayTagData :: TagData -> [T.Text]
 displayTagData td =
   concat
   [ [ "TagData"
-    , "  epc      = <" <> bytesToHex (tdEpc td) <> ">"
-    , "  protocol = " <> tShow (tdProtocol td)
-    , "  crc      = " <> T.pack (printf "0x%04x" $ tdCrc td)
+    , "  epc         = <" <> bytesToHex (tdEpc td) <> ">"
+    , "  protocol    = " <> tShow (tdProtocol td)
+    , "  crc         = " <> T.pack (printf "0x%04x" $ tdCrc td)
     ]
   , case tdGen2 td of
       Nothing -> []
-      Just gen2 -> ["  gen2.pc  = <" <> bytesToHex (g2Pc gen2) <> ">"]
+      Just gen2 -> ["  gen2.pc     = <" <> bytesToHex (g2Pc gen2) <> ">"]
   ]
 
 indent :: [T.Text] -> [T.Text]
@@ -559,10 +559,10 @@ cLocale :: Ptr Locale
 {-# NOINLINE cLocale #-}
 cLocale = U.unsafePerformIO $ throwErrnoIfNull "newlocale" c_new_c_locale
 
-formatTimestamp :: Word64 -> CBool -> IO T.Text
-formatTimestamp t local = do
+formatTimestamp :: Word64 -> CBool -> String -> IO T.Text
+formatTimestamp t local z = do
   let (seconds, millis) = t `divMod` 1000
-      fmt = "%FT%H:%M:%S" ++ printf ".%03d" millis ++ "%z"
+      fmt = "%FT%H:%M:%S" ++ printf ".%03d" millis ++ z
       bufSize = 80
   withCAString fmt $ \cFmt -> allocaBytes bufSize $ \buf -> do
     ret <- c_format_time buf (fromIntegral bufSize) cFmt
@@ -574,13 +574,13 @@ formatTimestamp t local = do
 -- | Convert a timestamp into a human-readable representation in UTC.
 displayTimestamp :: Word64 -- ^ milliseconds since 1\/1\/1970 UTC
                  -> T.Text
-displayTimestamp t = U.unsafePerformIO $ formatTimestamp t cFalse
+displayTimestamp t = U.unsafePerformIO $ formatTimestamp t cFalse "Z"
 
 -- | Convert a timestamp into a human-readable representation in
 -- the local timezone.
 displayLocalTimestamp :: Word64 -- ^ milliseconds since 1\/1\/1970 UTC
                       -> IO T.Text
-displayLocalTimestamp t = formatTimestamp t cTrue
+displayLocalTimestamp t = formatTimestamp t cTrue "%z"
 
 -- | Convert a 'TagReadData' to a human-readable list of lines.
 displayTagReadData :: TagReadData -> [T.Text]
