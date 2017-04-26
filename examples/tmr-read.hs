@@ -19,21 +19,14 @@ main = do
   TMR.paramSet rdr TMR.PARAM_TRANSPORTTIMEOUT (10000 :: Word32)
   TMR.connect rdr
 
-  putStrLn "setting parameters"
   plan <- TMR.paramGet rdr TMR.PARAM_READ_PLAN
-  putStrLn "setting region"
   TMR.paramSet rdr TMR.PARAM_REGION_ID TMR.REGION_NA2
-  putStrLn "setting read power"
   TMR.paramSet rdr TMR.PARAM_RADIO_READPOWER (500 :: Int32)
   let plan' = plan { TMR.rpAntennas = [1] }
-  putStrLn "setting plan"
   TMR.paramSet rdr TMR.PARAM_READ_PLAN plan'
 
-  putStrLn "reading tags"
-  forM_ [1..10] $ \_ -> do
-    tags <- TMR.read rdr 500
-    putStrLn "here are the tags:"
-    mapM_ T.putStrLn $ concatMap TMR.displayTagReadData tags
-    putStrLn ""
+  tags <- TMR.read rdr 1000
+  putStrLn $ "read " ++ show (length tags) ++ " tags"
+  mapM_ T.putStrLn $ concatMap TMR.displayTagReadData tags
 
   TMR.destroy rdr
