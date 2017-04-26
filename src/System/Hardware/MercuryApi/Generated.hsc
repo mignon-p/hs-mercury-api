@@ -342,7 +342,7 @@ peekList8 (lp, _, _, _) = do
 newtype GEN2_TagData =
   GEN2_TagData
   { g2Pc :: (ByteString) -- ^ Tag PC
-  } deriving (Eq, Ord, Show)
+  } deriving (Eq, Ord, Show, Read)
 
 instance Storable GEN2_TagData where
   sizeOf _ = #{size TMR_GEN2_TagData}
@@ -354,7 +354,7 @@ instance Storable GEN2_TagData where
     GEN2_TagData
       <$> (peekArrayAsByteString pPc pPcByteCount)
 
-  poke p x = error "poke not implemented"
+  poke p x = error "poke not implemented for GEN2_TagData"
 
 -- | A record to represent RFID tags.
 data TagData =
@@ -363,7 +363,7 @@ data TagData =
   , tdProtocol :: !(TagProtocol) -- ^ Protocol of the tag
   , tdCrc :: !(Word16) -- ^ Tag CRC
   , tdGen2 :: !(Maybe (GEN2_TagData)) -- ^ Gen2-specific tag information
-  } deriving (Eq, Ord, Show)
+  } deriving (Eq, Ord, Show, Read)
 
 instance Storable TagData where
   sizeOf _ = #{size TMR_TagData}
@@ -381,7 +381,7 @@ instance Storable TagData where
       <*> (peek pCrc)
       <*> (peekMaybe (peek) (== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)) pU_gen2 pProtocol)
 
-  poke p x = error "poke not implemented"
+  poke p x = error "poke not implemented for TagData"
 
 -- | The identity and state of a single GPIO pin.
 data GpioPin =
@@ -389,7 +389,7 @@ data GpioPin =
   { gpId :: !(Word8) -- ^ The ID number of the pin.
   , gpHigh :: !(Bool) -- ^ Whether the pin is in the high state.
   , gpOutput :: !(Bool) -- ^ The direction of the pin
-  } deriving (Eq, Ord, Show)
+  } deriving (Eq, Ord, Show, Read)
 
 instance Storable GpioPin where
   sizeOf _ = #{size TMR_GpioPin}
@@ -404,7 +404,7 @@ instance Storable GpioPin where
       <*> (toBool' <$> peek pHigh)
       <*> (toBool' <$> peek pOutput)
 
-  poke p x = error "poke not implemented"
+  poke p x = error "poke not implemented for GpioPin"
 
 -- | A record to represent a read of an RFID tag.
 -- Provides access to the metadata of the read event,
@@ -426,7 +426,7 @@ data TagReadData =
   , trTidMemData :: !(ByteString) -- ^ Read TID bank data bytes
   , trUserMemData :: !(ByteString) -- ^ Read USER bank data bytes
   , trReservedMemData :: !(ByteString) -- ^ Read RESERVED bank data bytes
-  } deriving (Eq, Ord, Show)
+  } deriving (Eq, Ord, Show, Read)
 
 instance Storable TagReadData where
   sizeOf _ = #{size TMR_TagReadData}
@@ -465,7 +465,7 @@ instance Storable TagReadData where
       <*> (peekListAsByteString pUserMemData)
       <*> (peekListAsByteString pReservedMemData)
 
-  poke p x = error "poke not implemented"
+  poke p x = error "poke not implemented for TagReadData"
 
 data StatusType =
     SUCCESS_TYPE

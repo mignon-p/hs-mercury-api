@@ -497,7 +497,7 @@ sub makePfield {
 }
 
 sub emitStruct2 {
-    my ($hType, $prefix, $cType, $fields, $info) = @_;
+    my ($hType, $prefix, $cType, $fields, $info, $poke) = @_;
 
     my $nFields = 0;
     foreach my $field (@$fields) {
@@ -525,7 +525,7 @@ sub emitStruct2 {
             $sep = ",";
         }
     }
-    emit "  } deriving (Eq, Ord, Show)";
+    emit "  } deriving (Eq, Ord, Show, Read)";
     emit "";
 
     emit "instance Storable $hType where";
@@ -560,7 +560,22 @@ sub emitStruct2 {
         }
     }
     emit "";
-    emit '  poke p x = error "poke not implemented"';
+
+    if ($poke) {
+        emit "  poke p x = do";
+        foreach my $field (@$fields) {
+            if (exists $info->{$field}) {
+                my $c = $info->{$field}{"c"};
+                my $marshall = $info->{$field}{"marshall"}[1];
+                my $hField = $prefix . ucfirst ($field);
+                my @ptrs = map ("#{ptr $cType, $_}", @$c);
+                emit ("    $marshall " . join (" ", @ptrs) . " ($hField x)");
+            }
+        }
+    } else {
+        emit "  poke p x = error \"poke not implemented for $hType\"";
+    }
+
     emit "";
 }
 
@@ -656,7 +671,7 @@ sub emitGen2 {
 
     byteStringArrayField (\%fields, "pc", "pcByteCount");
 
-    emitStruct2 ("GEN2_TagData", "g2", $cName, \@fieldOrder, \%fields);
+    emitStruct2 ("GEN2_TagData", "g2", $cName, \@fieldOrder, \%fields, 0);
 }
 
 sub emitTagData {
@@ -676,7 +691,7 @@ sub emitTagData {
     $fields{"gen2"}{"c"}[0] = "u.gen2";
     wrapField (\%fields, "protocol", "toTagProtocol", "fromTagProtocol");
 
-    emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields);
+    emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields, 0);
 }
 
 sub emitGpio {
@@ -693,7 +708,7 @@ sub emitGpio {
     wrapField (\%fields, "high", "toBool'", "fromBool'");
     wrapField (\%fields, "output", "toBool'", "fromBool'");
 
-    emitStruct2 ("GpioPin", "gp", $cName, \@fieldOrder, \%fields);
+    emitStruct2 ("GpioPin", "gp", $cName, \@fieldOrder, \%fields, 0);
 }
 
 sub deleteUnderscoreFields {
@@ -741,7 +756,7 @@ sub emitTagReadData {
         byteStringListField (\%fields, $f);
     }
 
-    emitStruct2 ("TagReadData", "tr", $cName, \@fieldOrder, \%fields);
+    emitStruct2 ("TagReadData", "tr", $cName, \@fieldOrder, \%fields, 0);
 }
 
 sub emitStructs {
