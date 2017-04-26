@@ -571,13 +571,12 @@ formatTimestamp t local z = do
       then fail "error formatting time"
       else textFromCString buf
 
--- | Convert a timestamp into a human-readable representation in UTC.
+-- | Convert a timestamp into ISO 8601 format in UTC.
 displayTimestamp :: Word64 -- ^ milliseconds since 1\/1\/1970 UTC
                  -> T.Text
 displayTimestamp t = U.unsafePerformIO $ formatTimestamp t cFalse "Z"
 
--- | Convert a timestamp into a human-readable representation in
--- the local timezone.
+-- | Convert a timestamp into ISO 8601 format in the local timezone.
 displayLocalTimestamp :: Word64 -- ^ milliseconds since 1\/1\/1970 UTC
                       -> IO T.Text
 displayLocalTimestamp t = formatTimestamp t cTrue "%z"

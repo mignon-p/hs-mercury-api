@@ -20,6 +20,8 @@ typedef struct ReaderEtc ReaderEtc;
 typedef struct List16 List16;
 typedef struct List8 List8;
 typedef struct ReadPlanEtc ReadPlanEtc;
+typedef struct TagOpEtc TagOpEtc;
+typedef struct TagFilterEtc TagFilterEtc;
 
 struct ReaderEtc {
     TMR_Reader reader;
@@ -67,13 +69,30 @@ struct List8 {
     uint8_t len;
 };
 
+#define GLUE_MAX_MASK TMR_MAX_EMBEDDED_DATA_LENGTH
+
+struct TagFilterEtc {
+    TMR_TagFilter filter;
+    uint8_t mask[GLUE_MAX_MASK];
+};
+
+#define GLUE_MAX_DATA16 TMR_MAX_EMBEDDED_DATA_LENGTH
+
+struct TagOpEtc {
+    TMR_TagOp tagop;
+    TMR_TagData epc;
+    uint16_t data16[GLUE_MAX_DATA16];
+};
+
 #define GLUE_MAX_ANTENNAS TMR_SR_MAX_ANTENNA_PORTS
-#define GLUE_MAX_GPIPORTS 32
+#define GLUE_MAX_GPIPORTS 16
 
 struct ReadPlanEtc {
     TMR_ReadPlan plan;
     uint8_t antennas[GLUE_MAX_ANTENNAS];
     uint8_t gpiPorts[GLUE_MAX_GPIPORTS];
+    TagFilterEtc filter;
+    TagOpEtc tagop;
 };
 
 TMR_Status c_TMR_create (ReaderEtc *reader, const char *deviceUri);
