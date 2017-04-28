@@ -227,11 +227,13 @@ sub readStructs {
             $structName = undef;
         } elsif (m%^\s+/\*+\s*(.*?)\s*\*+/%) {
             $comment = $1;
-        } elsif (/^\s+(\w+)\s+(\w+)[\w\[\]]*?;/ and defined $structName) {
-            my ($fieldName, $type) = ($2, $1);
+        } elsif (/^\s+(\w+)\s+(\w+)([\w\[\]]*?);/ and defined $structName) {
+            my ($fieldName, $type, $dim) = ($2, $1, $3);
             push @{$structs->{$structName}{'fields'}}, $fieldName;
             $structs->{$structName}{'type'}{$fieldName} = $type;
             $structs->{$structName}{'comment'}{$fieldName} = escapeHaddock($comment);
+            $dim =~ s/[\[\]]//g;
+            $structs->{$structName}{'dim'}{$fieldName} = $dim if ($dim ne "");
             $comment = "";
         }
     }
@@ -511,6 +513,10 @@ sub convertStruct {
             "marshall" => ["peek", "poke"]
             );
 
+        if (exists $cStruct->{'dim'}{$field}) {
+            $info{"dim"} = $cStruct->{'dim'}{$field};
+        }
+
         $fields->{$field} = \%info;
     }
 }
@@ -607,9 +613,10 @@ sub emitStruct2 {
 }
 
 sub byteStringArrayField {
-    my ($fields, $arrayField, $lengthField, $maxLen) = @_;
+    my ($fields, $arrayField, $lengthField) = @_;
 
     my $info = $fields->{$arrayField};
+    my $maxLen = $info->{"dim"};
     $info->{"c"} = [$arrayField, $lengthField];
     $info->{"type"} = "ByteString";
     $info->{"marshall"} = ["peekArrayAsByteString",
@@ -697,8 +704,7 @@ sub emitGen2 {
 
     convertStruct ($cStruct, \@fieldOrder, \%fields);
 
-    byteStringArrayField (\%fields, "pc", "pcByteCount",
-                          "TMR_GEN2_MAX_PC_BYTE_COUNT");
+    byteStringArrayField (\%fields, "pc", "pcByteCount");
 
     emitStruct2 ("GEN2_TagData", "g2", $cName, \@fieldOrder, \%fields, 1);
 }
@@ -714,8 +720,7 @@ sub emitTagData {
 
     convertStruct ($cStruct, \@fieldOrder, \%fields);
 
-    byteStringArrayField (\%fields, "epc", "epcByteCount",
-                          "TMR_MAX_EPC_BYTE_COUNT");
+    byteStringArrayField (\%fields, "epc", "epcByteCount");
     maybeField (\%fields, "gen2", "protocol",
                 "== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)");
     $fields{"gen2"}{"c"}[0] = "u.gen2";
