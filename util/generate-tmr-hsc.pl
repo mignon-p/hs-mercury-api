@@ -105,7 +105,7 @@ sub readStatus {
 
 sub parseParamComment {
     my ($c) = @_;
-    if ($c =~ /^(\"[^\"]+\"),\s+(\w+)/) {
+    if ($c =~ /^\"([^\"]+)\",\s+(\w+)/) {
         my ($quoted, $type) = ($1, $2);
         my $haskellType;
         if (exists $toHaskellType{$type}) {
@@ -113,7 +113,10 @@ sub parseParamComment {
         } else {
             $haskellType = $nyi;
         }
-        return ($haskellType, escapeHaddock("$quoted, $haskellType"));
+        my $equoted = escapeHaddock($quoted);
+        my $linkedType = $haskellType;
+        $linkedType =~ s/(\w+)/'$1'/ if ($linkedType ne $nyi);
+        return ($haskellType, "\@$equoted\@ $linkedType");
     } else {
         return ("", escapeHaddock($c));
     }
