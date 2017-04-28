@@ -94,7 +94,7 @@ sub readStatus {
             $comment = $1;
         } elsif (/^#define TMR_(ERROR_[A-Z0-9_]+)\s+/) {
             push @errorCodes, $1;
-            $errorCodes{$1} = $comment;
+            $errorCodes{$1} = escapeHaddock($comment);
             $comment = "";
         } else {
             $comment = "";
@@ -113,9 +113,9 @@ sub parseParamComment {
         } else {
             $haskellType = $nyi;
         }
-        return ($haskellType, "$quoted, $haskellType");
+        return ($haskellType, escapeHaddock("$quoted, $haskellType"));
     } else {
-        return ("", $c);
+        return ("", escapeHaddock($c));
     }
 }
 
@@ -149,13 +149,13 @@ sub readGlue {
     while (<F>) {
         if (/^#define (ERROR_TYPE_[A-Z]+)/) {
             push @glueTypes, $1;
-            $glueTypes{$1} = $comment;
+            $glueTypes{$1} = escapeHaddock($comment);
             $comment = "";
         } elsif (m%^/\*\*\s*(.*?)\s*\*/%) {
             $comment = $1;
         } elsif (/^#define (ERROR_[A-Z0-9_]+)\s+/) {
             push @glueCodes, $1;
-            $glueCodes{$1} = $comment;
+            $glueCodes{$1} = escapeHaddock($comment);
             $comment = "";
         } else {
             $comment = "";
@@ -169,7 +169,7 @@ sub readRegion {
     while (<F>) {
         if (m%^\s*/\*\*\s*(.*?)\s*\*+/\s*TMR_(REGION_\w+)%) {
             push @regions, $2;
-            $regions{$2} = $1;
+            $regions{$2} = escapeHaddock($1);
         }
     }
     close F;
@@ -204,7 +204,7 @@ sub readStructs {
             my ($fieldName, $type) = ($2, $1);
             push @{$structs->{$structName}{'fields'}}, $fieldName;
             $structs->{$structName}{'type'}{$fieldName} = $type;
-            $structs->{$structName}{'comment'}{$fieldName} = $comment;
+            $structs->{$structName}{'comment'}{$fieldName} = escapeHaddock($comment);
             $comment = "";
         }
     }
@@ -281,7 +281,7 @@ sub makeComment {
     if ($x eq "") {
         return "";
     } else {
-        return (" -- ^ " . escapeHaddock ($x));
+        return " -- ^ $x";
     }
 }
 
@@ -752,7 +752,7 @@ sub emitTagReadData {
 
     # timestampLow/timestampHigh merged into one
     split64Field (\@fieldOrder, \%fields, "timestamp",
-                  "Absolute time of the read, in milliseconds since 1/1/1970 UTC");
+                  escapeHaddock("Absolute time of the read, in milliseconds since 1/1/1970 UTC"));
 
     # uint8Lists as bytestrings
     foreach my $f (qw(data epcMemData tidMemData userMemData reservedMemData)) {
