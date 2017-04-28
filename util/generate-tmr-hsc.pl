@@ -84,6 +84,26 @@ my %listSize = (
     "[TagProtocol]" => "8",
     );
 
+# additional comments about parameters (i. e. units)
+my %extra = (
+    "/reader/commandTimeout" => "milliseconds",
+    "/reader/transportTimeout" => "milliseconds",
+    "/reader/antenna/settingTimeList" => "microseconds",
+    "/reader/gen2/BLF" => "kHz",
+    "/reader/gen2/writeReplyTimeout" => "microseconds",
+    "/reader/radio/powerMax" => "centi-dBm",
+    "/reader/radio/powerMin" => "centi-dBm",
+    "/reader/radio/portReadPowerList" => "centi-dBm",
+    "/reader/radio/portWritePowerList" => "centi-dBm",
+    "/reader/radio/readPower" => "centi-dBm",
+    "/reader/radio/writePower" => "centi-dBm",
+    "/reader/radio/temperature" => "degrees C",
+    "/reader/read/asyncOffTime" => "milliseconds",
+    "/reader/read/asyncOnTime" => "milliseconds",
+    "/reader/region/hopTable" => "kHz",
+    "/reader/region/hopTime" => "milliseconds",
+    );
+
 sub readStatus {
     open F, "$apiDir/tmr_status.h" or die;
     my $comment = "";
@@ -116,7 +136,11 @@ sub parseParamComment {
         my $equoted = escapeHaddock($quoted);
         my $linkedType = $haskellType;
         $linkedType =~ s/(\w+)/'$1'/ if ($linkedType ne $nyi);
-        return ($haskellType, "\@$equoted\@ $linkedType");
+        my $xtra = "";
+        if (exists $extra{$quoted} and $linkedType ne $nyi) {
+            $xtra = " (" . escapeHaddock($extra{$quoted}) . ")";
+        }
+        return ($haskellType, "\@$equoted\@ $linkedType$xtra");
     } else {
         return ("", escapeHaddock($c));
     }
