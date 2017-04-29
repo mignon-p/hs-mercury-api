@@ -224,6 +224,14 @@ peekMaybe oldPeek cond justP condP = do
     then Just <$> oldPeek justP
     else return Nothing
 
+pokeGen2TagData :: Ptr GEN2_TagData
+                -> Ptr RawTagProtocol
+                -> Maybe GEN2_TagData
+                -> IO ()
+pokeGen2TagData pGen2 _ mGen2 = do
+  let gen2 = fromMaybe (GEN2_TagData B.empty) mGen2
+  poke pGen2 gen2
+
 peekSplit64 :: Ptr Word32 -> Ptr Word32 -> IO Word64
 peekSplit64 pLow pHigh = do
   lo <- fromIntegral <$> peek pLow

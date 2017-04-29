@@ -731,9 +731,10 @@ sub emitTagData {
     maybeField (\%fields, "gen2", "protocol",
                 "== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)");
     $fields{"gen2"}{"c"}[0] = "u.gen2";
+    $fields{"gen2"}{"marshall"}[1] = "pokeGen2TagData";
     wrapField (\%fields, "protocol", "toTagProtocol", "fromTagProtocol");
 
-    emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields, 0);
+    emitStruct2 ("TagData", "td", $cName, \@fieldOrder, \%fields, 1);
 }
 
 sub emitGpio {

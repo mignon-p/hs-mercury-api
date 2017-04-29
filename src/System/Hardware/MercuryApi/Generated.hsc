@@ -224,6 +224,14 @@ peekMaybe oldPeek cond justP condP = do
     then Just <$> oldPeek justP
     else return Nothing
 
+pokeGen2TagData :: Ptr GEN2_TagData
+                -> Ptr RawTagProtocol
+                -> Maybe GEN2_TagData
+                -> IO ()
+pokeGen2TagData pGen2 _ mGen2 = do
+  let gen2 = fromMaybe (GEN2_TagData B.empty) mGen2
+  poke pGen2 gen2
+
 peekSplit64 :: Ptr Word32 -> Ptr Word32 -> IO Word64
 peekSplit64 pLow pHigh = do
   lo <- fromIntegral <$> peek pLow
@@ -394,7 +402,11 @@ instance Storable TagData where
       <*> (peek pCrc)
       <*> (peekMaybe (peek) (== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)) pU_gen2 pProtocol)
 
-  poke p x = error "poke not implemented for TagData"
+  poke p x = do
+    pokeArrayAsByteString "epc" #{const TMR_MAX_EPC_BYTE_COUNT} (#{ptr TMR_TagData, epc} p) (#{ptr TMR_TagData, epcByteCount} p) (tdEpc x)
+    poke (#{ptr TMR_TagData, protocol} p) (fromTagProtocol $ tdProtocol x)
+    poke (#{ptr TMR_TagData, crc} p) (tdCrc x)
+    pokeGen2TagData (#{ptr TMR_TagData, u.gen2} p) (#{ptr TMR_TagData, protocol} p) (tdGen2 x)
 
 -- | The identity and state of a single GPIO pin.
 data GpioPin =
