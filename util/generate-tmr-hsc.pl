@@ -587,8 +587,13 @@ sub emitStruct2 {
         if (exists $info->{$field}) {
             my $c = $info->{$field}{"c"};
             my $marshall = $info->{$field}{"marshall"}[0];
+            my $filter = "";
+            if (exists $info->{$field}{"filter"}) {
+                $filter = $info->{$field}{"filter"}[0];
+                $filter .= ' <$> ';
+            }
             my @ptrs = map { makePfield $_ } @$c;
-            emit ("      $sep ($marshall " . join (" ", @ptrs) . ")");
+            emit ("      $sep ($filter$marshall " . join (" ", @ptrs) . ")");
             $sep = '<*>';
         }
     }
@@ -600,9 +605,14 @@ sub emitStruct2 {
             if (exists $info->{$field}) {
                 my $c = $info->{$field}{"c"};
                 my $marshall = $info->{$field}{"marshall"}[1];
+                my $filter = "";
+                if (exists $info->{$field}{"filter"}) {
+                    $filter = $info->{$field}{"filter"}[1];
+                    $filter .= ' $ ';
+                }
                 my $hField = $prefix . ucfirst ($field);
                 my @ptrs = map ("(#{ptr $cType, $_} p)", @$c);
-                emit ("    $marshall " . join (" ", @ptrs) . " ($hField x)");
+                emit ("    $marshall " . join (" ", @ptrs) . " ($filter$hField x)");
             }
         }
     } else {
@@ -661,10 +671,7 @@ sub wrapField {
     my ($fields, $field, $peekWrap, $pokeWrap) = @_;
 
     my $info = $fields->{$field};
-    my $oldPeek = $info->{"marshall"}[0];
-    my $oldPoke = $info->{"marshall"}[1];
-    $info->{"marshall"} = ["$peekWrap <\$> $oldPeek",
-                           "$oldPoke \$ $pokeWrap"];
+    $info->{"filter"} = [$peekWrap, $pokeWrap]
 }
 
 sub split64Field {
