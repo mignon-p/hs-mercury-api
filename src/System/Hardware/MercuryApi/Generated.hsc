@@ -212,6 +212,35 @@ data TagFilter = TagFilterEPC TagData
                }
                deriving (Eq, Ord, Show, Read)
 
+instance Storable TagFilter where
+  sizeOf _ = #{size TagFilterEtc}
+  alignment _ = 8
+
+  poke p (TagFilterEPC td) = do
+    #{poke TagFilterEtc, filter.type} p
+      (#{const TMR_FILTER_TYPE_TAG_DATA} :: #{type TMR_FilterType})
+    #{poke TagFilterEtc, filter.u.tagData} p td
+
+  poke p tf@(TagFilterGen2 {}) = do
+    #{poke TagFilterEtc, filter.type} p
+      (#{const TMR_FILTER_TYPE_GEN2_SELECT} :: #{type TMR_FilterType})
+    #{poke TagFilterEtc, filter.u.gen2Select.invert} p (fromBool' $ tfInvert tf)
+    #{poke TagFilterEtc, filter.u.gen2Select.bank} p (tfFilterOn tf)
+    #{poke TagFilterEtc, filter.u.gen2Select.bitPointer} p (tfBitPointer tf)
+    #{poke TagFilterEtc, filter.u.gen2Select.maskBitLength} p (tfMaskBitLength tf)
+    let maskLenBytes = fromIntegral $ (tfMaskBitLength tf + 7) `div` 8
+        origLen = B.length (tfMask tf)
+        bs = if origLen < maskLenBytes
+               then tfMask tf <> B.pack (replicate (maskLenBytes - origLen) 0)
+               else tfMask tf
+    B.useAsCStringLen bs $ \(cs, len) -> do
+      len' <- castLen' #{const GLUE_MAX_MASK} "tfMask" len
+      copyArray (#{ptr TagFilterEtc, mask} p) cs (fromIntegral len')
+    #{poke TagFilterEtc, filter.u.gen2Select.mask} p (#{ptr TagFilterEtc, mask} p)
+
+  peek p = undefined
+
+
 packFlags :: [MetadataFlag] -> RawMetadataFlag
 packFlags flags = sum $ map fromMetadataFlag flags
 
