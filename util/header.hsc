@@ -170,12 +170,28 @@ instance Storable ReadPlan where
       , rpTriggerRead = triggerRead
       }
 
-{-
-
 -- | Filter on EPC length, or on a Gen2 bank.
 data FilterOn = FilterOnBank GEN2_Bank
               | FilterOnEpcLength
               deriving (Eq, Ord, Show, Read)
+
+instance Storable FilterOn where
+  sizeOf _ = #{size TMR_GEN2_Bank}
+  alignment _ = 8
+
+  poke p FilterOnEpcLength = do
+    let p' = castPtr p :: Ptr RawBank
+    poke p' #{const TMR_GEN2_EPC_LENGTH_FILTER}
+
+  poke p (FilterOnBank bank) = do
+    let p' = castPtr p :: Ptr RawBank
+    poke p' (fromBank bank)
+
+  peek p = do
+    x <- peek (castPtr p)
+    if x == #{const TMR_GEN2_EPC_LENGTH_FILTER}
+      then return FilterOnEpcLength
+      else return $ FilterOnBank $ toBank x
 
 -- | Filter on EPC data, or on Gen2-specific information.
 data TagFilter = TagFilterEPC TagData
@@ -195,8 +211,6 @@ data TagFilter = TagFilterEPC TagData
                                                  -- of tag memory, MSB first
                }
                deriving (Eq, Ord, Show, Read)
-
--}
 
 packFlags :: [MetadataFlag] -> RawMetadataFlag
 packFlags flags = sum $ map fromMetadataFlag flags

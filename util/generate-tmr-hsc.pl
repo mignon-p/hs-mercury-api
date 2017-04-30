@@ -1006,6 +1006,7 @@ sub emitBanks {
 
     emit "toBank :: RawBank -> GEN2_Bank";
     emitTo ("toBank", "TMR_", \@banks);
+    emit "toBank x = error \$ \"didn't expect bank to be \" ++ show x";
     emit "";
 }
 
