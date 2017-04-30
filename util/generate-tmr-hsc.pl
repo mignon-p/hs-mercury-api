@@ -29,6 +29,9 @@ my @tagProtocols = ();
 
 my @metadataFlags = ();
 
+my @banks = ();
+my %banks = ();
+
 my %tagDataStructs = ();
 my %gen2Structs = ();
 my %gpioStructs = ();
@@ -258,7 +261,23 @@ sub readTagData {
 }
 
 sub readGen2 {
-    readStructs ("$apiDir/tmr_gen2.h", \%gen2Structs);
+    my $file = "$apiDir/tmr_gen2.h";
+    open F, $file or die;
+    my $comment = "";
+    while (<F>) {
+        if (/^\s+TMR_(GEN2_BANK_[A-Z]+)\s/) {
+            my $bank = $1;
+            push @banks, $bank;
+            $banks{$bank} = escapeHaddock($comment);
+            $comment = "";
+        } elsif (m%^\s+/\*\*\s*(.*?)\s*\*/%) {
+            $comment = $1;
+        } else {
+            $comment = "";
+        }
+    }
+    close F;
+    readStructs ($file, \%gen2Structs);
 }
 
 sub readGpio {
@@ -972,6 +991,24 @@ sub emitMetadataFlags {
     emit "";
 }
 
+sub emitBanks {
+    emit "type RawBank = #{type TMR_GEN2_Bank}";
+    emit "";
+
+    emit "data GEN2_Bank =";
+    emitEnum (\@banks, \%banks);
+    emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
+    emit "";
+
+    emit "fromBank :: GEN2_Bank -> RawBank";
+    emitFrom ("fromBank", "TMR_", \@banks);
+    emit "";
+
+    emit "toBank :: RawBank -> GEN2_Bank";
+    emitTo ("toBank", "TMR_", \@banks);
+    emit "";
+}
+
 readStatus();
 readParams();
 readGlue();
@@ -987,6 +1024,7 @@ emitStatus();
 emitRegion();
 emitTagProtocol();
 emitMetadataFlags();
+emitBanks();
 emitParams();
 emitParamTypes();
 

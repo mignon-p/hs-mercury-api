@@ -170,6 +170,34 @@ instance Storable ReadPlan where
       , rpTriggerRead = triggerRead
       }
 
+{-
+
+-- | Filter on EPC length, or on a Gen2 bank.
+data FilterOn = FilterOnBank GEN2_Bank
+              | FilterOnEpcLength
+              deriving (Eq, Ord, Show, Read)
+
+-- | Filter on EPC data, or on Gen2-specific information.
+data TagFilter = TagFilterEPC TagData
+               | TagFilterGen2
+               { tfInvert        :: !Bool        -- ^ Whether to invert the
+                                                 -- selection (deselect tags
+                                                 -- that meet the comparison)
+               , tfFilterOn      :: !FilterOn    -- ^ The memory bank in which
+                                                 -- to compare the mask
+               , tfBitPointer    :: !Word32      -- ^ The location (in bits) at
+                                                 -- which to begin comparing
+                                                 -- the mask
+               , tfMaskBitLength :: !Word16      -- ^ The length (in bits) of
+                                                 -- the mask
+               , tfMask          :: !ByteString  -- ^ The mask value to compare
+                                                 -- with the specified region
+                                                 -- of tag memory, MSB first
+               }
+               deriving (Eq, Ord, Show, Read)
+
+-}
+
 packFlags :: [MetadataFlag] -> RawMetadataFlag
 packFlags flags = sum $ map fromMetadataFlag flags
 
@@ -834,6 +862,27 @@ fromMetadataFlag METADATA_FLAG_PHASE = #{const TMR_TRD_METADATA_FLAG_PHASE}
 fromMetadataFlag METADATA_FLAG_PROTOCOL = #{const TMR_TRD_METADATA_FLAG_PROTOCOL}
 fromMetadataFlag METADATA_FLAG_DATA = #{const TMR_TRD_METADATA_FLAG_DATA}
 fromMetadataFlag METADATA_FLAG_GPIO_STATUS = #{const TMR_TRD_METADATA_FLAG_GPIO_STATUS}
+
+type RawBank = #{type TMR_GEN2_Bank}
+
+data GEN2_Bank =
+    GEN2_BANK_RESERVED -- ^ Reserved bank (kill and access passwords)
+  | GEN2_BANK_EPC -- ^ EPC memory bank
+  | GEN2_BANK_TID -- ^ TID memory bank
+  | GEN2_BANK_USER -- ^ User memory bank
+  deriving (Eq, Ord, Show, Read, Bounded, Enum)
+
+fromBank :: GEN2_Bank -> RawBank
+fromBank GEN2_BANK_RESERVED = #{const TMR_GEN2_BANK_RESERVED}
+fromBank GEN2_BANK_EPC = #{const TMR_GEN2_BANK_EPC}
+fromBank GEN2_BANK_TID = #{const TMR_GEN2_BANK_TID}
+fromBank GEN2_BANK_USER = #{const TMR_GEN2_BANK_USER}
+
+toBank :: RawBank -> GEN2_Bank
+toBank #{const TMR_GEN2_BANK_RESERVED} = GEN2_BANK_RESERVED
+toBank #{const TMR_GEN2_BANK_EPC} = GEN2_BANK_EPC
+toBank #{const TMR_GEN2_BANK_TID} = GEN2_BANK_TID
+toBank #{const TMR_GEN2_BANK_USER} = GEN2_BANK_USER
 
 type RawParam = #{type TMR_Param}
 

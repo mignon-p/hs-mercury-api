@@ -170,6 +170,34 @@ instance Storable ReadPlan where
       , rpTriggerRead = triggerRead
       }
 
+{-
+
+-- | Filter on EPC length, or on a Gen2 bank.
+data FilterOn = FilterOnBank GEN2_Bank
+              | FilterOnEpcLength
+              deriving (Eq, Ord, Show, Read)
+
+-- | Filter on EPC data, or on Gen2-specific information.
+data TagFilter = TagFilterEPC TagData
+               | TagFilterGen2
+               { tfInvert        :: !Bool        -- ^ Whether to invert the
+                                                 -- selection (deselect tags
+                                                 -- that meet the comparison)
+               , tfFilterOn      :: !FilterOn    -- ^ The memory bank in which
+                                                 -- to compare the mask
+               , tfBitPointer    :: !Word32      -- ^ The location (in bits) at
+                                                 -- which to begin comparing
+                                                 -- the mask
+               , tfMaskBitLength :: !Word16      -- ^ The length (in bits) of
+                                                 -- the mask
+               , tfMask          :: !ByteString  -- ^ The mask value to compare
+                                                 -- with the specified region
+                                                 -- of tag memory, MSB first
+               }
+               deriving (Eq, Ord, Show, Read)
+
+-}
+
 packFlags :: [MetadataFlag] -> RawMetadataFlag
 packFlags flags = sum $ map fromMetadataFlag flags
 
