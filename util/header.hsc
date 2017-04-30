@@ -86,18 +86,19 @@ class ParamValue a where
 -- | A ReadPlan structure specifies the antennas, protocols, and filters
 -- to use for a search (read).
 --
--- Currently, only @SimpleReadPlan@ is supported, and @filter@ and @tagop@
--- are not supported.
+-- Currently, only @SimpleReadPlan@ is supported, and @tagop@
+-- is not supported.
 data ReadPlan =
   SimpleReadPlan
   { rpWeight        :: !Word32          -- ^ The relative weight of this read plan
   , rpEnableAutonomousRead :: !Bool     -- ^ Option for Autonomous read
   , rpAntennas      :: ![Word8]         -- ^ The list of antennas to read on
   , rpProtocol      :: !TagProtocol     -- ^ The protocol to use for reading
+  , rpFilter        :: !(Maybe TagFilter) -- ^ The filter to apply to reading
   , rpUseFastSearch :: !Bool            -- ^ Option to use the FastSearch
   , rpStopOnCount   :: !(Maybe Word32)  -- ^ Number of tags to be read
-  , rpTriggerRead   :: !(Maybe [Word8]) -- ^ The list of GPI ports which should be
-                                     -- used to trigger the read
+  , rpTriggerRead   :: !(Maybe [Word8]) -- ^ The list of GPI ports which should
+                                        -- be used to trigger the read
   } deriving (Eq, Ord, Show, Read)
 
 antennasInfo :: Ptr ReadPlan -> (Ptr List16, Word16, Ptr Word8, Text)
@@ -131,7 +132,11 @@ instance Storable ReadPlan where
     pokeList16 (antennasInfo p) (rpAntennas x)
     #{poke ReadPlanEtc, plan.u.simple.protocol} p
       (fromTagProtocol $ rpProtocol x)
-    #{poke ReadPlanEtc, plan.u.simple.filter} p nullPtr
+    case rpFilter x of
+      Nothing -> #{poke ReadPlanEtc, plan.u.simple.filter} p nullPtr
+      Just f -> do
+        #{poke ReadPlanEtc, filter} p f
+        #{poke ReadPlanEtc, plan.u.simple.filter} p (#{ptr ReadPlanEtc, filter} p)
     #{poke ReadPlanEtc, plan.u.simple.tagop} p nullPtr
     #{poke ReadPlanEtc, plan.u.simple.useFastSearch} p
       (fromBool' $ rpUseFastSearch x)
@@ -151,6 +156,10 @@ instance Storable ReadPlan where
     enableAutonomousRead <- #{peek ReadPlanEtc, plan.enableAutonomousRead} p
     antennas <- peekList16 (antennasInfo p)
     protocol <- #{peek ReadPlanEtc, plan.u.simple.protocol} p
+    fPtr <- #{peek ReadPlanEtc, plan.u.simple.filter} p
+    filt <- if fPtr == nullPtr
+            then return Nothing
+            else Just <$> peek fPtr
     useFastSearch <- #{peek ReadPlanEtc, plan.u.simple.useFastSearch} p
     stop <- #{peek ReadPlanEtc, plan.u.simple.stopOnCount.stopNTriggerStatus} p
     stopOnCount <- if toBool' stop
@@ -165,6 +174,7 @@ instance Storable ReadPlan where
       , rpEnableAutonomousRead = toBool' enableAutonomousRead
       , rpAntennas = antennas
       , rpProtocol = toTagProtocol protocol
+      , rpFilter = filt
       , rpUseFastSearch = toBool' useFastSearch
       , rpStopOnCount = stopOnCount
       , rpTriggerRead = triggerRead
