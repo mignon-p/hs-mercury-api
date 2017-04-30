@@ -238,8 +238,25 @@ instance Storable TagFilter where
       copyArray (#{ptr TagFilterEtc, mask} p) cs (fromIntegral len')
     #{poke TagFilterEtc, filter.u.gen2Select.mask} p (#{ptr TagFilterEtc, mask} p)
 
-  peek p = undefined
+  peek p = do
+    ft <- #{peek TagFilterEtc, filter.type} p :: IO #{type TMR_FilterType}
+    case ft of
+      #{const TMR_FILTER_TYPE_TAG_DATA} ->
+        TagFilterEPC <$> #{peek TagFilterEtc, filter.u.tagData} p
+      #{const TMR_FILTER_TYPE_GEN2_SELECT} ->
+        TagFilterGen2
+        <$> (toBool' <$> #{peek TagFilterEtc, filter.u.gen2Select.invert} p)
+        <*> #{peek TagFilterEtc, filter.u.gen2Select.bank} p
+        <*> #{peek TagFilterEtc, filter.u.gen2Select.bitPointer} p
+        <*> #{peek TagFilterEtc, filter.u.gen2Select.maskBitLength} p
+        <*> peekMask p
 
+peekMask :: Ptr TagFilter -> IO ByteString
+peekMask p = do
+  bitLength <- #{peek TagFilterEtc, filter.u.gen2Select.maskBitLength} p :: IO Word32
+  let len = fromIntegral $ (bitLength + 7) `div` 8
+  maskPtr <- #{peek TagFilterEtc, filter.u.gen2Select.mask} p
+  B.packCStringLen (maskPtr, len)
 
 packFlags :: [MetadataFlag] -> RawMetadataFlag
 packFlags flags = sum $ map fromMetadataFlag flags
