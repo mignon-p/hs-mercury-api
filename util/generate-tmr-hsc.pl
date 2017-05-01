@@ -707,7 +707,7 @@ sub emitUnion {
         my $info   = $cInfo->{'info'};
         my $dValue = $cInfo->{'discriminator'};
         emit "      #{const $dValue} -> do";
-        emitPeek ($hType, $cType, $fields, $info, "        ");
+        emitPeek ($const, $cType, $fields, $info, "        ");
     }
     emit "";
 
@@ -924,7 +924,7 @@ sub emitTagOp {
     my @ops = (qw(writeTag writeData readData));
 
     my $hType = "TagOp";
-    my $prefix = "to";
+    my $prefix = "op";
     my $cType = "TagOpEtc";
     my %discriminator = ("field" => "tagop.type", "type" => "TMR_TagOpType");
     my @constructors;
