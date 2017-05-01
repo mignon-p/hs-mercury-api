@@ -662,8 +662,12 @@ sub emitStruct2 {
 # discriminator{'field'} = string (C field name)
 # discriminator{'type'}  = string (C type name)
 # constInfo{constructor}{'fields'}        = array
-# constInfo{constructor}{'info'}          = hash
 # constInfo{constructor}{'discriminator'} = string (C constant value)
+# constInfo{constructor}{'info'}{field}{'c'} = array of C field names
+# constInfo{constructor}{'info'}{field}{'type'} = string (Haskell type)
+# constInfo{constructor}{'info'}{field}{'comment'} = string
+# constInfo{constructor}{'info'}{field}{'marshall'} = array of length 2
+# constInfo{constructor}{'info'}{field}{'filter'} = array of length 2
 sub emitUnion {
     my ($hType, $prefix, $cType, $discriminator, $constructors, $constInfo) = @_;
     my $dField = $discriminator->{'field'};
