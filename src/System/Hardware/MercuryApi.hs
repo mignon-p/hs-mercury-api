@@ -504,9 +504,12 @@ hexListener' h useColor tx dat _ = do
   setColors useColor [SetColor Foreground Vivid Magenta]
   lstn dat (prefix tx)
   setColors useColor [Reset]
+  flushColor useColor
   where
     setColors False _ = return ()
     setColors True sgr = hSetSGR h sgr
+    flushColor False = return ()
+    flushColor True = hFlush h
     prefix True  = "Sending: "
     prefix False = "Received:"
     lstn bs pfx = do
