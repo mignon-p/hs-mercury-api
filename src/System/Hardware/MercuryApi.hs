@@ -234,15 +234,16 @@ checkStatus' rdr rstat loc param getUri = do
   case t of
     SUCCESS_TYPE -> return ()
     _ -> do
+      uri <- getUri
       if statusIsErrno t rstat
         then do
         let errno = statusGetErrno rstat
-            ioe = errnoToIOError (T.unpack loc) errno Nothing Nothing
+            ioe = errnoToIOError (T.unpack loc) errno Nothing
+                  (Just $ T.unpack uri)
         throwIO ioe
         else do
         cstr <- c_TMR_strerr rdr rstat
         msg <- textFromCString cstr
-        uri <- getUri
         let exc = MercuryException
                   { meStatusType = t
                   , meStatus = stat
