@@ -35,6 +35,7 @@ my %banks = ();
 my %tagDataStructs = ();
 my %gen2Structs = ();
 my %gpioStructs = ();
+my %tagopStructs = ();
 
 my @lines = ();
 
@@ -230,13 +231,15 @@ sub readStructs {
             $structName = undef;
         } elsif (m%^\s+/\*+\s*(.*?)\s*\*+/%) {
             $comment = $1;
-        } elsif (/^\s+(\w+)\s+(\w+)([\w\[\]]*?);/ and defined $structName) {
-            my ($fieldName, $type, $dim) = ($2, $1, $3);
+        } elsif (/^\s+(\w+)([\*\s]+)(\w+)([\w\[\]]*?);/ and defined $structName) {
+            my ($fieldName, $type, $dim, $ptr) = ($3, $1, $4, $2);
             push @{$structs->{$structName}{'fields'}}, $fieldName;
             $structs->{$structName}{'type'}{$fieldName} = $type;
             $structs->{$structName}{'comment'}{$fieldName} = escapeHaddock($comment);
             $dim =~ s/[\[\]]//g;
             $structs->{$structName}{'dim'}{$fieldName} = $dim if ($dim ne "");
+            $ptr =~ s/\s//g;
+            $structs->{$structName}{'ptr'}{$fieldName} = $ptr if ($ptr ne "");
             $comment = "";
         }
     }
@@ -282,6 +285,10 @@ sub readGen2 {
 
 sub readGpio {
     readStructs ("$apiDir/tmr_gpio.h", \%gpioStructs);
+}
+
+sub readTagop {
+    readStructs ("$apiDir/tmr_tagop.h", \%tagopStructs);
 }
 
 sub emit {
@@ -896,6 +903,44 @@ sub emitTagReadData {
     emitStruct2 ("TagReadData", "tr", $cName, \@fieldOrder, \%fields, 0);
 }
 
+sub emitTagOp {
+    my @ops = (qw(writeTag writeData readData));
+
+    my $hType = "TagOp";
+    my $prefix = "to";
+    my $cType = "TagOpEtc";
+    my %discriminator = ("field" => "tagop.type", "type" => "TMR_TagOpType");
+    my @constructors;
+    my %constInfo;
+
+    foreach my $op (@ops) {
+        my $const = "TagOp_GEN2_" . ucfirst($op);
+        my $struct = "TMR_$const";
+        my $disc = uc($struct);
+        my $s = $tagopStructs{$struct};
+        my @fields;
+        my %info;
+
+        convertStruct ($s, \@fields, \%info);
+        foreach my $field (@fields) {
+            my $i = $info{$field};
+            my @newC;
+            foreach my $c (@{$i->{"c"}}) {
+                push @newC, "tagop.u.gen2.u.$op.$c";
+            }
+            $i->{"c"} = \@newC;
+        }
+
+        push @constructors, $const;
+        $constInfo{$const}{'fields'} = \@fields;
+        $constInfo{$const}{'discriminator'} = $disc;
+        $constInfo{$const}{'info'} = \%info;
+    }
+
+    emitUnion ($hType, $prefix, $cType,
+               \%discriminator, \@constructors, \%constInfo);
+}
+
 sub emitStructs {
     emitListStruct ("16");
     emitListFuncs ("16");
@@ -906,6 +951,7 @@ sub emitStructs {
     emitTagData();
     emitGpio();
     emitTagReadData();
+    # emitTagOp();
 }
 
 sub paramTypeName {
@@ -1099,6 +1145,7 @@ readTagProtocol();
 readTagData();
 readGen2();
 readGpio();
+readTagop();
 
 emitHeader();
 emitStructs();
