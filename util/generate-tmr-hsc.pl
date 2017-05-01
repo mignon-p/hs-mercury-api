@@ -548,6 +548,78 @@ sub makePfield {
     return "p$u";
 }
 
+sub emitData {
+    my ($prefix, $fields, $info, $bang, $indent) = @_;
+
+    my $sep = "{";
+    foreach my $field (@$fields) {
+        if (exists $info->{$field}) {
+            my $fieldType = $info->{$field}{"type"};
+            my $comment = $info->{$field}{"comment"};
+            my $ufield = ucfirst ($field);
+            croak "comment undefined for $field" if (not defined $comment);
+            $comment = makeComment ($comment);
+            emit "$indent$sep $prefix$ufield :: $bang($fieldType)$comment";
+            $sep = ",";
+        }
+    }
+}
+
+sub emitPeek {
+    my ($constructor, $cType, $fields, $info, $indent) = @_;
+
+    my %already;
+    my $sep = "let";
+    foreach my $field (@$fields) {
+        if (exists $info->{$field}) {
+            my $c = $info->{$field}{"c"};
+            foreach my $cField (@$c) {
+                if (not exists $already{$cField}) {
+                    my $pfield = makePfield ($cField);
+                    emit "$indent$sep $pfield = #{ptr $cType, $cField} p";
+                    $sep = "   ";
+                    $already{$cField} = 1;
+                }
+            }
+        }
+    }
+    emit "$indent$constructor";
+    $sep = '<$>';
+    foreach my $field (@$fields) {
+        if (exists $info->{$field}) {
+            my $c = $info->{$field}{"c"};
+            my $marshall = $info->{$field}{"marshall"}[0];
+            my $filter = "";
+            if (exists $info->{$field}{"filter"}) {
+                $filter = $info->{$field}{"filter"}[0];
+                $filter .= ' <$> ';
+            }
+            my @ptrs = map { makePfield $_ } @$c;
+            emit ("$indent  $sep ($filter$marshall " . join (" ", @ptrs) . ")");
+            $sep = '<*>';
+        }
+    }
+}
+
+sub emitPoke {
+    my ($prefix, $cType, $fields, $info, $indent) = @_;
+
+    foreach my $field (@$fields) {
+        if (exists $info->{$field}) {
+            my $c = $info->{$field}{"c"};
+            my $marshall = $info->{$field}{"marshall"}[1];
+            my $filter = "";
+            if (exists $info->{$field}{"filter"}) {
+                $filter = $info->{$field}{"filter"}[1];
+                $filter .= ' $ ';
+            }
+            my $hField = $prefix . ucfirst ($field);
+            my @ptrs = map ("(#{ptr $cType, $_} p)", @$c);
+            emit ("$indent$marshall " . join (" ", @ptrs) . " ($filter$hField x)");
+        }
+    }
+}
+
 sub emitStruct2 {
     my ($hType, $prefix, $cType, $fields, $info, $poke) = @_;
 
@@ -565,18 +637,7 @@ sub emitStruct2 {
 
     emit "$data $hType =";
     emit "  $hType";
-    my $sep = "{";
-    foreach my $field (@$fields) {
-        if (exists $info->{$field}) {
-            my $fieldType = $info->{$field}{"type"};
-            my $comment = $info->{$field}{"comment"};
-            my $ufield = ucfirst ($field);
-            croak "comment undefined for $field" if (not defined $comment);
-            $comment = makeComment ($comment);
-            emit "  $sep $prefix$ufield :: $bang($fieldType)$comment";
-            $sep = ",";
-        }
-    }
+    emitData ($prefix, $fields, $info, $bang, "  ");
     emit "  } deriving (Eq, Ord, Show, Read)";
     emit "";
 
@@ -585,55 +646,12 @@ sub emitStruct2 {
     emit "  alignment _ = 8"; # because "#alignment" doesn't work for me
     emit "";
     emit "  peek p = do";
-    my %already;
-    $sep = "let";
-    foreach my $field (@$fields) {
-        if (exists $info->{$field}) {
-            my $c = $info->{$field}{"c"};
-            foreach my $cField (@$c) {
-                if (not exists $already{$cField}) {
-                    my $pfield = makePfield ($cField);
-                    emit "    $sep $pfield = #{ptr $cType, $cField} p";
-                    $sep = "   ";
-                    $already{$cField} = 1;
-                }
-            }
-        }
-    }
-    emit "    $hType";
-    $sep = '<$>';
-    foreach my $field (@$fields) {
-        if (exists $info->{$field}) {
-            my $c = $info->{$field}{"c"};
-            my $marshall = $info->{$field}{"marshall"}[0];
-            my $filter = "";
-            if (exists $info->{$field}{"filter"}) {
-                $filter = $info->{$field}{"filter"}[0];
-                $filter .= ' <$> ';
-            }
-            my @ptrs = map { makePfield $_ } @$c;
-            emit ("      $sep ($filter$marshall " . join (" ", @ptrs) . ")");
-            $sep = '<*>';
-        }
-    }
+    emitPeek ($hType, $cType, $fields, $info, "    ");
     emit "";
 
     if ($poke) {
         emit "  poke p x = do";
-        foreach my $field (@$fields) {
-            if (exists $info->{$field}) {
-                my $c = $info->{$field}{"c"};
-                my $marshall = $info->{$field}{"marshall"}[1];
-                my $filter = "";
-                if (exists $info->{$field}{"filter"}) {
-                    $filter = $info->{$field}{"filter"}[1];
-                    $filter .= ' $ ';
-                }
-                my $hField = $prefix . ucfirst ($field);
-                my @ptrs = map ("(#{ptr $cType, $_} p)", @$c);
-                emit ("    $marshall " . join (" ", @ptrs) . " ($filter$hField x)");
-            }
-        }
+        emitPoke ($prefix, $cType, $fields, $info, "    ");
     } else {
         emit "  poke p x = error \"poke not implemented for $hType\"";
     }
