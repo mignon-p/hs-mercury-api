@@ -1008,6 +1008,12 @@ sub emitBanks {
     emitTo ("toBank", "TMR_", \@banks);
     emit "toBank x = error \$ \"didn't expect bank to be \" ++ show x";
     emit "";
+
+    emit "fromExtraBank :: GEN2_Bank -> RawBank";
+    for my $con (@banks) {
+        emit "fromExtraBank $con = #{const TMR_${con}_ENABLED}";
+    }
+    emit "";
 }
 
 readStatus();

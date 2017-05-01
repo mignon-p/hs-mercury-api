@@ -268,20 +268,32 @@ peekMask p = do
   maskPtr <- #{peek TagFilterEtc, filter.u.gen2Select.mask} p
   B.packCStringLen (maskPtr, len)
 
-packFlags :: [MetadataFlag] -> RawMetadataFlag
-packFlags flags = sum $ map fromMetadataFlag flags
+packBits :: Num b => (a -> b) -> [a] -> b
+packBits from flags = sum $ map from flags
 
-unpackFlags :: RawMetadataFlag -> [MetadataFlag]
-unpackFlags x = mapMaybe f [minBound..maxBound]
-  where f flag = if (x .&. fromMetadataFlag flag) == 0
+unpackBits :: (Bounded a, Enum a, Num b, Bits b) => (a -> b) -> b -> [a]
+unpackBits from x = mapMaybe f [minBound..maxBound]
+  where f flag = if (x .&. from flag) == 0
                  then Nothing
                  else Just flag
+
+packFlags :: [MetadataFlag] -> RawMetadataFlag
+packFlags = packBits fromMetadataFlag
+
+unpackFlags :: RawMetadataFlag -> [MetadataFlag]
+unpackFlags = unpackBits fromMetadataFlag
 
 packFlags16 :: [MetadataFlag] -> Word16
 packFlags16 = fromIntegral . packFlags
 
 unpackFlags16 :: Word16 -> [MetadataFlag]
 unpackFlags16 = unpackFlags . fromIntegral
+
+packExtraBanks :: [GEN2_Bank] -> RawBank
+packExtraBanks = packBits fromExtraBank
+
+unpackExtraBanks :: RawBank -> [GEN2_Bank]
+unpackExtraBanks = unpackBits fromExtraBank
 
 peekArrayAsByteString :: Ptr Word8 -> Ptr Word8 -> IO ByteString
 peekArrayAsByteString arrayPtr lenPtr = do
@@ -954,6 +966,12 @@ toBank #{const TMR_GEN2_BANK_EPC} = GEN2_BANK_EPC
 toBank #{const TMR_GEN2_BANK_TID} = GEN2_BANK_TID
 toBank #{const TMR_GEN2_BANK_USER} = GEN2_BANK_USER
 toBank x = error $ "didn't expect bank to be " ++ show x
+
+fromExtraBank :: GEN2_Bank -> RawBank
+fromExtraBank GEN2_BANK_RESERVED = #{const TMR_GEN2_BANK_RESERVED_ENABLED}
+fromExtraBank GEN2_BANK_EPC = #{const TMR_GEN2_BANK_EPC_ENABLED}
+fromExtraBank GEN2_BANK_TID = #{const TMR_GEN2_BANK_TID_ENABLED}
+fromExtraBank GEN2_BANK_USER = #{const TMR_GEN2_BANK_USER_ENABLED}
 
 type RawParam = #{type TMR_Param}
 
