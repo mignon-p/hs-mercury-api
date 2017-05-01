@@ -801,6 +801,23 @@ sub split64Field {
     @$fieldOrder = @newOrder;
 }
 
+sub renameField {
+    my ($fieldOrder, $fields, $oldField, $newField) = @_;
+
+    $fields->{$newField} = $fields->{$oldField};
+    delete $fields->{$oldField};
+
+    my @newOrder;
+    foreach my $f (@$fieldOrder) {
+        if ($f eq $oldField) {
+            push @newOrder, $newField;
+        } else {
+            push @newOrder, $f;
+        }
+    }
+    @$fieldOrder = @newOrder;
+}
+
 sub emitGen2 {
     emit "-- | Gen2-specific per-tag data";
 
@@ -936,6 +953,13 @@ sub emitTagOp {
         $constInfo{$const}{'discriminator'} = $disc;
         $constInfo{$const}{'info'} = \%info;
     }
+
+    # Ugh, now all the special cases
+    my $writeTag = $constInfo{'TagOp_GEN2_WriteTag'};
+    renameField ($writeTag->{'fields'}, $writeTag->{'info'}, "epcptr", "epc");
+    my $epc = $writeTag->{'info'}{"epc"};
+    push @{$epc->{'c'}}, "epc";
+    $epc->{'marshall'} = ["peekPtr", "pokePtr"];
 
     emitUnion ($hType, $prefix, $cType,
                \%discriminator, \@constructors, \%constInfo);

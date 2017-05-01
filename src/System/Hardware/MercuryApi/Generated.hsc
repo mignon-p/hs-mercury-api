@@ -348,6 +348,16 @@ peekSplit64 pLow pHigh = do
   hi <- fromIntegral <$> peek pHigh
   return $ lo .|. (hi `shiftL` 32)
 
+peekPtr :: Storable a => Ptr (Ptr a) -> Ptr a -> IO a
+peekPtr pp _ = do
+  p <- peek pp
+  peek p
+
+pokePtr :: Storable a => Ptr (Ptr a) -> Ptr a -> a -> IO ()
+pokePtr pp p x = do
+  poke p x
+  poke pp p
+
 -- end of code inserted from util/header.hsc
 
 data List16 =
