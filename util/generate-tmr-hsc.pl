@@ -659,6 +659,59 @@ sub emitStruct2 {
     emit "";
 }
 
+# discriminator{'field'} = string (C field name)
+# discriminator{'type'}  = string (C type name)
+# constInfo{constructor}{'fields'}        = array
+# constInfo{constructor}{'info'}          = hash
+# constInfo{constructor}{'discriminator'} = string (C constant value)
+sub emitUnion {
+    my ($hType, $prefix, $cType, $discriminator, $constructors, $constInfo) = @_;
+    my $dField = $discriminator->{'field'};
+    my $dType = $discriminator->{'type'};
+
+    emit "data $hType =";
+    my $sep = " ";
+    foreach my $const (@$constructors) {
+        my $cInfo  = $constInfo->{$const};
+        my $fields = $cInfo->{'fields'};
+        my $info   = $cInfo->{'info'};
+        emit "  $sep $const";
+        emitData ($prefix, $fields, $info, "!", "    ");
+        emit "    }";
+        $sep = "|";
+    }
+    emit "  deriving (Eq, Ord, Show, Read)";
+    emit "";
+
+    emit "instance Storable $hType where";
+    emit "  sizeOf _ = #{size $cType}";
+    emit "  alignment _ = 8"; # because "#alignment" doesn't work for me
+    emit "";
+    emit "  peek p = do";
+    emit "    x <- #{peek $cType, $dField} p :: IO $dType";
+    emit "    case x of";
+    foreach my $const (@$constructors) {
+        my $cInfo  = $constInfo->{$const};
+        my $fields = $cInfo->{'fields'};
+        my $info   = $cInfo->{'info'};
+        my $dValue = $cInfo->{'discriminator'};
+        emit "      #{const $dValue} -> do";
+        emitPeek ($hType, $cType, $fields, $info, "        ");
+    }
+    emit "";
+
+    foreach my $const (@$constructors) {
+        my $cInfo  = $constInfo->{$const};
+        my $fields = $cInfo->{'fields'};
+        my $info   = $cInfo->{'info'};
+        my $dValue = $cInfo->{'discriminator'};
+        emit "  poke p x\@($const {}) = do";
+        emit "    #{poke $cType, $dField} p (#{const $dValue} :: $dType)";
+        emitPoke ($prefix, $cType, $fields, $info, "    ");
+        emit "";
+    }
+}
+
 sub byteStringArrayField {
     my ($fields, $arrayField, $lengthField) = @_;
 
