@@ -322,6 +322,29 @@ peekArrayAsList arrayPtr lenPtr = do
   len <- peek lenPtr
   peekArray (fromIntegral len) arrayPtr
 
+peekListAsList :: Storable a => Ptr List16 -> Ptr a -> IO [a]
+peekListAsList listPtr _ = do
+  lst <- peek listPtr
+  peekArray (fromIntegral $ l16_len lst) (castPtr $ l16_list lst)
+
+pokeListAsList :: Storable a
+               => Text
+               -> Word16
+               -> Ptr List16
+               -> Ptr a
+               -> [a]
+               -> IO ()
+pokeListAsList desc maxLen listPtr storage xs = do
+  withArrayLen xs $ \len tmpPtr -> do
+    len' <- castLen' maxLen desc len
+    copyArray storage tmpPtr len
+    let lst = List16
+              { l16_list = castPtr storage
+              , l16_max = maxLen
+              , l16_len = len'
+              }
+    poke listPtr lst
+
 peekMaybe :: (Storable a, Storable b)
           => (Ptr a -> IO a)
           -> (b -> Bool)

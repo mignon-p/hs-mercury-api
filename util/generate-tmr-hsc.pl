@@ -76,7 +76,9 @@ my %toHaskellType = (
 my %toHaskellType2 = (
     %toHaskellType,
     "TMR_GEN2_TagData" => "GEN2_TagData",
-    "TMR_TagData" => "TagData"
+    "TMR_TagData" => "TagData",
+    "TMR_GEN2_Bank" => "GEN2_Bank",
+    "TMR_uint16List" => "[Word16]",
     );
 
 my %listSize = (
@@ -699,7 +701,7 @@ sub emitUnion {
     emit "  alignment _ = 8"; # because "#alignment" doesn't work for me
     emit "";
     emit "  peek p = do";
-    emit "    x <- #{peek $cType, $dField} p :: IO $dType";
+    emit "    x <- #{peek $cType, $dField} p :: IO #{type $dType}";
     emit "    case x of";
     foreach my $const (@$constructors) {
         my $cInfo  = $constInfo->{$const};
@@ -717,7 +719,7 @@ sub emitUnion {
         my $info   = $cInfo->{'info'};
         my $dValue = $cInfo->{'discriminator'};
         emit "  poke p x\@($const {}) = do";
-        emit "    #{poke $cType, $dField} p (#{const $dValue} :: $dType)";
+        emit "    #{poke $cType, $dField} p (#{const $dValue} :: #{type $dType})";
         emitPoke ($prefix, $cType, $fields, $info, "    ");
         emit "";
     }
@@ -753,6 +755,15 @@ sub listArrayField {
     $info->{"marshall"} = ["peekArrayAsList", "pokeArrayAsList"];
 
     delete $fields->{$lengthField};
+}
+
+sub listListField {
+    my ($fields, $listField, $storageField, $maxLen) = @_;
+
+    my $info = $fields->{$listField};
+    push @{$info->{"c"}}, $storageField;
+    $info->{"marshall"} = ["peekListAsList",
+                           "pokeListAsList \"$listField\" #{const $maxLen}"];
 }
 
 sub maybeField {
@@ -961,6 +972,14 @@ sub emitTagOp {
     push @{$epc->{'c'}}, "epc";
     $epc->{'marshall'} = ["peekPtr", "pokePtr"];
 
+    foreach my $const ("TagOp_GEN2_WriteData", "TagOp_GEN2_ReadData") {
+        wrapField ($constInfo{$const}{"info"}, "bank", "toBank", "fromBank");
+    }
+
+    my $writeData = $constInfo{"TagOp_GEN2_WriteData"};
+    listListField ($writeData->{'info'}, "data",
+                   "data16", "GLUE_MAX_DATA16");
+
     emitUnion ($hType, $prefix, $cType,
                \%discriminator, \@constructors, \%constInfo);
 }
@@ -975,7 +994,7 @@ sub emitStructs {
     emitTagData();
     emitGpio();
     emitTagReadData();
-    # emitTagOp();
+    emitTagOp();
 }
 
 sub paramTypeName {

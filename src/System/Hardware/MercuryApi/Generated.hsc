@@ -322,6 +322,29 @@ peekArrayAsList arrayPtr lenPtr = do
   len <- peek lenPtr
   peekArray (fromIntegral len) arrayPtr
 
+peekListAsList :: Storable a => Ptr List16 -> Ptr a -> IO [a]
+peekListAsList listPtr _ = do
+  lst <- peek listPtr
+  peekArray (fromIntegral $ l16_len lst) (castPtr $ l16_list lst)
+
+pokeListAsList :: Storable a
+               => Text
+               -> Word16
+               -> Ptr List16
+               -> Ptr a
+               -> [a]
+               -> IO ()
+pokeListAsList desc maxLen listPtr storage xs = do
+  withArrayLen xs $ \len tmpPtr -> do
+    len' <- castLen' maxLen desc len
+    copyArray storage tmpPtr len
+    let lst = List16
+              { l16_list = castPtr storage
+              , l16_max = maxLen
+              , l16_len = len'
+              }
+    poke listPtr lst
+
 peekMaybe :: (Storable a, Storable b)
           => (Ptr a -> IO a)
           -> (b -> Bool)
@@ -611,6 +634,68 @@ instance Storable TagReadData where
       <*> (peekListAsByteString pReservedMemData)
 
   poke p x = error "poke not implemented for TagReadData"
+
+data TagOp =
+    TagOp_GEN2_WriteTag
+    { opEpc :: !(TagData) -- ^ Tag EPC
+    }
+  | TagOp_GEN2_WriteData
+    { opBank :: !(GEN2_Bank) -- ^ Gen2 memory bank to write to
+    , opWordAddress :: !(Word32) -- ^ Word address to start writing at
+    , opData :: !([Word16]) -- ^ Data to write
+    }
+  | TagOp_GEN2_ReadData
+    { opBank :: !(GEN2_Bank) -- ^ Gen2 memory bank to read from
+    , opWordAddress :: !(Word32) -- ^ Word address to start reading at
+    , opLen :: !(Word8) -- ^ Number of words to read
+    }
+  deriving (Eq, Ord, Show, Read)
+
+instance Storable TagOp where
+  sizeOf _ = #{size TagOpEtc}
+  alignment _ = 8
+
+  peek p = do
+    x <- #{peek TagOpEtc, tagop.type} p :: IO #{type TMR_TagOpType}
+    case x of
+      #{const TMR_TAGOP_GEN2_WRITETAG} -> do
+        let pTagop_u_gen2_u_writeTag_epcptr = #{ptr TagOpEtc, tagop.u.gen2.u.writeTag.epcptr} p
+            pEpc = #{ptr TagOpEtc, epc} p
+        TagOp_GEN2_WriteTag
+          <$> (peekPtr pTagop_u_gen2_u_writeTag_epcptr pEpc)
+      #{const TMR_TAGOP_GEN2_WRITEDATA} -> do
+        let pTagop_u_gen2_u_writeData_bank = #{ptr TagOpEtc, tagop.u.gen2.u.writeData.bank} p
+            pTagop_u_gen2_u_writeData_wordAddress = #{ptr TagOpEtc, tagop.u.gen2.u.writeData.wordAddress} p
+            pTagop_u_gen2_u_writeData_data = #{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p
+            pData16 = #{ptr TagOpEtc, data16} p
+        TagOp_GEN2_WriteData
+          <$> (toBank <$> peek pTagop_u_gen2_u_writeData_bank)
+          <*> (peek pTagop_u_gen2_u_writeData_wordAddress)
+          <*> (peekListAsList pTagop_u_gen2_u_writeData_data pData16)
+      #{const TMR_TAGOP_GEN2_READDATA} -> do
+        let pTagop_u_gen2_u_readData_bank = #{ptr TagOpEtc, tagop.u.gen2.u.readData.bank} p
+            pTagop_u_gen2_u_readData_wordAddress = #{ptr TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p
+            pTagop_u_gen2_u_readData_len = #{ptr TagOpEtc, tagop.u.gen2.u.readData.len} p
+        TagOp_GEN2_ReadData
+          <$> (toBank <$> peek pTagop_u_gen2_u_readData_bank)
+          <*> (peek pTagop_u_gen2_u_readData_wordAddress)
+          <*> (peek pTagop_u_gen2_u_readData_len)
+
+  poke p x@(TagOp_GEN2_WriteTag {}) = do
+    #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_WRITETAG} :: #{type TMR_TagOpType})
+    pokePtr (#{ptr TagOpEtc, tagop.u.gen2.u.writeTag.epcptr} p) (#{ptr TagOpEtc, epc} p) (opEpc x)
+
+  poke p x@(TagOp_GEN2_WriteData {}) = do
+    #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_WRITEDATA} :: #{type TMR_TagOpType})
+    poke (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.bank} p) (fromBank $ opBank x)
+    poke (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.wordAddress} p) (opWordAddress x)
+    pokeListAsList "data" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p) (#{ptr TagOpEtc, data16} p) (opData x)
+
+  poke p x@(TagOp_GEN2_ReadData {}) = do
+    #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_READDATA} :: #{type TMR_TagOpType})
+    poke (#{ptr TagOpEtc, tagop.u.gen2.u.readData.bank} p) (fromBank $ opBank x)
+    poke (#{ptr TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p) (opWordAddress x)
+    poke (#{ptr TagOpEtc, tagop.u.gen2.u.readData.len} p) (opLen x)
 
 data StatusType =
     SUCCESS_TYPE
