@@ -83,11 +83,10 @@ class ParamValue a where
   pGet :: (Ptr () -> IO ()) -> IO a
   pSet :: a -> (Ptr () -> IO ()) -> IO ()
 
--- | A ReadPlan structure specifies the antennas, protocols, and filters
+-- | A ReadPlan record specifies the antennas, protocols, and filters
 -- to use for a search (read).
 --
--- Currently, only @SimpleReadPlan@ is supported, and @tagop@
--- is not supported.
+-- Currently, only @SimpleReadPlan@ is supported.
 data ReadPlan =
   SimpleReadPlan
   { rpWeight        :: !Word32          -- ^ The relative weight of this read plan
@@ -95,6 +94,8 @@ data ReadPlan =
   , rpAntennas      :: ![Word8]         -- ^ The list of antennas to read on
   , rpProtocol      :: !TagProtocol     -- ^ The protocol to use for reading
   , rpFilter        :: !(Maybe TagFilter) -- ^ The filter to apply to reading
+  , rpTagop         :: !(Maybe TagOp)   -- ^ The tag operation to apply to
+                                        -- each read tag
   , rpUseFastSearch :: !Bool            -- ^ Option to use the FastSearch
   , rpStopOnCount   :: !(Maybe Word32)  -- ^ Number of tags to be read
   , rpTriggerRead   :: !(Maybe [Word8]) -- ^ The list of GPI ports which should
@@ -137,7 +138,11 @@ instance Storable ReadPlan where
       Just f -> do
         #{poke ReadPlanEtc, filter} p f
         #{poke ReadPlanEtc, plan.u.simple.filter} p (#{ptr ReadPlanEtc, filter} p)
-    #{poke ReadPlanEtc, plan.u.simple.tagop} p nullPtr
+    case rpTagop x of
+      Nothing -> #{poke ReadPlanEtc, plan.u.simple.tagop} p nullPtr
+      Just op -> do
+        #{poke ReadPlanEtc, tagop} p op
+        #{poke ReadPlanEtc, plan.u.simple.tagop} p (#{ptr ReadPlanEtc, tagop} p)
     #{poke ReadPlanEtc, plan.u.simple.useFastSearch} p
       (fromBool' $ rpUseFastSearch x)
     let (stop, nTags) = case rpStopOnCount x of
@@ -160,6 +165,10 @@ instance Storable ReadPlan where
     filt <- if fPtr == nullPtr
             then return Nothing
             else Just <$> peek fPtr
+    opPtr <- #{peek ReadPlanEtc, plan.u.simple.tagop} p
+    op <- if opPtr == nullPtr
+          then return Nothing
+          else Just <$> peek opPtr
     useFastSearch <- #{peek ReadPlanEtc, plan.u.simple.useFastSearch} p
     stop <- #{peek ReadPlanEtc, plan.u.simple.stopOnCount.stopNTriggerStatus} p
     stopOnCount <- if toBool' stop
@@ -175,6 +184,7 @@ instance Storable ReadPlan where
       , rpAntennas = antennas
       , rpProtocol = toTagProtocol protocol
       , rpFilter = filt
+      , rpTagop = op
       , rpUseFastSearch = toBool' useFastSearch
       , rpStopOnCount = stopOnCount
       , rpTriggerRead = triggerRead
