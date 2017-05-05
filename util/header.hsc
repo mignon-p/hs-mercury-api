@@ -390,3 +390,8 @@ pokePtr :: Storable a => Ptr (Ptr a) -> Ptr a -> a -> IO ()
 pokePtr pp p x = do
   poke p x
   poke pp p
+
+pokeOr :: (Storable a, Bits a) => Ptr a -> a -> IO ()
+pokeOr p x = do
+  old <- peek p
+  poke p (x .|. old)

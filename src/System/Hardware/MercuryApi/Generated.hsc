@@ -391,6 +391,11 @@ pokePtr pp p x = do
   poke p x
   poke pp p
 
+pokeOr :: (Storable a, Bits a) => Ptr a -> a -> IO ()
+pokeOr p x = do
+  old <- peek p
+  poke p (x .|. old)
+
 -- end of code inserted from util/header.hsc
 
 data List16 =
@@ -656,6 +661,7 @@ data TagOp =
     }
   | TagOp_GEN2_ReadData
     { opBank :: !(GEN2_Bank) -- ^ Gen2 memory bank to read from
+    , opExtraBanks :: !([GEN2_Bank]) -- ^ Additional Gen2 memory banks to read from
     , opWordAddress :: !(Word32) -- ^ Word address to start reading at
     , opLen :: !(Word8) -- ^ Number of words to read
     }
@@ -679,7 +685,7 @@ instance Storable TagOp where
             pTagop_u_gen2_u_writeData_data = #{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p
             pData16 = #{ptr TagOpEtc, data16} p
         TagOp_GEN2_WriteData
-          <$> (toBank <$> peek pTagop_u_gen2_u_writeData_bank)
+          <$> ((toBank . (.&. 3)) <$> peek pTagop_u_gen2_u_writeData_bank)
           <*> (peek pTagop_u_gen2_u_writeData_wordAddress)
           <*> (peekListAsList pTagop_u_gen2_u_writeData_data pData16)
       #{const TMR_TAGOP_GEN2_READDATA} -> do
@@ -687,7 +693,8 @@ instance Storable TagOp where
             pTagop_u_gen2_u_readData_wordAddress = #{ptr TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p
             pTagop_u_gen2_u_readData_len = #{ptr TagOpEtc, tagop.u.gen2.u.readData.len} p
         TagOp_GEN2_ReadData
-          <$> (toBank <$> peek pTagop_u_gen2_u_readData_bank)
+          <$> ((toBank . (.&. 3)) <$> peek pTagop_u_gen2_u_readData_bank)
+          <*> (unpackExtraBanks <$> peek pTagop_u_gen2_u_readData_bank)
           <*> (peek pTagop_u_gen2_u_readData_wordAddress)
           <*> (peek pTagop_u_gen2_u_readData_len)
 
@@ -704,6 +711,7 @@ instance Storable TagOp where
   poke p x@(TagOp_GEN2_ReadData {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_READDATA} :: #{type TMR_TagOpType})
     poke (#{ptr TagOpEtc, tagop.u.gen2.u.readData.bank} p) (fromBank $ opBank x)
+    pokeOr (#{ptr TagOpEtc, tagop.u.gen2.u.readData.bank} p) (packExtraBanks $ opExtraBanks x)
     poke (#{ptr TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p) (opWordAddress x)
     poke (#{ptr TagOpEtc, tagop.u.gen2.u.readData.len} p) (opLen x)
 

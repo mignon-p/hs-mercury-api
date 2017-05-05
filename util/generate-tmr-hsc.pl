@@ -973,12 +973,31 @@ sub emitTagOp {
     $epc->{'marshall'} = ["peekPtr", "pokePtr"];
 
     foreach my $const ("TagOp_GEN2_WriteData", "TagOp_GEN2_ReadData") {
-        wrapField ($constInfo{$const}{"info"}, "bank", "toBank", "fromBank");
+        wrapField ($constInfo{$const}{"info"}, "bank",
+                   "(toBank . (.&. 3))", "fromBank");
     }
 
     my $writeData = $constInfo{"TagOp_GEN2_WriteData"};
     listListField ($writeData->{'info'}, "data",
                    "data16", "GLUE_MAX_DATA16");
+
+    my $readData       = $constInfo{"TagOp_GEN2_ReadData"};
+    my $readDataFields = $readData->{'fields'};
+    my $readDataInfo   = $readData->{'info'};
+    my @newFields;
+    foreach my $field (@$readDataFields) {
+        push @newFields, $field;
+        if ($field eq 'bank') {
+            my %newInfo = %{$readDataInfo->{$field}};
+            push @newFields, "extraBanks";
+            $newInfo{'type'} = "[GEN2_Bank]";
+            $newInfo{'comment'} = "Additional Gen2 memory banks to read from";
+            $newInfo{'marshall'} = ["peek", "pokeOr"];
+            $readDataInfo->{"extraBanks"} = \%newInfo;
+        }
+    }
+    @$readDataFields = @newFields;
+    wrapField ($readDataInfo, "extraBanks", "unpackExtraBanks", "packExtraBanks");
 
     emitUnion ($hType, $prefix, $cType,
                \%discriminator, \@constructors, \%constInfo);
