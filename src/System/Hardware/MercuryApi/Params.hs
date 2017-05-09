@@ -2,25 +2,13 @@
 module System.Hardware.MercuryApi.Params where
 
 import Control.Applicative
-import Control.Exception
 import Data.ByteString (ByteString)
 import Data.Int
 import Data.Text (Text)
+import qualified Data.Text as T
 import Data.Word
 
 import System.Hardware.MercuryApi hiding (read)
-
-throwUnimp :: Reader -> Text -> Param -> IO ()
-throwUnimp (Reader fp) loc param = do
-  uri <- withForeignPtr fp (textFromCString . uriPtr)
-  throwIO $ MercuryException
-    { meStatusType = ERROR_TYPE_BINDING
-    , meStatus = ERROR_UNIMPLEMENTED_PARAM
-    , meMessage = "The given parameter is not yet implemented in the Haskell binding."
-    , meLocation = loc
-    , meParam = T.pack $ show param
-    , meUri = uri
-    }
 
 -- | Set parameter 'PARAM_BAUDRATE' (@\/reader\/baudRate@)
 paramSetBaudRate :: Reader -> Word32 -> IO ()
@@ -470,6 +458,8 @@ paramSetMetadataflags rdr = paramSet rdr PARAM_METADATAFLAG
 paramGetMetadataflags :: Reader -> IO [MetadataFlag]
 paramGetMetadataflags rdr = paramGet rdr PARAM_METADATAFLAG
 
+-- | Version of 'paramSet' which converts its argument from a
+-- string to the proper type using 'read'.
 paramSetString :: Reader -> Param -> Text -> IO ()
 paramSetString rdr param txt = do
   let str = T.unpack txt
@@ -490,8 +480,10 @@ paramSetString rdr param txt = do
     ParamTypeTagProtocolList -> paramSet rdr param (read str :: [TagProtocol])
     ParamTypeWord32List -> paramSet rdr param (read str :: [Word32])
     ParamTypeWord8List -> paramSet rdr param (read str :: [Word8])
-    _ -> throwUnimp rdr "paramSetString" param
+    _ -> paramSet rdr param (undefined :: Bool) -- force ERROR_UNIMPLEMENTED_PARAM
 
+-- | Version of 'paramGet' which converts its result to a
+-- string using 'show'.
 paramGetString :: Reader -> Param -> IO Text
 paramGetString rdr param =
   T.pack <$>
@@ -512,5 +504,5 @@ paramGetString rdr param =
     ParamTypeTagProtocolList -> show <$> (paramGet rdr param :: IO [TagProtocol])
     ParamTypeWord32List -> show <$> (paramGet rdr param :: IO [Word32])
     ParamTypeWord8List -> show <$> (paramGet rdr param :: IO [Word8])
-    _ -> throwUnimp rdr "paramGetString" param
+    _ -> show <$> (paramGet rdr param :: IO Bool) -- force ERROR_UNIMPLEMENTED_PARAM
 

@@ -1212,25 +1212,13 @@ sub emitParamHeader {
     emit "module System.Hardware.MercuryApi.Params where";
     emit "";
     emit "import Control.Applicative";
-    emit "import Control.Exception";
     emit "import Data.ByteString (ByteString)";
     emit "import Data.Int";
     emit "import Data.Text (Text)";
+    emit "import qualified Data.Text as T";
     emit "import Data.Word";
     emit "";
     emit "import System.Hardware.MercuryApi hiding (read)";
-    emit "";
-    emit "throwUnimp :: Reader -> Text -> Param -> IO ()";
-    emit "throwUnimp (Reader fp) loc param = do";
-    emit "  uri <- withForeignPtr fp (textFromCString . uriPtr)";
-    emit '  throwIO $ MercuryException';
-    emit "    { meStatusType = ERROR_TYPE_BINDING";
-    emit "    , meStatus = ERROR_UNIMPLEMENTED_PARAM";
-    emit '    , meMessage = "The given parameter is not yet implemented in the Haskell binding."';
-    emit "    , meLocation = loc";
-    emit '    , meParam = T.pack $ show param';
-    emit "    , meUri = uri";
-    emit "    }";
     emit "";
 }
 
@@ -1265,6 +1253,8 @@ sub emitParamStringHelpers {
         $ptn{$paramType} = paramTypeName ($paramType);
     }
 
+    emit "-- | Version of 'paramSet' which converts its argument from a";
+    emit "-- string to the proper type using 'read'.";
     emit "paramSetString :: Reader -> Param -> Text -> IO ()";
     emit "paramSetString rdr param txt = do";
     emit "  let str = T.unpack txt";
@@ -1273,9 +1263,11 @@ sub emitParamStringHelpers {
         my $name = $ptn{$paramType};
         emit "    $name -> paramSet rdr param (read str :: $paramType)";
     }
-    emit '    _ -> throwUnimp rdr "paramSetString" param';
+    emit '    _ -> paramSet rdr param (undefined :: Bool) -- force ERROR_UNIMPLEMENTED_PARAM';
     emit "";
 
+    emit "-- | Version of 'paramGet' which converts its result to a";
+    emit "-- string using 'show'.";
     emit "paramGetString :: Reader -> Param -> IO Text";
     emit "paramGetString rdr param =";
     emit '  T.pack <$>';
@@ -1284,7 +1276,7 @@ sub emitParamStringHelpers {
         my $name = $ptn{$paramType};
         emit "    $name -> show <\$> (paramGet rdr param :: IO $paramType)";
     }
-    emit '    _ -> throwUnimp rdr "paramGetString" param';
+    emit '    _ -> show <$> (paramGet rdr param :: IO Bool) -- force ERROR_UNIMPLEMENTED_PARAM';
     emit "";
 }
 
