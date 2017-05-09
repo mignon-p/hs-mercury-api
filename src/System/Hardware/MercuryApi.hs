@@ -27,6 +27,7 @@ module System.Hardware.MercuryApi
   , firmwareLoadFile
   , paramSet
   , paramGet
+  , defaultReadPlan
   , paramList
   , paramName
   , paramID
@@ -451,6 +452,15 @@ paramGet rdr param = withReturnType $ \returnType -> do
     throwPE rdr (invalidParam pt pt') "paramGet" pName
   pGet $ \pp -> withReaderEtc rdr "paramGet" pName $
                 \p -> c_TMR_paramGet p rp pp
+
+-- | Get the read plan that the reader starts out with by default.
+-- This has reasonable settings for most things, except for the
+-- antennas, which need to be set.
+defaultReadPlan :: ReadPlan
+defaultReadPlan = U.unsafePerformIO $ do
+  alloca $ \p -> do
+    c_default_read_plan p
+    peek p
 
 -- | Get a list of parameters supported by the reader.
 paramList :: Reader -> IO [Param]
