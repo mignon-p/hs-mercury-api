@@ -49,10 +49,10 @@ cabal-version:       >=1.10
 library
   -- Modules exported by the library.
   exposed-modules:     System.Hardware.MercuryApi
-                     , System.Hardware.MercuryApi.Generated
+                     , System.Hardware.MercuryApi.Params
 
   -- Modules included in this library but not exported.
-  -- other-modules:
+  other-modules:       System.Hardware.MercuryApi.Generated
 
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
