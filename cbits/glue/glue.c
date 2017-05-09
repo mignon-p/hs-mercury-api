@@ -164,8 +164,8 @@ TMR_Status c_TMR_paramGet(ReaderEtc *reader, TMR_Param key, void *value)
                 *rp = reader->readPlan->plan;
             } else {
                 /* No cached read plan, which means it's initialized to
-                 * the default, which is this: */
-                TMR_RP_init_simple (rp, 0, NULL, TMR_TAG_PROTOCOL_GEN2, 1);
+                 * the default. */
+                c_default_read_plan (rp);
             }
 
             return TMR_SUCCESS;
@@ -173,6 +173,13 @@ TMR_Status c_TMR_paramGet(ReaderEtc *reader, TMR_Param key, void *value)
             return TMR_paramGet (&reader->reader, key, value);
         }
     }
+}
+
+void c_default_read_plan (TMR_ReadPlan *rp)
+{
+    /* This should match the call to TMR_RP_init_simple() in
+     * TMR_reader_init_internal() in tm_reader.c. */
+    TMR_RP_init_simple (rp, 0, NULL, TMR_TAG_PROTOCOL_GEN2, 1);
 }
 
 TMR_Status c_TMR_paramList (ReaderEtc *reader, TMR_Param *keys, uint32_t *len)

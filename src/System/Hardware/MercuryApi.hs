@@ -136,6 +136,10 @@ foreign import ccall safe "glue.h c_TMR_paramGet"
                    -> Ptr ()
                    -> IO RawStatus
 
+foreign import ccall unsafe "glue.h c_default_read_plan"
+    c_default_read_plan :: Ptr ReadPlan
+                        -> IO ()
+
 foreign import ccall safe "glue.h c_TMR_paramList"
     c_TMR_paramList :: Ptr ReaderEtc
                     -> Ptr RawParam

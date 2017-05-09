@@ -112,6 +112,7 @@ TMR_Status c_TMR_paramSet(ReaderEtc *reader,
                           TMR_Param key,
                           const void *value);
 TMR_Status c_TMR_paramGet(ReaderEtc *reader, TMR_Param key, void *value);
+void c_default_read_plan (TMR_ReadPlan *rp);
 TMR_Status c_TMR_paramList (ReaderEtc *reader, TMR_Param *keys, uint32_t *len);
 TMR_Status c_TMR_addTransportListener (ReaderEtc *reader,
                                        TMR_TransportListener func,
