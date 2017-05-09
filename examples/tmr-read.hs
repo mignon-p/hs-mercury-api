@@ -19,11 +19,16 @@ main = do
   TMR.paramSet rdr TMR.PARAM_TRANSPORTTIMEOUT (10000 :: Word32)
   TMR.connect rdr
 
-  plan <- TMR.paramGet rdr TMR.PARAM_READ_PLAN
   TMR.paramSet rdr TMR.PARAM_REGION_ID TMR.REGION_NA2
   TMR.paramSet rdr TMR.PARAM_RADIO_READPOWER (500 :: Int32)
-  let plan' = plan { TMR.rpAntennas = [1] }
-  TMR.paramSet rdr TMR.PARAM_READ_PLAN plan'
+  let tagop = TMR.TagOp_GEN2_ReadData
+              { TMR.opBank = TMR.GEN2_BANK_TID
+              , TMR.opExtraBanks = [minBound..maxBound]
+              , TMR.opWordAddress = 0
+              , TMR.opLen = 8
+              }
+      plan = TMR.antennaReadPlan { TMR.rpTagop = Just tagop }
+  TMR.paramSet rdr TMR.PARAM_READ_PLAN plan
 
   tags <- TMR.read rdr 1000
   putStrLn $ "read " ++ show (length tags) ++ " tags"

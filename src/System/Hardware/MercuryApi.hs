@@ -18,6 +18,8 @@ module System.Hardware.MercuryApi
   , GpioPin (..)
   , TagData (..)
   , GEN2_TagData (..)
+  , GEN2_Bank (..)
+  , TagOp (..)
   , apiVersion
   , create
   , connect
@@ -28,6 +30,7 @@ module System.Hardware.MercuryApi
   , paramSet
   , paramGet
   , defaultReadPlan
+  , antennaReadPlan
   , paramList
   , paramName
   , paramID
@@ -461,6 +464,12 @@ defaultReadPlan = U.unsafePerformIO $ do
   alloca $ \p -> do
     c_default_read_plan p
     peek p
+
+-- | Like 'defaultReadPlan', but with the antenna list set to [1].
+-- This is the correct setting for the
+-- <http://sparkfun.com/products/14066 Sparkfun Simultaneous RFID Reader>.
+antennaReadPlan :: ReadPlan
+antennaReadPlan = defaultReadPlan { rpAntennas = [1] }
 
 -- | Get a list of parameters supported by the reader.
 paramList :: Reader -> IO [Param]
