@@ -1222,14 +1222,22 @@ sub emitParamHeader {
 
 sub emitParamHelpers {
     foreach my $param (@params) {
-        my $camel = $paramPath{$param};
+        my $path = $paramPath{$param};
+        my $camel = $path;
         $camel =~ s%^/reader%%;
         $camel =~ s%/(.)%uc($1)%eg;
         my $type = $paramType{$param};
+        my $esc = escapeHaddock($path);
+        my $com = "";
+        if (exists $extra{$path}) {
+            $com = " (" . escapeHaddock($extra{$path}) . ")";
+        }
         if ($type ne $nyi and $camel ne "") {
+            emit "-- | Set parameter '$param' (\@$esc\@)$com";
             emit "paramSet$camel :: Reader -> $type -> IO ()";
             emit "paramSet$camel rdr = paramSet rdr $param";
             emit "";
+            emit "-- | Get parameter '$param' (\@$esc\@)$com";
             emit "paramGet$camel :: Reader -> IO $type";
             emit "paramGet$camel rdr = paramGet rdr $param";
             emit "";
