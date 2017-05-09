@@ -25,6 +25,7 @@ module System.Hardware.MercuryApi
   , connect
   , destroy
   , read
+  , executeTagOp
   , firmwareLoad
   , firmwareLoadFile
   , paramSet
@@ -121,6 +122,13 @@ foreign import ccall safe "glue.h c_TMR_getNextTag"
 foreign import ccall unsafe "tmr_tag_data.h TMR_TRD_init"
     c_TMR_TRD_init :: Ptr TagReadData
                    -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_executeTagOp"
+    c_TMR_executeTagOp :: Ptr ReaderEtc
+                       -> Ptr TagOp
+                       -> Ptr TagFilter
+                       -> Ptr List16
+                       -> IO RawStatus
 
 foreign import ccall safe "glue.h c_TMR_firmwareLoad"
     c_TMR_firmwareLoad :: Ptr ReaderEtc
@@ -380,6 +388,28 @@ read rdr timeoutMs = do
     tagCount <- peek tagCountPtr
     alloca $ \trdPtr -> alloca $
                         \boolPtr -> readLoop rdr tagCount trdPtr boolPtr 0 []
+
+-- | Directly executes a 'TagOp' command.
+-- Operates on the first tag found, with applicable tag filtering.
+-- The call returns immediately after finding one tag
+-- and operating on it, unless the command timeout expires first.
+-- The operation is performed on the antenna specified in the
+-- @\/reader\/tagop\/antenna@ parameter.
+-- @\/reader\/tagop\/protocol@ specifies the protocol to be used.
+executeTagOp :: Reader -> TagOp -> TagFilter -> IO B.ByteString
+executeTagOp rdr tagOp tagFilter = alloca $ \pOp -> alloca $ \pFilt -> do
+  eth1 <- try $ poke pOp tagOp
+  case eth1 of
+    Left err -> throwPE rdr err "executeTagOp" "tagop"
+    Right _ -> return ()
+  eth2 <- try $ poke pFilt tagFilter
+  case eth2 of
+    Left err -> throwPE rdr err "executeTagOp" "filter"
+    Right _ -> return ()
+  results <- getList16 $ \pList -> do
+    withReaderEtc rdr "executeTagOp" "" $ \pRdr -> do
+      c_TMR_executeTagOp pRdr pOp pFilt (castPtr pList)
+  return $ B.pack results
 
 -- | Attempts to install firmware on the reader, then restart and reinitialize.
 firmwareLoad :: Reader       -- ^ The reader being operated on
