@@ -1,0 +1,22 @@
+commit 2e465a2272fe8ce8562ba46ff96ef7c293622fad
+Author: Patrick Pelletier <code@funwithsoftware.org>
+Date:   Fri May 12 02:14:10 2017 +0000
+
+    avoid infinite loop of readOffSet = 142, dataLength = 128
+    
+    I suspect this is a symptom of something else having gone wrong, but
+    at least this fix prevents an infinite loop.
+
+diff --git a/serial_reader_l3.c b/serial_reader_l3.c
+index c4f331b..ee77c90 100644
+--- a/serial_reader_l3.c
++++ b/serial_reader_l3.c
+@@ -1754,7 +1754,7 @@ TMR_SR_parseMetadataFromMessage(TMR_Reader *reader, TMR_TagReadData *read, uint1
+     uint16_t epcDataLength;
+     while (dataLength != 0)
+     {
+-      if (readOffSet == dataLength)
++      if (readOffSet >= dataLength)
+         break;
+       bank = ((read->data.list[readOffSet] >> 4) & 0x1F);
+       epcDataLength = (read->data.list[readOffSet + 1] * 2);

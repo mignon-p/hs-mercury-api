@@ -1,0 +1,19 @@
+commit 77d711420137c83976d4ea141003916aa738befb
+Author: Patrick Pelletier <code@funwithsoftware.org>
+Date:   Tue Apr 11 14:55:51 2017 -0700
+
+    avoid linker error by using "extern"
+
+diff --git a/cbits/api/serial_reader_imp.h b/cbits/api/serial_reader_imp.h
+index a96405f..d784c24 100644
+--- a/cbits/api/serial_reader_imp.h
++++ b/cbits/api/serial_reader_imp.h
+@@ -40,7 +40,7 @@ extern "C" {
+ /* This is used to enable the Gen2 secure readdata option */
+ 
+ #ifndef BARE_METAL
+-  bool isSecureAccessEnabled ;
++  extern bool isSecureAccessEnabled ;
+ #else
+   static bool isSecureAccessEnabled;	
+ #endif

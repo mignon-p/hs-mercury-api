@@ -1,0 +1,770 @@
+diff --git a/llrp_reader_l3.c b/llrp_reader_l3.c
+index 66975a1..64e92c0 100644
+--- a/llrp_reader_l3.c
++++ b/llrp_reader_l3.c
+@@ -9516,7 +9516,7 @@ TMR_LLRP_verifyOpSpecResultStatus(TMR_Reader *reader,
+ 
+           case LLRP_C1G2ReadResultType_Memory_Locked_Error:
+             {
+-              ret = TMR_ERROR_GEN2_PROCOCOL_MEMORY_LOCKED;
++              ret = TMR_ERROR_GEN2_PROTOCOL_MEMORY_LOCKED;
+               break;
+             }
+ 
+@@ -9550,7 +9550,7 @@ TMR_LLRP_verifyOpSpecResultStatus(TMR_Reader *reader,
+ 
+           case LLRP_C1G2WriteResultType_Tag_Memory_Locked_Error:
+             {
+-              ret = TMR_ERROR_GEN2_PROCOCOL_MEMORY_LOCKED;
++              ret = TMR_ERROR_GEN2_PROTOCOL_MEMORY_LOCKED;
+               break;
+             }
+ 
+@@ -9706,7 +9706,7 @@ TMR_LLRP_verifyOpSpecResultStatus(TMR_Reader *reader,
+ 
+           case LLRP_C1G2BlockEraseResultType_Tag_Memory_Locked_Error:
+             {
+-              ret = TMR_ERROR_GEN2_PROCOCOL_MEMORY_LOCKED;
++              ret = TMR_ERROR_GEN2_PROTOCOL_MEMORY_LOCKED;
+               break;
+             }
+ 
+@@ -9764,7 +9764,7 @@ TMR_LLRP_verifyOpSpecResultStatus(TMR_Reader *reader,
+ 
+           case LLRP_C1G2BlockWriteResultType_Tag_Memory_Locked_Error:
+             {
+-              ret = TMR_ERROR_GEN2_PROCOCOL_MEMORY_LOCKED;
++              ret = TMR_ERROR_GEN2_PROTOCOL_MEMORY_LOCKED;
+               break;
+             }
+ 
+diff --git a/osdep.h b/osdep.h
+index 86f74d5..2e918f5 100644
+--- a/osdep.h
++++ b/osdep.h
+@@ -52,7 +52,7 @@ extern "C" {
+   }TMR_TimeStructure;
+ 
+ /*
+- * The time funcution used to return the current time in
++ * The time function used to return the current time in
+  * thing magic time structure.
+  */
+ TMR_TimeStructure tmr_gettimestructure(void);
+diff --git a/serial_reader.c b/serial_reader.c
+index 1fdf25b..0b3baa2 100644
+--- a/serial_reader.c
++++ b/serial_reader.c
+@@ -228,7 +228,7 @@ TMR_SR_boot(TMR_Reader *reader, uint32_t currentBaudRate)
+   }
+ 
+   /**
+-   * In case for M6E and it's varient  check for CRC
++   * In case for M6E and its variant check for CRC
+    **/
+   if ((TMR_SR_MODEL_M6E == reader->u.serialReader.versionInfo.hardware[0]) ||
+       (TMR_SR_MODEL_M6E_I == reader->u.serialReader.versionInfo.hardware[0]) ||
+@@ -4751,7 +4751,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_GetSensorValue op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4773,7 +4773,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_GetMeasurementSetup op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4795,7 +4795,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_GetCalibrationData op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4817,7 +4817,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_SetCalibrationData op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4839,7 +4839,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_SetSfeParameters op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4862,7 +4862,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_GetLogState op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4884,7 +4884,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_SetLogMode op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4907,7 +4907,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_Initialize op;
+       
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4930,7 +4930,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_EndLog op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4952,7 +4952,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_SetPassword op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4974,7 +4974,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_AccessFifoStatus op;
+       
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -4995,7 +4995,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_AccessFifoRead op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -5016,7 +5016,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_AccessFifoWrite op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -5037,7 +5037,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_StartLog op;
+       
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -5059,7 +5059,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_GetBatteryLevel op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -5081,7 +5081,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_SetLogLimits op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+@@ -5103,7 +5103,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
+     {
+       TMR_TagOp_GEN2_IDS_SL900A_SetShelfLife op;
+ 
+-      /* Set the protocol for tag opearation */
++      /* Set the protocol for tag operation */
+       ret = setProtocol(reader, TMR_TAG_PROTOCOL_GEN2);
+       if (TMR_SUCCESS != ret)
+       {
+diff --git a/serial_reader_imp.h b/serial_reader_imp.h
+index 9f5fd54..a96405f 100644
+--- a/serial_reader_imp.h
++++ b/serial_reader_imp.h
+@@ -467,7 +467,7 @@ typedef struct TMR_SR_Gen2ReaderWriteTimeOut
+   /* Status of reader timeout */
+   bool earlyexit;
+ 
+-  /* Timeout value used for write opearation */
++  /* Timeout value used for write operation */
+   uint16_t writetimeout;
+ }TMR_SR_Gen2ReaderWriteTimeOut;
+ /**
+@@ -677,11 +677,11 @@ TMR_Status TMR_SR_cmdSL900aGetBatteryLevel(TMR_Reader *reader, uint16_t timeout,
+                                            uint8_t CommandCode, uint32_t password, PasswordLevel level,BatteryType type,
+                                            TMR_uint8List *data, TMR_TagFilter* target);
+ TMR_Status TMR_SR_cmdSL900aAccessFifoStatus(TMR_Reader *reader, uint16_t timeout, TMR_GEN2_Password accessPassword, uint8_t CommandCode,
+-           uint32_t password, PasswordLevel level, AccessFifoOperation opearation, TMR_uint8List * data, TMR_TagFilter* target);
++           uint32_t password, PasswordLevel level, AccessFifoOperation operation, TMR_uint8List * data, TMR_TagFilter* target);
+ TMR_Status TMR_SR_cmdSL900aAccessFifoRead(TMR_Reader *reader, uint16_t timeout, TMR_GEN2_Password accessPassword, uint8_t CommandCode,
+-            uint32_t password, PasswordLevel level, AccessFifoOperation opearation, uint8_t length,TMR_uint8List * data, TMR_TagFilter* target);
++            uint32_t password, PasswordLevel level, AccessFifoOperation operation, uint8_t length,TMR_uint8List * data, TMR_TagFilter* target);
+ TMR_Status TMR_SR_cmdSL900aAccessFifoWrite(TMR_Reader *reader, uint16_t timeout, TMR_GEN2_Password accessPassword, uint8_t CommandCode,
+-           uint32_t password, PasswordLevel level, AccessFifoOperation opearation, TMR_uint8List *payLoad, TMR_uint8List * data, TMR_TagFilter* target);
++           uint32_t password, PasswordLevel level, AccessFifoOperation operation, TMR_uint8List *payLoad, TMR_uint8List * data, TMR_TagFilter* target);
+ TMR_Status TMR_SR_cmdHibikiReadLock(TMR_Reader *reader, uint16_t timeout,
+             TMR_GEN2_Password accessPassword, uint16_t mask, uint16_t action);
+ TMR_Status TMR_SR_cmdHibikiGetSystemInformation(TMR_Reader *reader, uint16_t timeout,
+@@ -945,7 +945,7 @@ TMR_SR_msgAddIdsSL900aSetPassword(uint8_t *msg, uint8_t *i, uint16_t timeout, TM
+                                   PasswordLevel newPasswordLevel, TMR_TagFilter* target);
+ void 
+ TMR_SR_msgAddIdsSL900aAccessFifoStatus(uint8_t *msg, uint8_t *i, uint16_t timeout, TMR_GEN2_Password accessPassword,
+-                                  uint8_t CommandCode, uint32_t password, PasswordLevel level, AccessFifoOperation opearation,
++                                  uint8_t CommandCode, uint32_t password, PasswordLevel level, AccessFifoOperation operation,
+                                   TMR_TagFilter* target);
+ void 
+ TMR_SR_msgAddIdsSL900aGetBatteryLevel(uint8_t *msg, uint8_t *i, uint16_t timeout, TMR_GEN2_Password accessPassword,
+@@ -953,11 +953,11 @@ TMR_SR_msgAddIdsSL900aGetBatteryLevel(uint8_t *msg, uint8_t *i, uint16_t timeout
+                                       TMR_TagFilter* target);
+ void 
+ TMR_SR_msgAddIdsSL900aAccessFifoRead(uint8_t *msg, uint8_t *i, uint16_t timeout, TMR_GEN2_Password accessPassword,
+-                                  uint8_t CommandCode, uint32_t password, PasswordLevel level, AccessFifoOperation opearation,
++                                  uint8_t CommandCode, uint32_t password, PasswordLevel level, AccessFifoOperation operation,
+                                   uint8_t length, TMR_TagFilter* target);
+ void 
+ TMR_SR_msgAddIdsSL900aAccessFifoWrite(uint8_t *msg, uint8_t *i, uint16_t timeout, TMR_GEN2_Password accessPassword,
+-                                  uint8_t CommandCode, uint32_t password, PasswordLevel level, AccessFifoOperation opearation,
++                                  uint8_t CommandCode, uint32_t password, PasswordLevel level, AccessFifoOperation operation,
+                                   TMR_uint8List *payLoad, TMR_TagFilter* target);
+ void 
+ TMR_SR_msgAddIdsSL900aStartLog(uint8_t *msg, uint8_t *i, uint16_t timeout, TMR_GEN2_Password accessPassword,
+diff --git a/serial_reader_l3.c b/serial_reader_l3.c
+index 685f065..b5a2858 100644
+--- a/serial_reader_l3.c
++++ b/serial_reader_l3.c
+@@ -358,7 +358,7 @@ retryHeader:
+      }
+ 
+     /* We got a response for a different command than the one we
+-     * sent. This usually means we recieved the boot-time message from
++     * sent. This usually means we received the boot-time message from
+      * a M6e, and thus that the device was rebooted somewhere between
+      * the previous command and this one. Report this as a problem.
+      */
+@@ -1743,7 +1743,7 @@ TMR_SR_parseMetadataFromMessage(TMR_Reader *reader, TMR_TagReadData *read, uint1
+ 	}
+ 
+   /**
+-   * if the gen2AllMemoryBankEnabled is enbled,
++   * if the gen2AllMemoryBankEnabled is enabled,
+    * extract the values
+    **/
+   if (reader->u.serialReader.gen2AllMemoryBankEnabled)
+@@ -3765,7 +3765,7 @@ TMR_SR_msgSetupMultipleProtocolSearch(TMR_Reader *reader, uint8_t *msg, TMR_SR_O
+     case TMR_SR_OPCODE_READ_TAG_ID_MULTIPLE:
+       {
+         /**
+-        * simple read plan uses this funcution, only when tagop is NULL,
++        * simple read plan uses this function, only when tagop is NULL,
+         * s0, need to check for simple read plan tagop.
+         **/
+         if (TMR_READ_PLAN_TYPE_MULTI == reader->readParams.readPlan->type)
+@@ -5149,7 +5149,7 @@ void TMR_SR_msgAddIdsSL900aGetBatteryLevel(uint8_t *msg, uint8_t *i, uint16_t ti
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param data If the operation is success, this data contains the requested value
+  * @param target Filter to be applied.
+@@ -5221,7 +5221,7 @@ void TMR_SR_msgAddIdsSL900aGetSensorValue(uint8_t *msg, uint8_t *i, uint16_t tim
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param data If the operation is success, this data contains the requested value
+  * @param target Filter to be applied.
+@@ -5291,7 +5291,7 @@ void TMR_SR_msgAddIdsSL900aGetMeasurementSetup(uint8_t *msg, uint8_t *i, uint16_
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param data If the operation is success, this data contains the requested value
+  * @param target Filter to be applied.
+@@ -5361,7 +5361,7 @@ void TMR_SR_msgAddIdsSL900aGetLogState(uint8_t *msg, uint8_t *i, uint16_t timeou
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param to specify SL900A sensor type
+  * @param data If the operation is success, this data contains the requested value
+@@ -5446,7 +5446,7 @@ void TMR_SR_msgAddIdsSL900aSetLogMode(uint8_t *msg, uint8_t *i, uint16_t timeout
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param level IDS password level
+  * @param form IDS logging form
+@@ -5505,7 +5505,7 @@ void TMR_SR_msgAddIdsSL900aInitialize(uint8_t *msg, uint8_t *i, uint16_t timeout
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param delayTime to secify delayTime
+  * @param applicatioData to specify applicationData
+@@ -5556,7 +5556,7 @@ void TMR_SR_msgAddIdsSL900aEndLog(uint8_t *msg, uint8_t *i, uint16_t timeout, TM
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param data If the operation is success, this data contains the requested value
+  * @param target Filter to be applied.
+@@ -5576,7 +5576,7 @@ TMR_SR_cmdSL900aEndLog(TMR_Reader *reader, uint16_t timeout, TMR_GEN2_Password a
+ }
+ 
+ /**
+- * Helper funcution to form the IDS SL900A SetPassword command
++ * Helper function to form the IDS SL900A SetPassword command
+  */ 
+ void TMR_SR_msgAddIdsSL900aSetPassword(uint8_t *msg, uint8_t *i, uint16_t timeout, TMR_GEN2_Password accessPassword,
+                                        uint8_t CommandCode, uint32_t password, PasswordLevel level, uint32_t newPassword,
+@@ -5606,7 +5606,7 @@ void TMR_SR_msgAddIdsSL900aSetPassword(uint8_t *msg, uint8_t *i, uint16_t timeou
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param data If the operation is success, this data contains the requested value
+  * @param target Filter to be applied.
+@@ -5656,7 +5656,7 @@ void TMR_SR_msgAddIdsSL900aAccessFifoStatus(uint8_t *msg, uint8_t *i, uint16_t t
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param data If the operation is success, this data contains the requested value
+  * @param target Filter to be applied.
+@@ -5727,7 +5727,7 @@ void TMR_SR_msgAddIdsSL900aAccessFifoRead(uint8_t *msg, uint8_t *i, uint16_t tim
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param data If the operation is success, this data contains the requested value
+  * @param target Filter to be applied.
+@@ -5801,7 +5801,7 @@ void TMR_SR_msgAddIdsSL900aAccessFifoWrite(uint8_t *msg, uint8_t *i, uint16_t ti
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param data If the operation is success, this data contains the requested value
+  * @param target Filter to be applied.
+@@ -5872,7 +5872,7 @@ void TMR_SR_msgAddIdsSL900aStartLog(uint8_t *msg, uint8_t *i, uint16_t timeout,
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param startTime to specify count start time
+  * @param target Filter to be applied.
+@@ -5919,7 +5919,7 @@ void TMR_SR_msgAddIdsSL900aGetCalibrationData(uint8_t *msg, uint8_t *i, uint16_t
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param data If the operation is success, this data contains the requested value
+  * @param target Filter to be applied.
+@@ -6004,7 +6004,7 @@ void TMR_SR_msgAddIdsSL900aSetCalibrationData(uint8_t *msg, uint8_t *i, uint16_t
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param calibration to spcify the calibration data
+  * @param target Filter to be applied.
+@@ -6054,7 +6054,7 @@ void TMR_SR_msgAddIdsSL900aSetSfeParameters(uint8_t *msg, uint8_t *i, uint16_t t
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param sfe to spcify the sfe parameters
+  * @param target Filter to be applied.
+@@ -6171,7 +6171,7 @@ void TMR_SR_msgAddIdsSL900aSetShelfLife(uint8_t *msg, uint8_t *i, uint16_t timeo
+  * @param reader The reader
+  * @param timeout The timeout of the operation, in milliseconds. Valid range is 0-65535.
+  * @param accessPassword The access password to use to write on the tag
+- * @param commandcode to specify the opearation
++ * @param commandcode to specify the operation
+  * @param password to specify SL900A password access level values
+  * @param data If the operation is success, this data contains the requested value
+  * @param target Filter to be applied.
+@@ -6796,7 +6796,7 @@ TMR_SR_cmdResetReaderStatistics(TMR_Reader *reader, TMR_SR_ReaderStatisticsFlag
+ 
+ 
+ /**
+- * Helper funcution to be used in GetReaderStats
++ * Helper function to be used in GetReaderStats
+  */ 
+ TMR_Status
+ TMR_fillReaderStats(TMR_Reader *reader, TMR_Reader_StatsValues* stats, uint16_t flag, uint8_t* msg, uint8_t offset)
+diff --git a/tm_reader.c b/tm_reader.c
+index 5d50db9..a39ea3a 100644
+--- a/tm_reader.c
++++ b/tm_reader.c
+@@ -3027,7 +3027,7 @@ TMR_init_GEN2_Impinj_Monza4_Payload(TMR_Monza4_Payload *payload)
+ }
+ 
+ /**
+- * Helper funcution to update or modifying the sfe parameters
++ * Helper function to update or modifying the sfe parameters
+  */
+ TMR_Status
+ TMR_update_GEN2_IDS_SL900A_SfeParameters(TMR_TagOp_GEN2_IDS_SL900A_SfeParameters *sfe)
+@@ -3091,7 +3091,7 @@ TMR_update_GEN2_IDS_SL900A_SfeParameters(TMR_TagOp_GEN2_IDS_SL900A_SfeParameters
+ }
+ 
+ /**
+- * Helper funcution to update or modifying the calibration Data
++ * Helper function to update or modifying the calibration Data
+  */
+ TMR_Status
+ TMR_update_GEN2_IDS_SL900A_CalibrationData(TMR_TagOp_GEN2_IDS_SL900A_CalibrationData *cal)
+@@ -3188,7 +3188,7 @@ TMR_update_GEN2_IDS_SL900A_CalibrationData(TMR_TagOp_GEN2_IDS_SL900A_Calibration
+ }
+ 
+ /**
+- * Helper funcution to set the calibration Data
++ * Helper function to set the calibration Data
+  */
+ TMR_Status
+ TMR_init_GEN2_IDS_SL900A_CalibrationData(uint8_t byte[7], TMR_TagOp_GEN2_IDS_SL900A_CalibrationData *cal)
+@@ -3218,7 +3218,7 @@ TMR_init_GEN2_IDS_SL900A_CalibrationData(uint8_t byte[7], TMR_TagOp_GEN2_IDS_SL9
+ }
+ 
+ /**
+- * Helper funcution to set the sfe parameters
++ * Helper function to set the sfe parameters
+  */
+ TMR_Status
+ TMR_init_GEN2_IDS_SL900A_SfeParameters(uint8_t byte[2], TMR_TagOp_GEN2_IDS_SL900A_SfeParameters *sfe)
+diff --git a/tm_reader.h b/tm_reader.h
+index 15ff0b5..91934a6 100644
+--- a/tm_reader.h
++++ b/tm_reader.h
+@@ -119,9 +119,9 @@ typedef enum TMR_Reader_StatsFlag
+   TMR_READER_STATS_FLAG_RF_ON_TIME = (1 << 0),
+   /** Noise floor with the TX on for the antennas were last configured for searching */
+   TMR_READER_STATS_FLAG_NOISE_FLOOR_SEARCH_RX_TX_WITH_TX_ON = (1 << 6),
+-  /** Current frequency in uints of Khz */
++  /** Current frequency in units of Khz */
+   TMR_READER_STATS_FLAG_FREQUENCY = (1 << 7),
+-  /** Current temperature of the device in units of Celcius */
++  /** Current temperature of the device in units of Celsius */
+   TMR_READER_STATS_FLAG_TEMPERATURE = (1 << 8),
+   /** Current antenna */
+   TMR_READER_STATS_FLAG_ANTENNA_PORTS = (1 << 9),
+@@ -370,7 +370,7 @@ struct TMR_Reader
+   bool isStopNTags;
+   /* Param wait indicator for Reader and protocol param control during continuous read */
+   bool paramWait;
+-  /* Param responsefor Reader and protocol param control during continuous read */
++  /* Param response for Reader and protocol param control during continuous read */
+   uint8_t paramMessage[256];
+   /* True Continuous Read Start indicator */
+   bool hasContinuousReadStarted;
+@@ -1001,7 +1001,7 @@ TMR_Param TMR_paramID(const char *name);
+  * @ingroup reader
+  * 
+  * Add a listener to the list of functions that will be called for
+- * each message sent to or recieved from the reader.
++ * each message sent to or received from the reader.
+  *
+  * @param reader The reader to operate on.
+  * @param block A structure containing a pointer to the listener
+@@ -1015,7 +1015,7 @@ TMR_Status TMR_addTransportListener(TMR_Reader *reader, TMR_TransportListenerBlo
+  * @ingroup reader
+  * 
+  * Remove a listener from the list of functions that will be called
+- * for each message sent to or recieved from the reader.
++ * for each message sent to or received from the reader.
+  *
+  * @param reader The reader to operate on.
+  * @param block A structure containing a pointer to the listener
+@@ -1167,9 +1167,9 @@ TMR_Status TMR_stopReading(struct TMR_Reader *reader);
+ 
+ /**
+  * @ingroup reader
+- * Stores the transport init function againest the provided scheme.
++ * Stores the transport init function against the provided scheme.
+  *
+- * @param scheme the transport schme name.
++ * @param scheme the transport scheme name.
+  * @param nativeInit reference to the init function.
+  */ 
+ TMR_Status TMR_setSerialTransport(char* scheme, TMR_TransportNativeInit nativeInit);
+@@ -1185,14 +1185,14 @@ const char *TMR_strerr(TMR_Reader *reader, TMR_Status status);
+ 
+ /**
+  * @ingroup reader
+- * This funcution will initialize the
++ * This function will initialize the
+  * TMR_StatValues structure with the default values
+  */
+ TMR_Status TMR_STATS_init(TMR_Reader_StatsValues *stats);
+ 
+ /**
+  * @ingroup reader
+- * This funcution loads the reader configuration parameters from file and applies to module.
++ * This function loads the reader configuration parameters from file and applies to module.
+  *
+  * @param reader The reader to operate on.
+  * @param filePath load reader configurations from filepath.
+@@ -1201,7 +1201,7 @@ TMR_Status TMR_loadConfig(struct TMR_Reader *reader, char *filePath);
+ 
+ /**
+  * @ingroup reader
+- * This funcution saves the current reader configuration parameters and its values to a file.
++ * This function saves the current reader configuration parameters and its values to a file.
+  *
+  * @param reader The reader to operate on.
+  * @param filePath  save reader configurations from filepath.
+diff --git a/tmr_gen2.h b/tmr_gen2.h
+index 311ad27..9696f61 100644
+--- a/tmr_gen2.h
++++ b/tmr_gen2.h
+@@ -135,7 +135,7 @@ typedef struct TMR_GEN2_Select
+   bool invert;
+   /** The memory bank in which to compare the mask */
+   TMR_GEN2_Bank bank;
+-  /** The location (in bits) at which t to begin comparing the mask */
++  /** The location (in bits) at which to begin comparing the mask */
+   uint32_t bitPointer;
+   /** The length (in bits) of the mask */
+   uint16_t maskBitLength;
+diff --git a/tmr_params.h b/tmr_params.h
+index 82fd0c6..e9fdc7b 100644
+--- a/tmr_params.h
++++ b/tmr_params.h
+@@ -67,7 +67,7 @@ typedef enum TMR_Param
+   TMR_PARAM_ANTENNA_PORTSWITCHGPOS,
+   /** "/reader/antenna/settlingTimeList", TMR_PortValueList  */
+   TMR_PARAM_ANTENNA_SETTLINGTIMELIST,
+-  /** "reader/antenna/returnLoss", TMR_PortValueList */
++  /** "/reader/antenna/returnLoss", TMR_PortValueList */
+   TMR_PARAM_ANTENNA_RETURNLOSS,
+   /** "/reader/antenna/txRxMap", TMR_AntennaMapList  */
+   TMR_PARAM_ANTENNA_TXRXMAP,
+@@ -107,7 +107,7 @@ typedef enum TMR_Param
+   TMR_PARAM_READ_ASYNCONTIME,
+   /** "/reader/read/plan", TMR_ReadPlan */
+   TMR_PARAM_READ_PLAN,
+-  /** "/reader/radio/enablePowerSave, bool **/
++  /** "/reader/radio/enablePowerSave", bool **/
+   TMR_PARAM_RADIO_ENABLEPOWERSAVE,
+   /** "/reader/radio/powerMax", int16_t */
+   TMR_PARAM_RADIO_POWERMAX,
+@@ -133,7 +133,7 @@ typedef enum TMR_Param
+   TMR_PARAM_TAGREADDATA_UNIQUEBYDATA,
+   /** "/reader/tagop/antenna", uint8_t */
+   TMR_PARAM_TAGOP_ANTENNA,
+-  /** "/reader/tagop/protocol", TMR_Protocol */
++  /** "/reader/tagop/protocol", TMR_TagProtocol */
+   TMR_PARAM_TAGOP_PROTOCOL,
+   /** "/reader/version/hardware", TMR_String */
+   TMR_PARAM_VERSION_HARDWARE,
+@@ -165,7 +165,7 @@ typedef enum TMR_Param
+   TMR_PARAM_EXTENDEDEPC,
+   /** "/reader/statistics", TMR_SR_ReaderStatistics */
+   TMR_PARAM_READER_STATISTICS,
+-  /** "/reader/stats", TMR_ */
++  /** "/reader/stats", TMR_Reader_StatsValues */
+   TMR_PARAM_READER_STATS,
+   /** "/reader/uri", TMR_String */
+   TMR_PARAM_URI,
+@@ -193,7 +193,7 @@ typedef enum TMR_Param
+   TMR_PARAM_TAGREADDATA_UNIQUEBYPROTOCOL,
+   /** "/reader/description", TMR_String */
+   TMR_PARAM_READER_DESCRIPTION,
+-  /** "reader/hostname", TMR_String */
++  /** "/reader/hostname", TMR_String */
+   TMR_PARAM_READER_HOSTNAME,
+   /** "/reader/currentTime", struct tm */
+   TMR_PARAM_CURRENTTIME,
+@@ -201,7 +201,7 @@ typedef enum TMR_Param
+ 	TMR_PARAM_READER_WRITE_REPLY_TIMEOUT,
+ 	/** "/reader/gen2/writeEarlyExit", bool */
+ 	TMR_PARAM_READER_WRITE_EARLY_EXIT,
+-  /** "reader/stats/enable", TMR_StatsEnable */
++  /** "/reader/stats/enable", TMR_StatsEnable */
+   TMR_PARAM_READER_STATS_ENABLE,
+   /** "/reader/trigger/read/Gpi", TMR_uint8List */
+   TMR_PARAM_TRIGGER_READ_GPI,
+diff --git a/tmr_serial_transport.h b/tmr_serial_transport.h
+index 7d082ad..a45e68c 100644
+--- a/tmr_serial_transport.h
++++ b/tmr_serial_transport.h
+@@ -107,7 +107,7 @@ struct TMR_SR_SerialTransport
+    * @param this The TMR_SR_SerialTransport structure.
+    * @param length The number of bytes to receive.
+    * @param[out] messageLength The number of bytes received.
+-   * @param[out] message Pointer to the location to store recieved bytes.
++   * @param[out] message Pointer to the location to store received bytes.
+    * @param timeoutMs The duration for the operation to complete.
+    */
+   TMR_Status (*receiveBytes)(TMR_SR_SerialTransport *, uint32_t length,
+diff --git a/tmr_status.h b/tmr_status.h
+index 6f2c9ed..c1c713e 100644
+--- a/tmr_status.h
++++ b/tmr_status.h
+@@ -74,7 +74,7 @@ typedef uint32_t TMR_Status;
+ #define TMR_ERROR_INVALID_BAUD_RATE                       TMR_ERROR_CODE(0x10a)
+ /**Region is not supported. */
+ #define TMR_ERROR_INVALID_REGION                          TMR_ERROR_CODE(0x10b)
+-/** License key code in invalid */
++/** License key code is invalid */
+ #define TMR_ERROR_INVALID_LICENSE_KEY                     TMR_ERROR_CODE(0x10c)
+ /**Firmware is corrupt: Checksum doesn't match content. */
+ #define TMR_ERROR_BL_INVALID_IMAGE_CRC                    TMR_ERROR_CODE(0x200)
+@@ -133,10 +133,10 @@ typedef uint32_t TMR_Status;
+ /**Internal reader error.  Contact support. */
+ #define TMR_ERROR_GEN2_PROTOCOL_MEMORY_OVERRUN_BAD_PC     TMR_ERROR_CODE(0x423)
+ /**Internal reader error.  Contact support. */
+-#define TMR_ERROR_GEN2_PROCOCOL_MEMORY_LOCKED             TMR_ERROR_CODE(0x424)
++#define TMR_ERROR_GEN2_PROTOCOL_MEMORY_LOCKED             TMR_ERROR_CODE(0x424)
+ /**Authentication failed with specified key. */
+ #define TMR_ERROR_GEN2_PROTOCOL_V2_AUTHEN_FAILED				TMR_ERROR_CODE(0x425)
+-/** Untrace opearation failed. */
++/** Untrace operation failed. */
+ #define TMR_ERROR_GEN2_PROTOCOL_V2_UNTRACE_FAILED				TMR_ERROR_CODE(0x426)
+ /**Internal reader error.  Contact support. */
+ #define TMR_ERROR_GEN2_PROTOCOL_INSUFFICIENT_POWER        TMR_ERROR_CODE(0x42b)
+diff --git a/tmr_strerror.c b/tmr_strerror.c
+index 8bcefe1..85863db 100644
+--- a/tmr_strerror.c
++++ b/tmr_strerror.c
+@@ -172,7 +172,7 @@ TMR_strerr(TMR_Reader *reader, TMR_Status status)
+     return "Other Gen2 error";
+   case TMR_ERROR_GEN2_PROTOCOL_MEMORY_OVERRUN_BAD_PC:
+     return "Gen2 memory overrun - bad PC";
+-  case TMR_ERROR_GEN2_PROCOCOL_MEMORY_LOCKED:\
++  case TMR_ERROR_GEN2_PROTOCOL_MEMORY_LOCKED:
+     return "Gen2 memory locked";
+   case TMR_ERROR_GEN2_PROTOCOL_INSUFFICIENT_POWER:
+     return "Gen2 tag has insufficent power for operation";
+@@ -183,7 +183,7 @@ TMR_strerr(TMR_Reader *reader, TMR_Status status)
+ 	case TMR_ERROR_GEN2_PROTOCOL_V2_AUTHEN_FAILED:
+ 		return "Authentication failed with specified key.";
+ 	case TMR_ERROR_GEN2_PROTOCOL_V2_UNTRACE_FAILED:
+-		return "Untrace opearation failed.";
++		return "Untrace operation failed.";
+   case TMR_ERROR_AHAL_INVALID_FREQ:
+     return "Invalid frequency";
+   case TMR_ERROR_AHAL_CHANNEL_OCCUPIED:
+diff --git a/tmr_tag_data.h b/tmr_tag_data.h
+index 2f1ad8e..be42c53 100644
+--- a/tmr_tag_data.h
++++ b/tmr_tag_data.h
+@@ -140,7 +140,7 @@ typedef struct TMR_TagReadData
+   uint8_t gpioCount;
+   /** Number of times the tag was read */
+   uint32_t readCount;
+-  /** Strength of the signal recieved from the tag */
++  /** Strength of the signal received from the tag */
+   int32_t rssi;
+   /** RF carrier frequency the tag was read with */
+   uint32_t frequency;
+diff --git a/tmr_tag_protocol.h b/tmr_tag_protocol.h
+index 1c47fce..da5b267 100644
+--- a/tmr_tag_protocol.h
++++ b/tmr_tag_protocol.h
+@@ -67,4 +67,4 @@ typedef struct TMR_TagProtocolList
+ #endif
+ 
+ 
+-#endif /* _TMR_TAG_PROTOCL_H_ */
++#endif /* _TMR_TAG_PROTOCOL_H_ */
+diff --git a/tmr_tagop.h b/tmr_tagop.h
+index eb92f85..7b22248 100644
+--- a/tmr_tagop.h
++++ b/tmr_tagop.h
+@@ -363,7 +363,7 @@ typedef struct SecurePasswordLookup
+ 
+ typedef struct TMR_TagOp_GEN2_SecureReadData
+ {
+-  /** Gen2 read opearation */
++  /** Gen2 read operation */
+   TMR_TagOp_GEN2_ReadData readData;
+ 
+   /** type of Gen2 Secure operation*/
+@@ -1291,7 +1291,7 @@ typedef struct TMR_TagOp_GEN2_IDS_SL900A_Initialize
+   Delay delayTime;
+ }TMR_TagOp_GEN2_IDS_SL900A_Initialize;
+ 
+-/** Sub-Class for specifying AccessFifo opearation */
++/** Sub-Class for specifying AccessFifo operation */
+ typedef enum AccessFifoOperation
+ {
+   /* Read from FIFO */
+@@ -1312,7 +1312,7 @@ typedef struct TMR_TagOp_GEN2_IDS_SL900A_AccessFifo
+   uint32_t AccessPassword;
+   /* IDS SL900A Password */
+   uint32_t Password;
+-  /* specify the opearationn do be done on fifo */
++  /* specify the operation do be done on fifo */
+   AccessFifoOperation operation;
+ }TMR_TagOp_GEN2_IDS_SL900A_AccessFifo;
+ 
