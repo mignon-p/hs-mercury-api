@@ -9,6 +9,7 @@ import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Word
+import System.Console.ANSI
 import qualified System.Hardware.MercuryApi as TMR
 import System.IO
 
@@ -28,6 +29,13 @@ readUser =
   , TMR.opLen = 32
   }
 
+printInColor :: [T.Text] -> Int -> IO ()
+printInColor xs n = do
+  let color = if n `div` 2 == 0 then Blue else Green
+  setSGR [SetColor Foreground Vivid color]
+  mapM_ T.putStrLn xs
+  setSGR [Reset]
+
 main = do
   rdr <- TMR.create "tmr:///dev/ttyUSB0"
   listener <- TMR.hexListener stdout
@@ -42,6 +50,6 @@ main = do
 
   tags <- TMR.read rdr 1000
   putStrLn $ "read " ++ show (length tags) ++ " tags"
-  mapM_ T.putStrLn $ concatMap TMR.displayTagReadData tags
+  zipWithM_ printInColor (map TMR.displayTagReadData tags) [0..]
 
   TMR.destroy rdr
