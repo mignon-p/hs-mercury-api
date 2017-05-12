@@ -396,19 +396,22 @@ read rdr timeoutMs = do
 -- The operation is performed on the antenna specified in the
 -- @\/reader\/tagop\/antenna@ parameter.
 -- @\/reader\/tagop\/protocol@ specifies the protocol to be used.
-executeTagOp :: Reader -> TagOp -> TagFilter -> IO B.ByteString
+executeTagOp :: Reader -> TagOp -> Maybe TagFilter -> IO B.ByteString
 executeTagOp rdr tagOp tagFilter = alloca $ \pOp -> alloca $ \pFilt -> do
   eth1 <- try $ poke pOp tagOp
   case eth1 of
     Left err -> throwPE rdr err "executeTagOp" "tagop"
     Right _ -> return ()
-  eth2 <- try $ poke pFilt tagFilter
-  case eth2 of
-    Left err -> throwPE rdr err "executeTagOp" "filter"
-    Right _ -> return ()
+  pFilt' <- case tagFilter of
+              Nothing -> return nullPtr
+              Just tf -> do
+                eth2 <- try $ poke pFilt tf
+                case eth2 of
+                  Left err -> throwPE rdr err "executeTagOp" "filter"
+                  Right _ -> return pFilt
   results <- getList16 $ \pList -> do
     withReaderEtc rdr "executeTagOp" "" $ \pRdr -> do
-      c_TMR_executeTagOp pRdr pOp pFilt (castPtr pList)
+      c_TMR_executeTagOp pRdr pOp pFilt' (castPtr pList)
   return $ B.pack results
 
 -- | Attempts to install firmware on the reader, then restart and reinitialize.
@@ -431,7 +434,7 @@ firmwareLoadFile rdr filename = do
   firmware <- B.readFile filename
   firmwareLoad' (T.pack filename) rdr firmware
 
-throwPE :: Reader -> ParamException -> T.Text -> T.Text -> IO ()
+throwPE :: Reader -> ParamException -> T.Text -> T.Text -> IO a
 throwPE (Reader fp) (ParamException statusType status msg) loc param = do
   uri <- withForeignPtr fp (textFromCString . uriPtr)
   throwIO $ MercuryException
