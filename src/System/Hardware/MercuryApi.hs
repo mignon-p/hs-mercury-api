@@ -595,18 +595,22 @@ bytesToHex bytes = U.unsafePerformIO $ do
     c_TMR_bytesToHex (castPtr cs) (fromIntegral bytesLen) buf
     textFromBS <$> B.packCString buf
 
+displayByteString :: B.ByteString -> T.Text
+displayByteString bs =
+  "<" <> bytesToHex bs <> "> (" <> T.pack (show $ B.length bs) <> " bytes)"
+
 -- | Convert a 'TagData' to a human-readable list of lines.
 displayTagData :: TagData -> [T.Text]
 displayTagData td =
   concat
   [ [ "TagData"
-    , "  epc         = <" <> bytesToHex (tdEpc td) <> ">"
+    , "  epc         = " <> displayByteString (tdEpc td)
     , "  protocol    = " <> tShow (tdProtocol td)
     , "  crc         = " <> T.pack (printf "0x%04x" $ tdCrc td)
     ]
   , case tdGen2 td of
       Nothing -> []
-      Just gen2 -> ["  gen2.pc     = <" <> bytesToHex (g2Pc gen2) <> ">"]
+      Just gen2 -> ["  gen2.pc     = " <> displayByteString (g2Pc gen2)]
   ]
 
 indent :: [T.Text] -> [T.Text]
@@ -669,4 +673,4 @@ displayTagReadData trd =
                     (if (gpOutput gpio) then " output" else "  input")
     dat name bs = if B.null bs
                   then []
-                  else ["  " <> name <> " = <" <> bytesToHex bs <> ">"]
+                  else ["  " <> name <> " = " <> displayByteString bs]
