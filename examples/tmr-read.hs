@@ -31,7 +31,7 @@ readUser =
 
 printInColor :: [T.Text] -> Int -> IO ()
 printInColor xs n = do
-  let color = if n `div` 2 == 0 then Blue else Green
+  let color = if n `mod` 2 == 0 then Blue else Green
   setSGR [SetColor Foreground Vivid color]
   mapM_ T.putStrLn xs
   setSGR [Reset]
