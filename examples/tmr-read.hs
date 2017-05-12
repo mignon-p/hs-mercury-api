@@ -23,9 +23,9 @@ main = do
   TMR.paramSet rdr TMR.PARAM_RADIO_READPOWER (500 :: Int32)
   let tagop = TMR.TagOp_GEN2_ReadData
               { TMR.opBank = TMR.GEN2_BANK_TID
-              , TMR.opExtraBanks = [minBound..maxBound]
+              , TMR.opExtraBanks = [TMR.GEN2_BANK_EPC, TMR.GEN2_BANK_TID, TMR.GEN2_BANK_USER]
               , TMR.opWordAddress = 0
-              , TMR.opLen = 8
+              , TMR.opLen = 32
               }
       plan = TMR.antennaReadPlan { TMR.rpTagop = Just tagop }
   TMR.paramSet rdr TMR.PARAM_READ_PLAN plan
