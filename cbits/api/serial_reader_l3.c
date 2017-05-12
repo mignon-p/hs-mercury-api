@@ -358,7 +358,7 @@ retryHeader:
      }
 
     /* We got a response for a different command than the one we
-     * sent. This usually means we recieved the boot-time message from
+     * sent. This usually means we received the boot-time message from
      * a M6e, and thus that the device was rebooted somewhere between
      * the previous command and this one. Report this as a problem.
      */
@@ -1743,7 +1743,7 @@ TMR_SR_parseMetadataFromMessage(TMR_Reader *reader, TMR_TagReadData *read, uint1
 	}
 
   /**
-   * if the gen2AllMemoryBankEnabled is enbled,
+   * if the gen2AllMemoryBankEnabled is enabled,
    * extract the values
    **/
   if (reader->u.serialReader.gen2AllMemoryBankEnabled)
