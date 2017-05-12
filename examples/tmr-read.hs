@@ -12,6 +12,22 @@ import Data.Word
 import qualified System.Hardware.MercuryApi as TMR
 import System.IO
 
+readAll =
+  TMR.TagOp_GEN2_ReadData
+  { TMR.opBank = TMR.GEN2_BANK_TID
+  , TMR.opExtraBanks = [TMR.GEN2_BANK_EPC, TMR.GEN2_BANK_TID, TMR.GEN2_BANK_USER]
+  , TMR.opWordAddress = 0
+  , TMR.opLen = 32
+  }
+
+readUser =
+  TMR.TagOp_GEN2_ReadData
+  { TMR.opBank = TMR.GEN2_BANK_USER
+  , TMR.opExtraBanks = []
+  , TMR.opWordAddress = 0
+  , TMR.opLen = 32
+  }
+
 main = do
   rdr <- TMR.create "tmr:///dev/ttyUSB0"
   listener <- TMR.hexListener stdout
@@ -21,13 +37,7 @@ main = do
 
   TMR.paramSet rdr TMR.PARAM_REGION_ID TMR.REGION_NA2
   TMR.paramSet rdr TMR.PARAM_RADIO_READPOWER (500 :: Int32)
-  let tagop = TMR.TagOp_GEN2_ReadData
-              { TMR.opBank = TMR.GEN2_BANK_TID
-              , TMR.opExtraBanks = [TMR.GEN2_BANK_EPC, TMR.GEN2_BANK_TID, TMR.GEN2_BANK_USER]
-              , TMR.opWordAddress = 0
-              , TMR.opLen = 32
-              }
-      plan = TMR.antennaReadPlan { TMR.rpTagop = Just tagop }
+  let plan = TMR.antennaReadPlan { TMR.rpTagop = Just readUser }
   TMR.paramSet rdr TMR.PARAM_READ_PLAN plan
 
   tags <- TMR.read rdr 1000
