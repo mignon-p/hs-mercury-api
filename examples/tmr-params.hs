@@ -21,8 +21,7 @@ main = do
   listener <- TMR.hexListener stdout
   TMR.addTransportListener rdr listener
   -}
-  timeout <- TMR.paramGet rdr TMR.PARAM_TRANSPORTTIMEOUT :: IO Word32
-  print timeout
+  TMR.paramSetTransportTimeout rdr 10000
   TMR.connect rdr
   params <- TMR.paramList rdr
   forM_ params $ \param -> do
