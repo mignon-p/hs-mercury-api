@@ -43,9 +43,11 @@ main = do
   params <- TMR.paramList rdr
   forM_ params $ \param -> do
     putStrLn $ show param ++ " - " ++ T.unpack (TMR.paramName param)
-    txt <- TMR.paramGetString rdr param
     let typ = TMR.displayParamType $ TMR.paramType param
-    T.putStrLn $ "  " <> txt <> " :: " <> typ
+    eth <- try $ TMR.paramGetString rdr param
+    case eth of
+      Left err -> putStrLn $ "  " ++ show (TMR.meStatus err)
+      Right txt -> T.putStrLn $ "  " <> txt <> " :: " <> typ
 {-
   forM_ stringParams $ \param -> do
     putStrLn $ "paramGet " ++ show param
