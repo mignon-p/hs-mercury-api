@@ -26,7 +26,7 @@ main = do
   params <- TMR.paramList rdr
   forM_ params $ \param -> do
     setSGR [SetColor Foreground Vivid Blue]
-    putStrLn $ show param
+    putStr $ show param
     setSGR [Reset]
     T.putStrLn $ " - " <> TMR.paramName param
     let typ = TMR.displayParamType $ TMR.paramType param
