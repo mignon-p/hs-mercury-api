@@ -681,3 +681,12 @@ displayTagReadData trd =
 
 displayParamType :: ParamType -> T.Text
 displayParamType = paramTypeDisplay
+
+-- | Convert a 'B.ByteString' into a list of 'Word16', in big-endian
+-- order.  Padded with 0 if the number of bytes is odd.
+packBytesIntoWords :: B.ByteString -> [Word16]
+packBytesIntoWords bs = pbw (B.unpack bs)
+  where pbw [] = []
+        pbw [x] = [pk x 0]
+        pbw (x1:x2:xs) = pk x1 x2 : pbw xs
+        pk x1 x2 = (fromIntegral x1 `shiftL` 8) .|. fromIntegral x2
