@@ -132,6 +132,25 @@ sub readStatus {
     close F;
 }
 
+sub readStrerror {
+    open F, "$apiDir/tmr_strerror.c" or die;
+    my $status = "";
+    while (<F>) {
+        if (/^\s+case\s+TMR_(ERROR_\w+):/) {
+            $status = $1;
+        } elsif (/^\s+return\s+"([^"]+)";/) {
+            my $msg = $1;
+            if (exists $errorCodes{$status} and $errorCodes{$status} eq "") {
+                $errorCodes{$status} = escapeHaddock($msg);
+            }
+            $status = "";
+        } else {
+            $status = "";
+        }
+    }
+    close F;
+}
+
 sub parseParamComment {
     my ($c) = @_;
     if ($c =~ /^\"([^\"]+)\",\s+(\w+)/) {
@@ -1281,6 +1300,7 @@ sub emitParamStringHelpers {
 }
 
 readStatus();
+readStrerror();
 readParams();
 readGlue();
 readRegion();

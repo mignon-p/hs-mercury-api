@@ -601,7 +601,7 @@ data TagReadData =
   , trAntenna :: !(Word8) -- ^ Antenna where the tag was read
   , trGpio :: !([GpioPin]) -- ^ State of GPIO pins at the moment of the tag read
   , trReadCount :: !(Word32) -- ^ Number of times the tag was read
-  , trRssi :: !(Int32) -- ^ Strength of the signal recieved from the tag
+  , trRssi :: !(Int32) -- ^ Strength of the signal received from the tag
   , trFrequency :: !(Word32) -- ^ RF carrier frequency the tag was read with
   , trTimestamp :: !(Word64) -- ^ Absolute time of the read, in milliseconds since 1\/1\/1970 UTC
   , trData :: !(ByteString) -- ^ Data read from the tag
@@ -759,9 +759,9 @@ data Status =
   | ERROR_NO_TAGS_FOUND -- ^ Reader was asked to find tags, but none were detected.
   | ERROR_NO_PROTOCOL_DEFINED -- ^ RFID protocol has not been configured.
   | ERROR_INVALID_PROTOCOL_SPECIFIED -- ^ Requested RFID protocol is not recognized.
-  | ERROR_WRITE_PASSED_LOCK_FAILED
+  | ERROR_WRITE_PASSED_LOCK_FAILED -- ^ Lock failed after write operation
   | ERROR_PROTOCOL_NO_DATA_READ -- ^ Tag data was requested, but could not be read.
-  | ERROR_AFE_NOT_ON
+  | ERROR_AFE_NOT_ON -- ^ AFE not on - reader not sufficiently configured
   | ERROR_PROTOCOL_WRITE_FAILED -- ^ Write to tag failed.
   | ERROR_NOT_IMPLEMENTED_FOR_THIS_PROTOCOL -- ^ Command is not supported in the current RFID protocol.
   | ERROR_PROTOCOL_INVALID_WRITE_DATA -- ^ Data does not conform to protocol standards.
@@ -787,7 +787,7 @@ data Status =
   | ERROR_ANTENNA_NOT_CONNECTED -- ^  Antenna not detected during pre-transmit safety test.
   | ERROR_TEMPERATURE_EXCEED_LIMITS -- ^ Reader temperature outside safe range.
   | ERROR_HIGH_RETURN_LOSS -- ^  Excess power detected at transmitter port, usually due to antenna tuning mismatch.
-  | ERROR_INVALID_ANTENNA_CONFIG
+  | ERROR_INVALID_ANTENNA_CONFIG -- ^ Invalid antenna configuration
   | ERROR_TAG_ID_BUFFER_NOT_ENOUGH_TAGS_AVAILABLE -- ^ Asked for more tags than were available in the buffer.
   | ERROR_TAG_ID_BUFFER_FULL -- ^ Too many tags are in buffer.  Remove some with Get Tag ID Buffer or Clear Tag ID Buffer.
   | ERROR_TAG_ID_BUFFER_REPEATED_TAG_ID -- ^ Internal error -- reader is trying to insert a duplicate tag record.  Contact support.
@@ -795,44 +795,44 @@ data Status =
   | ERROR_TAG_ID_BUFFER_AUTH_REQUEST -- ^ Blocked response to get additional data from host.
   | ERROR_SYSTEM_UNKNOWN_ERROR -- ^ Internal reader error.  Contact support.
   | ERROR_TM_ASSERT_FAILED -- ^ Internal reader error.  Contact support.
-  | ERROR_TIMEOUT
-  | ERROR_NO_HOST
-  | ERROR_LLRP
-  | ERROR_PARSE
-  | ERROR_DEVICE_RESET
-  | ERROR_CRC_ERROR
-  | ERROR_INVALID
-  | ERROR_UNIMPLEMENTED
-  | ERROR_UNSUPPORTED
-  | ERROR_NO_ANTENNA
-  | ERROR_READONLY
-  | ERROR_TOO_BIG
-  | ERROR_NO_THREADS
-  | ERROR_NO_TAGS
-  | ERROR_NOT_FOUND
-  | ERROR_FIRMWARE_FORMAT
-  | ERROR_TRYAGAIN
-  | ERROR_OUT_OF_MEMORY
-  | ERROR_INVALID_WRITE_MODE
-  | ERROR_ILLEGAL_VALUE
+  | ERROR_TIMEOUT -- ^ Timeout
+  | ERROR_NO_HOST -- ^ No matching host found
+  | ERROR_LLRP -- ^ LLRP error
+  | ERROR_PARSE -- ^ Error parsing device response
+  | ERROR_DEVICE_RESET -- ^ Device was reset externally
+  | ERROR_CRC_ERROR -- ^ CRC Error
+  | ERROR_INVALID -- ^ Invalid argument
+  | ERROR_UNIMPLEMENTED -- ^ Unimplemented operation
+  | ERROR_UNSUPPORTED -- ^ Unsupported operation
+  | ERROR_NO_ANTENNA -- ^ No antenna or invalid antenna
+  | ERROR_READONLY -- ^ Value is read-only
+  | ERROR_TOO_BIG -- ^ Value too big
+  | ERROR_NO_THREADS -- ^ Thread initialization failed
+  | ERROR_NO_TAGS -- ^ No tags to be retrieved
+  | ERROR_NOT_FOUND -- ^ Key not found
+  | ERROR_FIRMWARE_FORMAT -- ^ Size or format of firmware image is incorrect
+  | ERROR_TRYAGAIN -- ^ Temporary error, try again
+  | ERROR_OUT_OF_MEMORY -- ^ Out of memory
+  | ERROR_INVALID_WRITE_MODE -- ^ Invalid write mode
+  | ERROR_ILLEGAL_VALUE -- ^ Illegal value
   | ERROR_END_OF_READING
-  | ERROR_UNSUPPORTED_READER_TYPE
-  | ERROR_BUFFER_OVERFLOW
+  | ERROR_UNSUPPORTED_READER_TYPE -- ^ Unsupported reader type
+  | ERROR_BUFFER_OVERFLOW -- ^ Buffer overflow
   | ERROR_LOADSAVE_CONFIG
-  | ERROR_AUTOREAD_ENABLED
-  | ERROR_FIRMWARE_UPDATE_ON_AUTOREAD
-  | ERROR_TIMESTAMP_NULL
-  | ERROR_LLRP_GETTYPEREGISTRY
-  | ERROR_LLRP_CONNECTIONFAILED
-  | ERROR_LLRP_SENDIO_ERROR
-  | ERROR_LLRP_RECEIVEIO_ERROR
-  | ERROR_LLRP_RECEIVE_TIMEOUT
-  | ERROR_LLRP_MSG_PARSE_ERROR
-  | ERROR_LLRP_ALREADY_CONNECTED
-  | ERROR_LLRP_INVALID_RFMODE
-  | ERROR_LLRP_UNDEFINED_VALUE
-  | ERROR_LLRP_READER_ERROR
-  | ERROR_LLRP_READER_CONNECTION_LOST
+  | ERROR_AUTOREAD_ENABLED -- ^ Autonomous mode is enabled on reader. Please disable it
+  | ERROR_FIRMWARE_UPDATE_ON_AUTOREAD -- ^ Firmware update is successful. Autonomous mode is already enabled on reader
+  | ERROR_TIMESTAMP_NULL -- ^ Timestamp cannot be null
+  | ERROR_LLRP_GETTYPEREGISTRY -- ^ LLRP Reader GetTypeRegistry Failed
+  | ERROR_LLRP_CONNECTIONFAILED -- ^ LLRP Reader Connection attempt is failed
+  | ERROR_LLRP_SENDIO_ERROR -- ^ LLRP Reader Send Messages failed
+  | ERROR_LLRP_RECEIVEIO_ERROR -- ^ LLRP Reader Receive Messages failed
+  | ERROR_LLRP_RECEIVE_TIMEOUT -- ^ LLRP Reader Receive Messages Timeout
+  | ERROR_LLRP_MSG_PARSE_ERROR -- ^ Error parsing LLRP message
+  | ERROR_LLRP_ALREADY_CONNECTED -- ^ Already connected to reader
+  | ERROR_LLRP_INVALID_RFMODE -- ^ Specified RF Mode operation is not supported
+  | ERROR_LLRP_UNDEFINED_VALUE -- ^ Undefined Value
+  | ERROR_LLRP_READER_ERROR -- ^ LLRP reader unknown error
+  | ERROR_LLRP_READER_CONNECTION_LOST -- ^ LLRP reader connection lost
   | ERROR_ALREADY_DESTROYED -- ^ Attempt to use reader after it was destroyed.
   | ERROR_INVALID_PARAM_TYPE -- ^ The parameter value was not of the type expected.
   | ERROR_UNIMPLEMENTED_PARAM -- ^ The given parameter is not yet implemented in the Haskell binding.
