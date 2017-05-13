@@ -97,6 +97,7 @@ library
 executable tmr-params
   main-is:             tmr-params.hs
   build-depends:       base >= 4.6 && < 5
+                     , ansi-terminal >= 0.6.2.3 && < 0.7
                      , bytestring >= 0.10.4 && < 0.11
                      , mercury-api
                      , text >= 1.2 && < 1.3
