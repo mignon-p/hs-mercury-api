@@ -30,6 +30,7 @@ module System.Hardware.MercuryApi
   , firmwareLoadFile
   , paramSet
   , paramGet
+  , paramSetBasics
   , defaultReadPlan
   , antennaReadPlan
   , paramList
@@ -46,6 +47,7 @@ module System.Hardware.MercuryApi
   , displayTagData
   , displayTagReadData
   , displayParamType
+  , packBytesIntoWords
   ) where
 
 import Prelude hiding (read)
@@ -458,6 +460,12 @@ invalidParam expected actual =
   ( "Expected " <> paramTypeDisplay expected <>
     " but got " <> paramTypeDisplay actual )
 
+-- | Sets the value of a reader parameter.  Throws 'MercuryException'
+-- with a 'meStatus' of 'ERROR_INVALID_PARAM_TYPE' if the parameter value
+-- is not of the correct type (sadly, this is only checked at runtime) or
+-- 'ERROR_UNIMPLEMENTED_PARAM' if the parameter has not yet been implemented
+-- in the Haskell binding.  Can also propagate errors from the C API, such
+-- as 'ERROR_UNSUPPORTED' or 'ERROR_READONLY'.
 paramSet :: ParamValue a => Reader -> Param -> a -> IO ()
 paramSet rdr param value = do
   let pt = paramType param
@@ -477,6 +485,12 @@ paramSet rdr param value = do
 withReturnType :: (a -> IO a) -> IO a
 withReturnType f = f undefined
 
+-- | Gets the value of a reader parameter.  Throws 'MercuryException'
+-- with a 'meStatus' of 'ERROR_INVALID_PARAM_TYPE' if the parameter value
+-- is not of the correct type (sadly, this is only checked at runtime) or
+-- 'ERROR_UNIMPLEMENTED_PARAM' if the parameter has not yet been implemented
+-- in the Haskell binding.  Can also propagate errors from the C API, such
+-- as 'ERROR_UNSUPPORTED'.
 paramGet :: ParamValue a => Reader -> Param -> IO a
 paramGet rdr param = withReturnType $ \returnType -> do
   let pt = paramType param
@@ -489,6 +503,29 @@ paramGet rdr param = withReturnType $ \returnType -> do
     throwPE rdr (invalidParam pt pt') "paramGet" pName
   pGet $ \pp -> withReaderEtc rdr "paramGet" pName $
                 \p -> c_TMR_paramGet p rp pp
+
+-- | Convenience function to set some of the most essential parameters.
+-- The specified 'Region' is written into 'PARAM_REGION_ID'.
+-- The specified power level is written into 'PARAM_RADIO_READPOWER'
+-- and 'PARAM_RADIO_WRITEPOWER'.  The specified antenna list is
+-- written into the 'rpAntennas' field of 'PARAM_READ_PLAN', and the first
+-- antenna in the list is written into 'TMR_PARAM_TAGOP_ANTENNA'.  For the
+-- <https://www.sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>,
+-- the antenna list should be [1], and if powering the reader off USB,
+-- the power level should be 500.  (Higher power levels can be used with a
+-- separate power supply.)
+paramSetBasics :: Reader   -- ^ The reader being operated on
+               -> Region   -- ^ The region
+               -> Int32    -- ^ Power in centi-dBm
+               -> [Word8]  -- ^ Antenna list
+               -> IO ()
+paramSetBasics rdr rgn pwr ant = do
+  paramSet rdr PARAM_REGION_ID rgn
+  paramSet rdr PARAM_RADIO_READPOWER pwr
+  paramSet rdr PARAM_RADIO_WRITEPOWER pwr
+  plan <- paramGet rdr PARAM_READ_PLAN
+  paramSet rdr PARAM_READ_PLAN plan { rpAntennas = ant }
+  when (not $ null ant) $ paramSet rdr PARAM_TAGOP_ANTENNA (head ant)
 
 -- | Get the read plan that the reader starts out with by default.
 -- This has reasonable settings for most things, except for the
