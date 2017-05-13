@@ -45,6 +45,7 @@ module System.Hardware.MercuryApi
   , displayLocalTimestamp
   , displayTagData
   , displayTagReadData
+  , displayParamType
   ) where
 
 import Prelude hiding (read)
@@ -677,3 +678,6 @@ displayTagReadData trd =
     dat name bs = if B.null bs
                   then []
                   else ["  " <> name <> " = " <> displayByteString bs]
+
+displayParamType :: ParamType -> T.Text
+displayParamType = paramTypeDisplay

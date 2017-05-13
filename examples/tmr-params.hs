@@ -10,6 +10,7 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Word
 import qualified System.Hardware.MercuryApi as TMR
+import qualified System.Hardware.MercuryApi.Params as TMR
 import System.IO
 
 stringParams :: [TMR.Param]
@@ -42,6 +43,10 @@ main = do
   params <- TMR.paramList rdr
   forM_ params $ \param -> do
     putStrLn $ show param ++ " - " ++ T.unpack (TMR.paramName param)
+    txt <- TMR.paramGetString rdr param
+    let typ = TMR.displayParamType $ TMR.paramType param
+    T.putStrLn $ "  " <> txt <> " :: " <> typ
+{-
   forM_ stringParams $ \param -> do
     putStrLn $ "paramGet " ++ show param
     txt <- TMR.paramGet rdr param
@@ -81,7 +86,7 @@ main = do
   putStrLn "read"
   tags <- TMR.read rdr 500
   print tags
-
+-}
   putStrLn ""
   putStrLn "destroy"
   TMR.destroy rdr
