@@ -26,15 +26,19 @@ main = do
   params <- TMR.paramList rdr
   forM_ params $ \param -> do
     setSGR [SetColor Foreground Vivid Blue]
-    putStrLn $ show param ++ " - " ++ T.unpack (TMR.paramName param)
+    putStrLn $ show param
+    setSGR [Reset]
+    T.putStrLn $ " - " <> TMR.paramName param
     let typ = TMR.displayParamType $ TMR.paramType param
     eth <- try $ TMR.paramGetString rdr param
     case eth of
       Left err -> do
         setSGR [SetColor Foreground Vivid Red]
         putStrLn $ "  " ++ show (TMR.meStatus err)
+        setSGR [Reset]
       Right txt -> do
-        setSGR [SetColor Foreground Vivid Green]
-        T.putStrLn $ "  " <> txt <> " :: " <> typ
-    setSGR [Reset]
+        setSGR [SetColor Foreground Dull Green]
+        T.putStr $ "  " <> txt
+        setSGR [Reset]
+        T.putStrLn $ " :: " <> typ
   TMR.destroy rdr
