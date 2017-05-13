@@ -20,6 +20,8 @@ module System.Hardware.MercuryApi
   , GEN2_TagData (..)
   , GEN2_Bank (..)
   , TagOp (..)
+  , TagFilter (..)
+  , FilterOn (..)
   , apiVersion
   , create
   , connect
@@ -31,6 +33,8 @@ module System.Hardware.MercuryApi
   , paramSet
   , paramGet
   , paramSetBasics
+  , paramSetReadPlanFilter
+  , paramSetReadPlanTagop
   , defaultReadPlan
   , antennaReadPlan
   , paramList
@@ -526,6 +530,20 @@ paramSetBasics rdr rgn pwr ant = do
   plan <- paramGet rdr PARAM_READ_PLAN
   paramSet rdr PARAM_READ_PLAN plan { rpAntennas = ant }
   when (not $ null ant) $ paramSet rdr PARAM_TAGOP_ANTENNA (head ant)
+
+-- | Sets the 'rpFilter' field of the 'PARAM_READ_PLAN' parameter,
+-- while leaving the rest of the read plan unchanged.
+paramSetReadPlanFilter :: Reader -> Maybe TagFilter -> IO ()
+paramSetReadPlanFilter rdr filt = do
+  plan <- paramGet rdr PARAM_READ_PLAN
+  paramSet rdr PARAM_READ_PLAN plan { rpFilter = filt }
+
+-- | Sets the 'rpTagop' field of the 'PARAM_READ_PLAN' parameter,
+-- while leaving the rest of the read plan unchanged.
+paramSetReadPlanTagop :: Reader -> Maybe TagOp -> IO ()
+paramSetReadPlanTagop rdr op = do
+  plan <- paramGet rdr PARAM_READ_PLAN
+  paramSet rdr PARAM_READ_PLAN plan { rpTagop = op }
 
 -- | Get the read plan that the reader starts out with by default.
 -- This has reasonable settings for most things, except for the
