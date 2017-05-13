@@ -34,6 +34,7 @@ main = do
   TMR.paramSetReadPlanFilter rdr (Just emptyUserDataFilter)
 
   tags <- TMR.read rdr 1000
+  putStrLn $ "read " ++ show (length tags) ++ " tags"
   mapM_ T.putStrLn $ concatMap TMR.displayTagReadData tags
 
   TMR.destroy rdr
