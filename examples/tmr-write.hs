@@ -5,7 +5,9 @@ import Control.Exception
 import Control.Monad
 import qualified Data.ByteString as B
 import Data.Int
+import Data.List
 import Data.Monoid
+import Data.Ord
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Word
@@ -35,6 +37,11 @@ main = do
 
   tags <- TMR.read rdr 1000
   putStrLn $ "read " ++ show (length tags) ++ " tags"
-  mapM_ T.putStrLn $ concatMap TMR.displayTagReadData tags
+  when (not $ null tags) $ do
+    let trd = maximumBy (comparing TMR.trRssi) tags
+        td = TMR.trTag trd
+        epc = TMR.tdEpc td
+        hex = TMR.bytesToHex epc
+    T.putStrLn $ "writing <" <> hex <> ">"
 
   TMR.destroy rdr
