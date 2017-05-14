@@ -939,6 +939,11 @@ sub emitTagReadData {
     deleteUnderscoreFields (\%fields);
 
     # fields that need special handling:
+    # add to comment for rssi
+    $fields{"rssi"}{"comment"} .=
+        "  (in either centi-dBm, or a number between 0 and 128, " .
+        "depending on 'PARAM_TAGREADDATA_REPORTRSSIINDBM')";
+
     # metadataFlags as list of flags
     wrapField (\%fields, "metadataFlags", "unpackFlags16", "packFlags16");
     $fields{"metadataFlags"}{"type"} = "[MetadataFlag]";
@@ -953,6 +958,10 @@ sub emitTagReadData {
     # uint8Lists as bytestrings
     foreach my $f (qw(data epcMemData tidMemData userMemData reservedMemData)) {
         byteStringListField (\%fields, $f);
+        if ($fields{$f}{"comment"} =~ /^Read (\w+) bank data bytes/) {
+            $fields{$f}{"comment"} .=
+                "  (Only if 'GEN2_BANK_$1' is present in 'opExtraBanks')";
+        }
     }
 
     emitStruct2 ("TagReadData", "tr", $cName, \@fieldOrder, \%fields, 0);
@@ -1018,7 +1027,9 @@ sub emitTagOp {
             my %newInfo = %{$readDataInfo->{$field}};
             push @newFields, "extraBanks";
             $newInfo{'type'} = "[GEN2_Bank]";
-            $newInfo{'comment'} = "Additional Gen2 memory banks to read from";
+            $newInfo{'comment'} =
+                "Additional Gen2 memory banks to read from  " .
+                "(seems buggy, though; I\\'ve had strange results with it)";
             $newInfo{'marshall'} = ["peek", "pokeOr"];
             $readDataInfo->{"extraBanks"} = \%newInfo;
         }

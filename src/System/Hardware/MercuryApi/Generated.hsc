@@ -601,14 +601,14 @@ data TagReadData =
   , trAntenna :: !(Word8) -- ^ Antenna where the tag was read
   , trGpio :: !([GpioPin]) -- ^ State of GPIO pins at the moment of the tag read
   , trReadCount :: !(Word32) -- ^ Number of times the tag was read
-  , trRssi :: !(Int32) -- ^ Strength of the signal received from the tag
+  , trRssi :: !(Int32) -- ^ Strength of the signal received from the tag  (in either centi-dBm, or a number between 0 and 128, depending on 'PARAM_TAGREADDATA_REPORTRSSIINDBM')
   , trFrequency :: !(Word32) -- ^ RF carrier frequency the tag was read with
   , trTimestamp :: !(Word64) -- ^ Absolute time of the read, in milliseconds since 1\/1\/1970 UTC
   , trData :: !(ByteString) -- ^ Data read from the tag
-  , trEpcMemData :: !(ByteString) -- ^ Read EPC bank data bytes
-  , trTidMemData :: !(ByteString) -- ^ Read TID bank data bytes
-  , trUserMemData :: !(ByteString) -- ^ Read USER bank data bytes
-  , trReservedMemData :: !(ByteString) -- ^ Read RESERVED bank data bytes
+  , trEpcMemData :: !(ByteString) -- ^ Read EPC bank data bytes  (Only if 'GEN2_BANK_EPC' is present in 'opExtraBanks')
+  , trTidMemData :: !(ByteString) -- ^ Read TID bank data bytes  (Only if 'GEN2_BANK_TID' is present in 'opExtraBanks')
+  , trUserMemData :: !(ByteString) -- ^ Read USER bank data bytes  (Only if 'GEN2_BANK_USER' is present in 'opExtraBanks')
+  , trReservedMemData :: !(ByteString) -- ^ Read RESERVED bank data bytes  (Only if 'GEN2_BANK_RESERVED' is present in 'opExtraBanks')
   } deriving (Eq, Ord, Show, Read)
 
 instance Storable TagReadData where
@@ -661,7 +661,7 @@ data TagOp =
     }
   | TagOp_GEN2_ReadData
     { opBank :: !(GEN2_Bank) -- ^ Gen2 memory bank to read from
-    , opExtraBanks :: !([GEN2_Bank]) -- ^ Additional Gen2 memory banks to read from
+    , opExtraBanks :: !([GEN2_Bank]) -- ^ Additional Gen2 memory banks to read from  (seems buggy, though; I\'ve had strange results with it)
     , opWordAddress :: !(Word32) -- ^ Word address to start reading at
     , opLen :: !(Word8) -- ^ Number of words to read
     }
