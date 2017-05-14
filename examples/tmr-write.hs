@@ -43,5 +43,13 @@ main = do
         epc = TMR.tdEpc td
         hex = TMR.bytesToHex epc
     T.putStrLn $ "writing <" <> hex <> ">"
+    let epcFilt = TMR.TagFilterEPC td
+        words = TMR.packBytesIntoWords "Hello, World!"
+        opWrite = TMR.TagOp_GEN2_WriteData
+                  { TMR.opBank = TMR.GEN2_BANK_USER
+                  , TMR.opWordAddress = 0
+                  , TMR.opData = words
+                  }
+    void $ TMR.executeTagOp rdr opWrite (Just epcFilt)
 
   TMR.destroy rdr
