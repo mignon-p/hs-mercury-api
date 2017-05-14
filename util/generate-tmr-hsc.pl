@@ -941,7 +941,7 @@ sub emitTagReadData {
     # fields that need special handling:
     # add to comment for rssi
     $fields{"rssi"}{"comment"} .=
-        "  (in either centi-dBm, or a number between 0 and 128, " .
+        "  (in either dBm, or a number between 0 and 128, " .
         "depending on 'PARAM_TAGREADDATA_REPORTRSSIINDBM')";
 
     # metadataFlags as list of flags

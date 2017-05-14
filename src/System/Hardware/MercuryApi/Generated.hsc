@@ -601,7 +601,7 @@ data TagReadData =
   , trAntenna :: !(Word8) -- ^ Antenna where the tag was read
   , trGpio :: !([GpioPin]) -- ^ State of GPIO pins at the moment of the tag read
   , trReadCount :: !(Word32) -- ^ Number of times the tag was read
-  , trRssi :: !(Int32) -- ^ Strength of the signal received from the tag  (in either centi-dBm, or a number between 0 and 128, depending on 'PARAM_TAGREADDATA_REPORTRSSIINDBM')
+  , trRssi :: !(Int32) -- ^ Strength of the signal received from the tag  (in either dBm, or a number between 0 and 128, depending on 'PARAM_TAGREADDATA_REPORTRSSIINDBM')
   , trFrequency :: !(Word32) -- ^ RF carrier frequency the tag was read with
   , trTimestamp :: !(Word64) -- ^ Absolute time of the read, in milliseconds since 1\/1\/1970 UTC
   , trData :: !(ByteString) -- ^ Data read from the tag
