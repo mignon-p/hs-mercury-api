@@ -522,8 +522,8 @@ unimplementedParam =
 invalidParam :: ParamType -> ParamType -> ParamException
 invalidParam expected actual =
   ParamException ERROR_TYPE_BINDING ERROR_INVALID_PARAM_TYPE
-  ( "Expected " <> paramTypeDisplay expected <>
-    " but got " <> paramTypeDisplay actual )
+  ( "Expected " <> displayParamType expected <>
+    " but got " <> displayParamType actual )
 
 -- | Sets the value of a reader parameter.  Throws 'MercuryException'
 -- with a 'meStatus' of 'ERROR_INVALID_PARAM_TYPE' if the parameter value
@@ -801,9 +801,6 @@ displayTagReadData trd =
     dat name bs = if B.null bs
                   then []
                   else ["  " <> name <> " = " <> displayByteString bs]
-
-displayParamType :: ParamType -> T.Text
-displayParamType = paramTypeDisplay
 
 -- | Convert a 'B.ByteString' into a list of 'Word16', in big-endian
 -- order.  Padded with 0 if the number of bytes is odd.

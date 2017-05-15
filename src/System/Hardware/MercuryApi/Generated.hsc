@@ -1447,24 +1447,26 @@ paramType PARAM_METADATAFLAG = ParamTypeMetadataFlagList
 paramType PARAM_LICENSED_FEATURES = ParamTypeWord8List
 paramType _ = ParamTypeUnimplemented
 
-paramTypeDisplay :: ParamType -> Text
-paramTypeDisplay ParamTypeBool = "Bool"
-paramTypeDisplay ParamTypeInt16 = "Int16"
-paramTypeDisplay ParamTypeInt32 = "Int32"
-paramTypeDisplay ParamTypeInt8 = "Int8"
-paramTypeDisplay ParamTypeReadPlan = "ReadPlan"
-paramTypeDisplay ParamTypeRegion = "Region"
-paramTypeDisplay ParamTypeTagProtocol = "TagProtocol"
-paramTypeDisplay ParamTypeText = "Text"
-paramTypeDisplay ParamTypeWord16 = "Word16"
-paramTypeDisplay ParamTypeWord32 = "Word32"
-paramTypeDisplay ParamTypeWord8 = "Word8"
-paramTypeDisplay ParamTypeMetadataFlagList = "[MetadataFlag]"
-paramTypeDisplay ParamTypeRegionList = "[Region]"
-paramTypeDisplay ParamTypeTagProtocolList = "[TagProtocol]"
-paramTypeDisplay ParamTypeWord32List = "[Word32]"
-paramTypeDisplay ParamTypeWord8List = "[Word8]"
-paramTypeDisplay _ = "(Not yet implemented)"
+-- | A textual representation of the Haskell type corresponding
+-- to a particular 'ParamType'.
+displayParamType :: ParamType -> Text
+displayParamType ParamTypeBool = "Bool"
+displayParamType ParamTypeInt16 = "Int16"
+displayParamType ParamTypeInt32 = "Int32"
+displayParamType ParamTypeInt8 = "Int8"
+displayParamType ParamTypeReadPlan = "ReadPlan"
+displayParamType ParamTypeRegion = "Region"
+displayParamType ParamTypeTagProtocol = "TagProtocol"
+displayParamType ParamTypeText = "Text"
+displayParamType ParamTypeWord16 = "Word16"
+displayParamType ParamTypeWord32 = "Word32"
+displayParamType ParamTypeWord8 = "Word8"
+displayParamType ParamTypeMetadataFlagList = "[MetadataFlag]"
+displayParamType ParamTypeRegionList = "[Region]"
+displayParamType ParamTypeTagProtocolList = "[TagProtocol]"
+displayParamType ParamTypeWord32List = "[Word32]"
+displayParamType ParamTypeWord8List = "[Word8]"
+displayParamType _ = "(Not yet implemented)"
 
 instance ParamValue Bool where
   pType _ = ParamTypeBool

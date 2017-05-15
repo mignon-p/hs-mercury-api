@@ -1121,12 +1121,14 @@ sub emitParamTypes {
     emit "paramType _ = ParamTypeUnimplemented";
     emit "";
 
-    emit "paramTypeDisplay :: ParamType -> Text";
+    emit "-- | A textual representation of the Haskell type corresponding";
+    emit "-- to a particular 'ParamType'.";
+    emit "displayParamType :: ParamType -> Text";
     foreach my $paramType (sort values %toHaskellType) {
         my $name = $ptn{$paramType};
-        emit "paramTypeDisplay $name = \"$paramType\"";
+        emit "displayParamType $name = \"$paramType\"";
     }
-    emit "paramTypeDisplay _ = \"$nyi\"";
+    emit "displayParamType _ = \"$nyi\"";
 
     foreach my $paramType (sort values %toHaskellType) {
         my $name = $ptn{$paramType};
