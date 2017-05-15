@@ -92,6 +92,7 @@ module System.Hardware.MercuryApi
   , TagProtocol (..)
   , MetadataFlag (..)
   , GEN2_Bank (..)
+  , TransportDirection (..)
   ) where
 
 import Prelude hiding (read)
@@ -127,17 +128,22 @@ type RawType = Word32
 type RawTransportListener =
   CBool -> Word32 -> Ptr Word8 -> Word32 -> Ptr () -> IO ()
 
+-- | The direction of data travel.  Passed to 'TransportListener'.
+data TransportDirection = Rx -- ^ Receive
+                        | Tx -- ^ Transmit
+                        deriving (Eq, Ord, Show, Read, Bounded, Enum)
+
 -- | A function which can be installed via 'addTransportListener'
 -- to be called every time Mercury API sends or receives data on
 -- the serial port.
-type TransportListener = Bool           -- ^ True for receive, False for send
+type TransportListener = TransportDirection -- ^ Direction of data transmission
                        -> B.ByteString  -- ^ Binary data sent or received
                        -> Word32        -- ^ Timeout
                        -> IO ()
 
 -- | An opaque type which can be passed to 'removeTransportListener'
 -- to remove a transport listener.
-newtype TransportListenerId = TransportListenerId Integer
+newtype TransportListenerId = TransportListenerId Integer deriving (Eq)
 
 newtype Locale = Locale ()
 
@@ -628,10 +634,14 @@ paramList rdr = do
       result <- peekArray (min (fromIntegral actual) (fromIntegral maxParams)) params
       return $ map toParam result
 
+txToDirection :: Bool -> TransportDirection
+txToDirection True = Tx
+txToDirection False = Rx
+
 callTransportListener :: TransportListener -> RawTransportListener
 callTransportListener listener tx dataLen dataPtr timeout _ = do
   bs <- B.packCStringLen (castToCStringLen dataLen dataPtr)
-  listener (toBool tx) bs timeout
+  listener (txToDirection $ toBool tx) bs timeout
 
 -- | Add a listener to the list of functions that will be called for
 -- each message sent to or recieved from the reader.
@@ -668,9 +678,9 @@ hexListener h = do
   return (hexListener' h useColor)
 
 hexListener' :: Handle -> Bool -> TransportListener
-hexListener' h useColor tx dat _ = do
+hexListener' h useColor dir dat _ = do
   setColors useColor [SetColor Foreground Vivid Magenta]
-  lstn dat (prefix tx)
+  lstn dat (prefix dir)
   setColors useColor [Reset]
   flushColor useColor
   where
@@ -678,8 +688,8 @@ hexListener' h useColor tx dat _ = do
     setColors True sgr = hSetSGR h sgr
     flushColor False = return ()
     flushColor True = hFlush h
-    prefix True  = "Sending: "
-    prefix False = "Received:"
+    prefix Tx = "Sending: "
+    prefix Rx = "Received:"
     lstn bs pfx = do
       let (bs1, bs2) = B.splitAt 16 bs
           hex = concatMap (printf " %02x") (B.unpack bs1)
