@@ -26,7 +26,7 @@ module System.Hardware.MercuryApi
   , executeTagOp
   , destroy
     -- ** Parameters
-    -- Although 'paramGet' and 'paramSet' are very flexible, they only
+    -- | Although 'paramGet' and 'paramSet' are very flexible, they only
     -- check that the parameter type is correct at runtime.  You may
     -- prefer to use the functions in "System.Hardware.MercuryApi.Params",
     -- which ensure the correct type at compile time.
@@ -37,6 +37,9 @@ module System.Hardware.MercuryApi
   , paramSetReadPlanFilter
   , paramSetReadPlanTagop
     -- ** Listeners
+    -- | Transport listeners can be used to monitor the raw serial data
+    -- going to and from the reader, for debugging purposed.  A listener
+    -- that prints the data to a 'Handle' is available from 'hexListener'.
   , addTransportListener
   , removeTransportListener
     -- ** Firmware
@@ -391,7 +394,10 @@ connect :: Reader -> IO ()
 connect rdr = withReaderEtc rdr "connect" "" c_TMR_connect
 
 -- | Closes the connection to the reader and releases any resources
--- that have been consumed by the reader structure.
+-- that have been consumed by the reader structure.  Any further
+-- operations performed on the reader will fail with
+-- 'ERROR_ALREADY_DESTROYED'.  On finalization of the 'Reader',
+-- 'destroy' will be called automatically if it has not already been called.
 destroy :: Reader -> IO ()
 destroy rdr = withReaderEtc rdr "destroy" "" c_TMR_destroy
 
@@ -447,8 +453,10 @@ read rdr timeoutMs = do
 -- The call returns immediately after finding one tag
 -- and operating on it, unless the command timeout expires first.
 -- The operation is performed on the antenna specified in the
--- @\/reader\/tagop\/antenna@ parameter.
--- @\/reader\/tagop\/protocol@ specifies the protocol to be used.
+-- 'PARAM_TAGOP_ANTENNA' parameter.
+-- 'PARAM_TAGOP_PROTOCOL' specifies the protocol to be used.
+-- Some TagOps return data, while others will just return an
+-- empty 'B.ByteString'.
 executeTagOp :: Reader -> TagOp -> Maybe TagFilter -> IO B.ByteString
 executeTagOp rdr tagOp tagFilter = alloca $ \pOp -> alloca $ \pFilt -> do
   eth1 <- try $ poke pOp tagOp
@@ -563,8 +571,9 @@ paramGet rdr param = withReturnType $ \returnType -> do
 -- antenna in the list is written into 'PARAM_TAGOP_ANTENNA'.  For the
 -- <https://www.sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>,
 -- the antenna list should be @[1]@, and if powering the reader off USB,
--- the power level should be 500.  (Higher power levels can be used with a
--- separate power supply.)
+-- the power level should be 500
+-- (<https://learn.sparkfun.com/tutorials/simultaneous-rfid-tag-reader-hookup-guide/power-supply-considerations 5 dBm>).
+-- (Higher power levels can be used with a separate power supply.)
 paramSetBasics :: Reader   -- ^ The reader being operated on
                -> Region   -- ^ The region
                -> Int32    -- ^ Power in centi-dBm

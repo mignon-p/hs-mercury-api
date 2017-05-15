@@ -179,7 +179,7 @@ sub parseParamComment {
         return ($haskellType, "\@$equoted\@ $linkedType$xtra", $quoted);
     } else {
         my $ec = escapeHaddock($c);
-        $ec =~ s/(return value from) TMR_paramID()/$1 'paramID'/;
+        $ec =~ s/(return value from) TMR_paramID\(\)/$1 \@paramID\@/;
         return ("", $ec, "");
     }
 }

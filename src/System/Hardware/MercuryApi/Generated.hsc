@@ -1102,7 +1102,7 @@ fromExtraBank GEN2_BANK_USER = #{const TMR_GEN2_BANK_USER_ENABLED}
 type RawParam = #{type TMR_Param}
 
 data Param =
-    PARAM_NONE -- ^ No such parameter - used as a return value from 'paramID'().
+    PARAM_NONE -- ^ No such parameter - used as a return value from @paramID@.
   | PARAM_BAUDRATE -- ^ @\/reader\/baudRate@ 'Word32'
   | PARAM_COMMANDTIMEOUT -- ^ @\/reader\/commandTimeout@ 'Word32' (milliseconds)
   | PARAM_CURRENTTIME -- ^ @\/reader\/currentTime@ (Not yet implemented)
