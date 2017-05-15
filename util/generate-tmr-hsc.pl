@@ -1322,11 +1322,17 @@ sub emitParamHeader {
     emit "module System.Hardware.MercuryApi.Params";
     emit "  ( -- * Type-safe getters and setters";
     my $sep = " ";
+    my $oldbase = "";
     foreach my $param (sort compareParam @params) {
         my $path = $paramPath{$param};
+        my $base = paramBase($path);
         my $camel = makeCamel($path);
         my $type = $paramType{$param};
         if ($type ne $nyi and $camel ne "") {
+            if ($oldbase ne $base) {
+                emit ("    -- ** " . escapeHaddock($base));
+                $oldbase = $base;
+            }
             emit "  $sep paramGet$camel";
             $sep = ",";
             emit "  $sep paramSet$camel" if (not exists $paramReadOnly{$param});
