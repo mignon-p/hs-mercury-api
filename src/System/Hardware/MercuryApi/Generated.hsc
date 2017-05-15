@@ -1101,6 +1101,16 @@ fromExtraBank GEN2_BANK_USER = #{const TMR_GEN2_BANK_USER_ENABLED}
 
 type RawParam = #{type TMR_Param}
 
+-- | Reader parameters which you can get and set.  The names
+-- are the same as the names of the enum in the C API.
+-- (Unfortunately, these do not correspond to the
+-- \"path\"-style names in any systematic way.)
+-- Each parameter is listed with its \"path\", and the
+-- Haskell type which is used to store it.  Some parameters
+-- are also listed with the physical units the parameter
+-- is in.  Not all parameters are implemented in the Haskell
+-- binding.  Please file a Github issue if there is a parameter
+-- you need which is not implemented.
 data Param =
     PARAM_NONE -- ^ No such parameter - used as a return value from @paramID@.
   | PARAM_BAUDRATE -- ^ @\/reader\/baudRate@ 'Word32'

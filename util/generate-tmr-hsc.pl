@@ -467,6 +467,16 @@ sub emitParams {
     emit "type RawParam = #{type TMR_Param}";
     emit "";
 
+    emit "-- | Reader parameters which you can get and set.  The names";
+    emit "-- are the same as the names of the enum in the C API.";
+    emit "-- (Unfortunately, these do not correspond to the";
+    emit "-- \\\"path\\\"-style names in any systematic way.)";
+    emit "-- Each parameter is listed with its \\\"path\\\", and the";
+    emit "-- Haskell type which is used to store it.  Some parameters";
+    emit "-- are also listed with the physical units the parameter";
+    emit "-- is in.  Not all parameters are implemented in the Haskell";
+    emit "-- binding.  Please file a Github issue if there is a parameter";
+    emit "-- you need which is not implemented.";
     emit "data Param =";
     emitEnum ([sort compareParam @params], \%params);
     emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
