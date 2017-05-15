@@ -26,6 +26,10 @@ module System.Hardware.MercuryApi
   , executeTagOp
   , destroy
     -- ** Parameters
+    -- Although 'paramGet' and 'paramSet' are very flexible, they only
+    -- check that the parameter type is correct at runtime.  You may
+    -- prefer to use the functions in "System.Hardware.MercuryApi.Params",
+    -- which ensure the correct type at compile time.
   , paramList
   , paramGet
   , paramSet
