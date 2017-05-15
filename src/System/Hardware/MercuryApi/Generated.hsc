@@ -1116,12 +1116,12 @@ data Param =
   | PARAM_READER_STATISTICS -- ^ @\/reader\/statistics@ (Not yet implemented)
   | PARAM_READER_STATS -- ^ @\/reader\/stats@ (Not yet implemented)
   | PARAM_TRANSPORTTIMEOUT -- ^ @\/reader\/transportTimeout@ 'Word32' (milliseconds)
-  | PARAM_URI -- ^ @\/reader\/uri@ 'Text'
+  | PARAM_URI -- ^ @\/reader\/uri@ 'Text' (read-only)
   | PARAM_USER_CONFIG -- ^ @\/reader\/userConfig@ (Not yet implemented)
   | PARAM_USERMODE -- ^ @\/reader\/userMode@ (Not yet implemented)
   | PARAM_ANTENNA_CHECKPORT -- ^ @\/reader\/antenna\/checkPort@ 'Bool'
-  | PARAM_ANTENNA_CONNECTEDPORTLIST -- ^ @\/reader\/antenna\/connectedPortList@ ['Word8']
-  | PARAM_ANTENNA_PORTLIST -- ^ @\/reader\/antenna\/portList@ ['Word8']
+  | PARAM_ANTENNA_CONNECTEDPORTLIST -- ^ @\/reader\/antenna\/connectedPortList@ ['Word8'] (read-only)
+  | PARAM_ANTENNA_PORTLIST -- ^ @\/reader\/antenna\/portList@ ['Word8'] (read-only)
   | PARAM_ANTENNA_PORTSWITCHGPOS -- ^ @\/reader\/antenna\/portSwitchGpos@ ['Word8']
   | PARAM_ANTENNA_RETURNLOSS -- ^ @\/reader\/antenna\/returnLoss@ (Not yet implemented)
   | PARAM_ANTENNA_SETTLINGTIMELIST -- ^ @\/reader\/antenna\/settlingTimeList@ (Not yet implemented)
@@ -1147,10 +1147,10 @@ data Param =
   | PARAM_RADIO_ENABLESJC -- ^ @\/reader\/radio\/enableSJC@ 'Bool'
   | PARAM_RADIO_PORTREADPOWERLIST -- ^ @\/reader\/radio\/portReadPowerList@ (Not yet implemented)
   | PARAM_RADIO_PORTWRITEPOWERLIST -- ^ @\/reader\/radio\/portWritePowerList@ (Not yet implemented)
-  | PARAM_RADIO_POWERMAX -- ^ @\/reader\/radio\/powerMax@ 'Int16' (centi-dBm)
-  | PARAM_RADIO_POWERMIN -- ^ @\/reader\/radio\/powerMin@ 'Int16' (centi-dBm)
+  | PARAM_RADIO_POWERMAX -- ^ @\/reader\/radio\/powerMax@ 'Int16' (centi-dBm, read-only)
+  | PARAM_RADIO_POWERMIN -- ^ @\/reader\/radio\/powerMin@ 'Int16' (centi-dBm, read-only)
   | PARAM_RADIO_READPOWER -- ^ @\/reader\/radio\/readPower@ 'Int32' (centi-dBm)
-  | PARAM_RADIO_TEMPERATURE -- ^ @\/reader\/radio\/temperature@ 'Int8' (degrees C)
+  | PARAM_RADIO_TEMPERATURE -- ^ @\/reader\/radio\/temperature@ 'Int8' (degrees C, read-only)
   | PARAM_RADIO_WRITEPOWER -- ^ @\/reader\/radio\/writePower@ 'Int32' (centi-dBm)
   | PARAM_READ_ASYNCOFFTIME -- ^ @\/reader\/read\/asyncOffTime@ 'Word32' (milliseconds)
   | PARAM_READ_ASYNCONTIME -- ^ @\/reader\/read\/asyncOnTime@ 'Word32' (milliseconds)
@@ -1158,7 +1158,7 @@ data Param =
   | PARAM_REGION_HOPTABLE -- ^ @\/reader\/region\/hopTable@ ['Word32'] (kHz)
   | PARAM_REGION_HOPTIME -- ^ @\/reader\/region\/hopTime@ 'Word32' (milliseconds)
   | PARAM_REGION_ID -- ^ @\/reader\/region\/id@ 'Region'
-  | PARAM_REGION_SUPPORTEDREGIONS -- ^ @\/reader\/region\/supportedRegions@ ['Region']
+  | PARAM_REGION_SUPPORTEDREGIONS -- ^ @\/reader\/region\/supportedRegions@ ['Region'] (read-only)
   | PARAM_REGION_LBT_ENABLE -- ^ @\/reader\/region\/lbt\/enable@ 'Bool'
   | PARAM_READER_STATS_ENABLE -- ^ @\/reader\/stats\/enable@ (Not yet implemented)
   | PARAM_STATUS_ENABLE_ANTENNAREPORT -- ^ @\/reader\/status\/antennaEnable@ 'Bool'
@@ -1168,22 +1168,22 @@ data Param =
   | PARAM_TAGREADDATA_READFILTERTIMEOUT -- ^ @\/reader\/tagReadData\/readFilterTimeout@ 'Int32'
   | PARAM_TAGREADDATA_RECORDHIGHESTRSSI -- ^ @\/reader\/tagReadData\/recordHighestRssi@ 'Bool'
   | PARAM_TAGREADDATA_REPORTRSSIINDBM -- ^ @\/reader\/tagReadData\/reportRssiInDbm@ 'Bool'
-  | PARAM_TAGREADATA_TAGOPFAILURECOUNT -- ^ @\/reader\/tagReadData\/tagopFailures@ 'Word16'
-  | PARAM_TAGREADATA_TAGOPSUCCESSCOUNT -- ^ @\/reader\/tagReadData\/tagopSuccesses@ 'Word16'
+  | PARAM_TAGREADATA_TAGOPFAILURECOUNT -- ^ @\/reader\/tagReadData\/tagopFailures@ 'Word16' (read-only)
+  | PARAM_TAGREADATA_TAGOPSUCCESSCOUNT -- ^ @\/reader\/tagReadData\/tagopSuccesses@ 'Word16' (read-only)
   | PARAM_TAGREADDATA_UNIQUEBYANTENNA -- ^ @\/reader\/tagReadData\/uniqueByAntenna@ 'Bool'
   | PARAM_TAGREADDATA_UNIQUEBYDATA -- ^ @\/reader\/tagReadData\/uniqueByData@ 'Bool'
   | PARAM_TAGREADDATA_UNIQUEBYPROTOCOL -- ^ @\/reader\/tagReadData\/uniqueByProtocol@ 'Bool'
   | PARAM_TAGOP_ANTENNA -- ^ @\/reader\/tagop\/antenna@ 'Word8'
   | PARAM_TAGOP_PROTOCOL -- ^ @\/reader\/tagop\/protocol@ 'TagProtocol'
   | PARAM_TRIGGER_READ_GPI -- ^ @\/reader\/trigger\/read\/Gpi@ ['Word8']
-  | PARAM_VERSION_HARDWARE -- ^ @\/reader\/version\/hardware@ 'Text'
-  | PARAM_VERSION_MODEL -- ^ @\/reader\/version\/model@ 'Text'
-  | PARAM_PRODUCT_GROUP -- ^ @\/reader\/version\/productGroup@ 'Text'
-  | PARAM_PRODUCT_GROUP_ID -- ^ @\/reader\/version\/productGroupID@ 'Word16'
-  | PARAM_PRODUCT_ID -- ^ @\/reader\/version\/productID@ 'Word16'
+  | PARAM_VERSION_HARDWARE -- ^ @\/reader\/version\/hardware@ 'Text' (read-only)
+  | PARAM_VERSION_MODEL -- ^ @\/reader\/version\/model@ 'Text' (read-only)
+  | PARAM_PRODUCT_GROUP -- ^ @\/reader\/version\/productGroup@ 'Text' (read-only)
+  | PARAM_PRODUCT_GROUP_ID -- ^ @\/reader\/version\/productGroupID@ 'Word16' (read-only)
+  | PARAM_PRODUCT_ID -- ^ @\/reader\/version\/productID@ 'Word16' (read-only)
   | PARAM_VERSION_SERIAL -- ^ @\/reader\/version\/serial@ 'Text'
-  | PARAM_VERSION_SOFTWARE -- ^ @\/reader\/version\/software@ 'Text'
-  | PARAM_VERSION_SUPPORTEDPROTOCOLS -- ^ @\/reader\/version\/supportedProtocols@ ['TagProtocol']
+  | PARAM_VERSION_SOFTWARE -- ^ @\/reader\/version\/software@ 'Text' (read-only)
+  | PARAM_VERSION_SUPPORTEDPROTOCOLS -- ^ @\/reader\/version\/supportedProtocols@ ['TagProtocol'] (read-only)
   | PARAM_LICENSED_FEATURES
   deriving (Eq, Ord, Show, Read, Bounded, Enum)
 
