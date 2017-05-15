@@ -14,7 +14,7 @@ my $paramFile = "$outputDir/Params.hs";
 
 my @errorTypes = ("SUCCESS_TYPE");
 my @errorCodes = ("SUCCESS");
-my %errorCodes = ("SUCCESS" => "Success!");
+my %errorCodes = ("SUCCESS" => "Success!  (Never thrown in an exception)");
 my @glueTypes = ();
 my %glueTypes = ();
 my @glueCodes = ();
@@ -170,7 +170,9 @@ sub parseParamComment {
         }
         return ($haskellType, "\@$equoted\@ $linkedType$xtra", $quoted);
     } else {
-        return ("", escapeHaddock($c), "");
+        my $ec = escapeHaddock($c);
+        $ec =~ s/(return value from) TMR_paramID()/$1 'paramID'/;
+        return ("", $ec, "");
     }
 }
 
@@ -406,6 +408,7 @@ sub emitFrom {
 }
 
 sub emitStatus {
+    emit "-- | Indicates a general category of error.";
     emit "data StatusType =";
     emitEnum (\@errorTypes, {});
     emitEnumCont (\@glueTypes, \%glueTypes);
@@ -419,6 +422,7 @@ sub emitStatus {
     emit "toStatusType _ = ERROR_TYPE_UNKNOWN";
     emit "";
 
+    emit "-- | A specific error encountered by the C API or the Haskell binding.";
     emit "data Status =";
     emitEnum (\@errorCodes, \%errorCodes);
     emitEnumCont (\@glueCodes, \%glueCodes);
@@ -1037,6 +1041,9 @@ sub emitTagOp {
     @$readDataFields = @newFields;
     wrapField ($readDataInfo, "extraBanks", "unpackExtraBanks", "packExtraBanks");
 
+    emit "-- | An operation that can be performed on a tag.  Can be used";
+    emit '-- as an argument to @executeTagOp@, or can be embedded into';
+    emit "-- a read plan.";
     emitUnion ($hType, $prefix, $cType,
                \%discriminator, \@constructors, \%constInfo);
 }
@@ -1070,12 +1077,14 @@ sub emitParamTypes {
         $ptn{$paramType} = paramTypeName ($paramType);
     }
 
+    emit "-- | The Haskell data type expected for a particular parameter.";
     emit "data ParamType =";
     emitEnum ([sort values %ptn], {});
     emit "  | ParamTypeUnimplemented";
     emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
     emit "";
 
+    emit "-- | Indicates the type expected for a given parameter.";
     emit "paramType :: Param -> ParamType";
     foreach my $param (@params) {
         my $type = $paramType{$param};
@@ -1164,6 +1173,7 @@ sub emitRegion {
     emit "type RawRegion = #{type TMR_Region}";
     emit "";
 
+    emit "-- | RFID regulatory regions";
     emit "data Region =";
     emitEnum (\@regions, \%regions);
     emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
@@ -1183,6 +1193,9 @@ sub emitTagProtocol {
     emit "type RawTagProtocol = #{type TMR_TagProtocol}";
     emit "";
 
+    emit "-- | The protocol used by an RFID tag.  Only 'TAG_PROTOCOL_GEN2'";
+    emit "-- is supported by the M6e Nano, and therefore the Haskell";
+    emit "-- binding currently only supports that protocol.";
     emit "data TagProtocol =";
     emitEnum (\@tagProtocols, {});
     emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
@@ -1202,6 +1215,8 @@ sub emitMetadataFlags {
     emit "type RawMetadataFlag = #{type TMR_TRD_MetadataFlag}";
     emit "";
 
+    emit "-- | Various metadata parameters which can be requested";
+    emit "-- in 'PARAM_METADATAFLAG'.";
     emit "data MetadataFlag =";
     emitEnum (\@metadataFlags, {});
     emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
@@ -1216,6 +1231,7 @@ sub emitBanks {
     emit "type RawBank = #{type TMR_GEN2_Bank}";
     emit "";
 
+    emit "-- | Gen2 memory banks";
     emit "data GEN2_Bank =";
     emitEnum (\@banks, \%banks);
     emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";

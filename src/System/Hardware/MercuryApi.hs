@@ -1,57 +1,88 @@
 {-# LANGUAGE ForeignFunctionInterface, DeriveDataTypeable, OverloadedStrings, BangPatterns #-}
+{-|
+Module      : System.Hardware.MercuryApi
+Description : Control ThingMagic RFID readers
+Copyright   : © Patrick Pelletier, 2017
+License     : MIT
+Maintainer  : code@funwithsoftware.org
+Portability : POSIX
+
+This module is a Haskell binding to the \"Mercury API\" C API for
+ThingMagic brand RFID readers.  It is especially geared toward the
+<https://www.sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>,
+which uses ThingMagic's M6e Nano module, but it should work with other
+ThingMagic readers.  (Though currently, only support for serial readers
+is compiled in.)  Most of the function and type names are the same as
+their counterparts in the C API, with the @TMR_@ prefix dropped.  For more
+in-depth, language-independent documentation of Mercury API, see
+<http://www.thingmagic.com/images/Downloads/Docs/MercuryAPI_ProgrammerGuide_for_v1.27.3.pdf Mercury API Programmers Guide>.
+-}
 
 module System.Hardware.MercuryApi
-  ( Reader
-  , Param (..)
-  , ParamType (..)
-  , ParamValue
-  , MercuryException (..)
-  , StatusType (..)
-  , Status (..)
-  , TransportListener
-  , TransportListenerId
-  , Region (..)
-  , TagProtocol (..)
-  , ReadPlan (..)
-  , MetadataFlag (..)
-  , TagReadData (..)
-  , GpioPin (..)
-  , TagData (..)
-  , GEN2_TagData (..)
-  , GEN2_Bank (..)
-  , TagOp (..)
-  , TagFilter (..)
-  , FilterOn (..)
-  , apiVersion
-  , create
+  ( -- * Reader
+    create
   , connect
-  , destroy
   , read
   , executeTagOp
-  , firmwareLoad
-  , firmwareLoadFile
-  , paramSet
+  , destroy
+    -- ** Parameters
+  , paramList
   , paramGet
+  , paramSet
   , paramSetBasics
   , paramSetReadPlanFilter
   , paramSetReadPlanTagop
-  , defaultReadPlan
-  , antennaReadPlan
-  , paramList
+    -- ** Listeners
+  , addTransportListener
+  , removeTransportListener
+    -- ** Firmware
+    -- | Firmware for the M6e Nano can be obtained
+    -- <http://www.thingmagic.com/index.php/download-nano-firmware here>.
+  , firmwareLoad
+  , firmwareLoadFile
+    -- * Utility functions
+  , apiVersion
+  , hexListener
+  , packBytesIntoWords
+    -- ** Parameters
   , paramName
   , paramID
   , paramType
-  , addTransportListener
-  , removeTransportListener
-  , hexListener
+    -- ** Hex conversion
   , bytesToHex
   , hexToBytes
+    -- ** Display
   , displayTimestamp
   , displayLocalTimestamp
   , displayTagData
   , displayTagReadData
   , displayParamType
-  , packBytesIntoWords
+    -- * Types
+  , Reader
+  , ParamValue
+  , TransportListener
+  , TransportListenerId
+    -- ** Records
+  , MercuryException (..)
+  , ReadPlan (..)
+  , defaultReadPlan
+  , antennaReadPlan
+  , TagOp (..)
+  , TagFilter (..)
+  , FilterOn (..)
+  , TagReadData (..)
+  , GpioPin (..)
+  , TagData (..)
+  , GEN2_TagData (..)
+    -- ** Enums
+  , StatusType (..)
+  , Status (..)
+  , Param (..)
+  , ParamType (..)
+  , Region (..)
+  , TagProtocol (..)
+  , MetadataFlag (..)
+  , GEN2_Bank (..)
   ) where
 
 import Prelude hiding (read)
@@ -78,6 +109,7 @@ import qualified System.IO.Unsafe as U
 
 import System.Hardware.MercuryApi.Generated
 
+-- | An opaque type which represents a connection to an RFID reader.
 newtype Reader = Reader (ForeignPtr ReaderEtc)
 
 type RawStatus = Word32
@@ -86,8 +118,16 @@ type RawType = Word32
 type RawTransportListener =
   CBool -> Word32 -> Ptr Word8 -> Word32 -> Ptr () -> IO ()
 
-type TransportListener = Bool -> B.ByteString -> Word32 -> IO ()
+-- | A function which can be installed via 'addTransportListener'
+-- to be called every time Mercury API sends or receives data on
+-- the serial port.
+type TransportListener = Bool           -- ^ True for receive, False for send
+                       -> B.ByteString  -- ^ Binary data sent or received
+                       -> Word32        -- ^ Timeout
+                       -> IO ()
 
+-- | An opaque type which can be passed to 'removeTransportListener'
+-- to remove a transport listener.
 newtype TransportListenerId = TransportListenerId Integer
 
 newtype Locale = Locale ()
@@ -391,7 +431,7 @@ read :: Reader -- ^ The reader being operated on
      -> IO [TagReadData]
 read rdr timeoutMs = do
   alloca $ \tagCountPtr -> do
-    withReaderEtc rdr "read" "read" $ \p -> c_TMR_read p timeoutMs tagCountPtr
+    withReaderEtc rdr "read" "" $ \p -> c_TMR_read p timeoutMs tagCountPtr
     tagCount <- peek tagCountPtr
     alloca $ \trdPtr -> alloca $
                         \boolPtr -> readLoop rdr tagCount trdPtr boolPtr 0 []
@@ -434,6 +474,7 @@ firmwareLoad' filename rdr firmware = do
       \p -> c_TMR_firmwareLoad p (castPtr fwPtr) (fromIntegral fwLen)
 
 -- | Like 'firmwareLoad', but loads firmware from a file.
+-- (e. g. @NanoFW-1.7.1.2.sim@)
 firmwareLoadFile :: Reader   -- ^ The reader being operated on
                  -> FilePath -- ^ Name of file containing firmware image
                  -> IO ()
@@ -513,9 +554,9 @@ paramGet rdr param = withReturnType $ \returnType -> do
 -- The specified power level is written into 'PARAM_RADIO_READPOWER'
 -- and 'PARAM_RADIO_WRITEPOWER'.  The specified antenna list is
 -- written into the 'rpAntennas' field of 'PARAM_READ_PLAN', and the first
--- antenna in the list is written into 'TMR_PARAM_TAGOP_ANTENNA'.  For the
+-- antenna in the list is written into 'PARAM_TAGOP_ANTENNA'.  For the
 -- <https://www.sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>,
--- the antenna list should be [1], and if powering the reader off USB,
+-- the antenna list should be @[1]@, and if powering the reader off USB,
 -- the power level should be 500.  (Higher power levels can be used with a
 -- separate power supply.)
 paramSetBasics :: Reader   -- ^ The reader being operated on
@@ -554,7 +595,7 @@ defaultReadPlan = U.unsafePerformIO $ do
     c_default_read_plan p
     peek p
 
--- | Like 'defaultReadPlan', but with the antenna list set to [1].
+-- | Like 'defaultReadPlan', but with the antenna list set to @[1]@.
 -- This is the correct setting for the
 -- <http://sparkfun.com/products/14066 Sparkfun Simultaneous RFID Reader>.
 antennaReadPlan :: ReadPlan

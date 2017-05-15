@@ -78,6 +78,7 @@ castLen' bound description x = do
 castLen :: (Integral a, Bounded a) => Text -> Int -> IO a
 castLen = castLen' maxBound
 
+-- | A class for types which can be used as parameter values.
 class ParamValue a where
   pType :: a -> ParamType
   pGet :: (Ptr () -> IO ()) -> IO a
@@ -650,6 +651,9 @@ instance Storable TagReadData where
 
   poke p x = error "poke not implemented for TagReadData"
 
+-- | An operation that can be performed on a tag.  Can be used
+-- as an argument to @executeTagOp@, or can be embedded into
+-- a read plan.
 data TagOp =
     TagOp_GEN2_WriteTag
     { opEpc :: !(TagData) -- ^ Tag EPC
@@ -715,6 +719,7 @@ instance Storable TagOp where
     poke (#{ptr TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p) (opWordAddress x)
     poke (#{ptr TagOpEtc, tagop.u.gen2.u.readData.len} p) (opLen x)
 
+-- | Indicates a general category of error.
 data StatusType =
     SUCCESS_TYPE
   | ERROR_TYPE_COMM
@@ -734,8 +739,9 @@ toStatusType #{const TMR_ERROR_TYPE_LLRP} = ERROR_TYPE_LLRP
 toStatusType #{const ERROR_TYPE_BINDING} = ERROR_TYPE_BINDING
 toStatusType _ = ERROR_TYPE_UNKNOWN
 
+-- | A specific error encountered by the C API or the Haskell binding.
 data Status =
-    SUCCESS -- ^ Success!
+    SUCCESS -- ^ Success!  (Never thrown in an exception)
   | ERROR_MSG_WRONG_NUMBER_OF_DATA -- ^ Invalid number of arguments
   | ERROR_INVALID_OPCODE -- ^ Command opcode not recognized.
   | ERROR_UNIMPLEMENTED_OPCODE -- ^ Command opcode recognized, but is not supported.
@@ -943,6 +949,7 @@ toStatus x = ERROR_UNKNOWN x
 
 type RawRegion = #{type TMR_Region}
 
+-- | RFID regulatory regions
 data Region =
     REGION_NONE -- ^ Unspecified region
   | REGION_NA -- ^ North America
@@ -1004,6 +1011,9 @@ fromRegion REGION_OPEN = #{const TMR_REGION_OPEN}
 
 type RawTagProtocol = #{type TMR_TagProtocol}
 
+-- | The protocol used by an RFID tag.  Only 'TAG_PROTOCOL_GEN2'
+-- is supported by the M6e Nano, and therefore the Haskell
+-- binding currently only supports that protocol.
 data TagProtocol =
     TAG_PROTOCOL_NONE
   | TAG_PROTOCOL_ISO180006B
@@ -1035,6 +1045,8 @@ fromTagProtocol TAG_PROTOCOL_ATA = #{const TMR_TAG_PROTOCOL_ATA}
 
 type RawMetadataFlag = #{type TMR_TRD_MetadataFlag}
 
+-- | Various metadata parameters which can be requested
+-- in 'PARAM_METADATAFLAG'.
 data MetadataFlag =
     METADATA_FLAG_READCOUNT
   | METADATA_FLAG_RSSI
@@ -1060,6 +1072,7 @@ fromMetadataFlag METADATA_FLAG_GPIO_STATUS = #{const TMR_TRD_METADATA_FLAG_GPIO_
 
 type RawBank = #{type TMR_GEN2_Bank}
 
+-- | Gen2 memory banks
 data GEN2_Bank =
     GEN2_BANK_RESERVED -- ^ Reserved bank (kill and access passwords)
   | GEN2_BANK_EPC -- ^ EPC memory bank
@@ -1089,7 +1102,7 @@ fromExtraBank GEN2_BANK_USER = #{const TMR_GEN2_BANK_USER_ENABLED}
 type RawParam = #{type TMR_Param}
 
 data Param =
-    PARAM_NONE -- ^ No such parameter - used as a return value from TMR_paramID().
+    PARAM_NONE -- ^ No such parameter - used as a return value from 'paramID'().
   | PARAM_BAUDRATE -- ^ @\/reader\/baudRate@ 'Word32'
   | PARAM_PROBEBAUDRATES -- ^ @\/reader\/probeBaudRates@ ['Word32']
   | PARAM_COMMANDTIMEOUT -- ^ @\/reader\/commandTimeout@ 'Word32' (milliseconds)
@@ -1352,6 +1365,7 @@ fromParam PARAM_LICENSED_FEATURES = #{const TMR_PARAM_LICENSED_FEATURES}
 paramMax :: RawParam
 paramMax = #{const TMR_PARAM_MAX}
 
+-- | The Haskell data type expected for a particular parameter.
 data ParamType =
     ParamTypeBool
   | ParamTypeInt16
@@ -1372,6 +1386,7 @@ data ParamType =
   | ParamTypeUnimplemented
   deriving (Eq, Ord, Show, Read, Bounded, Enum)
 
+-- | Indicates the type expected for a given parameter.
 paramType :: Param -> ParamType
 paramType PARAM_BAUDRATE = ParamTypeWord32
 paramType PARAM_PROBEBAUDRATES = ParamTypeWord32List

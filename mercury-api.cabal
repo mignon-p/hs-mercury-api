@@ -13,10 +13,19 @@ name:                mercury-api
 version:             0.1.0.0
 
 -- A short (one-line) description of the package.
--- synopsis:
+synopsis:            Haskell binding to Mercury API for ThingMagic RFID readers
 
 -- A longer description of the package.
--- description:
+description:
+    This package is a Haskell binding to the \"Mercury API\" C API for
+    ThingMagic brand RFID readers.  It is especially geared toward the
+    <https://www.sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>,
+    which uses ThingMagic's M6e Nano module, but it should work with other
+    ThingMagic readers.  (Though currently, only support for serial readers
+    is compiled in.)  Most of the function and type names are the same as
+    their counterparts in the C API, with the @TMR_@ prefix dropped.  For more
+    in-depth, language-independent documentation of Mercury API, see
+    <http://www.thingmagic.com/images/Downloads/Docs/MercuryAPI_ProgrammerGuide_for_v1.27.3.pdf Mercury API Programmers Guide>.
 
 -- The license under which the package is released.
 license:             MIT
