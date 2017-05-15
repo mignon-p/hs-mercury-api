@@ -1110,6 +1110,7 @@ data Param =
   | PARAM_EXTENDEDEPC -- ^ @\/reader\/extendedEpc@ 'Bool'
   | PARAM_READER_HOSTNAME -- ^ @\/reader\/hostname@ 'Text'
   | PARAM_LICENSE_KEY -- ^ @\/reader\/licenseKey@ ['Word8']
+  | PARAM_LICENSED_FEATURES -- ^ @\/reader\/licensedFeatures@ ['Word8']
   | PARAM_METADATAFLAG -- ^ @\/reader\/metadataflags@ ['MetadataFlag']
   | PARAM_POWERMODE -- ^ @\/reader\/powerMode@ (Not yet implemented)
   | PARAM_PROBEBAUDRATES -- ^ @\/reader\/probeBaudRates@ ['Word32']
@@ -1184,7 +1185,6 @@ data Param =
   | PARAM_VERSION_SERIAL -- ^ @\/reader\/version\/serial@ 'Text'
   | PARAM_VERSION_SOFTWARE -- ^ @\/reader\/version\/software@ 'Text' (read-only)
   | PARAM_VERSION_SUPPORTEDPROTOCOLS -- ^ @\/reader\/version\/supportedProtocols@ ['TagProtocol'] (read-only)
-  | PARAM_LICENSED_FEATURES
   deriving (Eq, Ord, Show, Read, Bounded, Enum)
 
 instance Hashable Param where
@@ -1444,6 +1444,7 @@ paramType PARAM_READER_WRITE_REPLY_TIMEOUT = ParamTypeWord16
 paramType PARAM_READER_WRITE_EARLY_EXIT = ParamTypeBool
 paramType PARAM_TRIGGER_READ_GPI = ParamTypeWord8List
 paramType PARAM_METADATAFLAG = ParamTypeMetadataFlagList
+paramType PARAM_LICENSED_FEATURES = ParamTypeWord8List
 paramType _ = ParamTypeUnimplemented
 
 paramTypeDisplay :: ParamType -> Text

@@ -14,6 +14,8 @@ module System.Hardware.MercuryApi.Params
   , paramSetHostname
   , paramGetLicenseKey
   , paramSetLicenseKey
+  , paramGetLicensedFeatures
+  , paramSetLicensedFeatures
   , paramGetMetadataflags
   , paramSetMetadataflags
   , paramGetProbeBaudRates
@@ -507,6 +509,14 @@ paramSetMetadataflags rdr = paramSet rdr PARAM_METADATAFLAG
 -- | Get parameter 'PARAM_METADATAFLAG' (@\/reader\/metadataflags@)
 paramGetMetadataflags :: Reader -> IO [MetadataFlag]
 paramGetMetadataflags rdr = paramGet rdr PARAM_METADATAFLAG
+
+-- | Set parameter 'PARAM_LICENSED_FEATURES' (@\/reader\/licensedFeatures@)
+paramSetLicensedFeatures :: Reader -> [Word8] -> IO ()
+paramSetLicensedFeatures rdr = paramSet rdr PARAM_LICENSED_FEATURES
+
+-- | Get parameter 'PARAM_LICENSED_FEATURES' (@\/reader\/licensedFeatures@)
+paramGetLicensedFeatures :: Reader -> IO [Word8]
+paramGetLicensedFeatures rdr = paramGet rdr PARAM_LICENSED_FEATURES
 
 -- | Version of 'paramSet' which converts its argument from a
 -- string to the proper type using 'read'.
