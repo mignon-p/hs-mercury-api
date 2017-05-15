@@ -49,6 +49,7 @@ module System.Hardware.MercuryApi
   , firmwareLoadFile
     -- * Utility functions
   , apiVersion
+  , sparkFunAntennas
   , hexListener
   , packBytesIntoWords
     -- ** Parameters
@@ -76,7 +77,6 @@ module System.Hardware.MercuryApi
   , MercuryException (..)
   , ReadPlan (..)
   , defaultReadPlan
-  , antennaReadPlan
   , TagOp (..)
   , TagFilter (..)
   , FilterOn (..)
@@ -610,18 +610,19 @@ paramSetReadPlanTagop rdr op = do
 
 -- | Get the read plan that the reader starts out with by default.
 -- This has reasonable settings for most things, except for the
--- antennas, which need to be set.
+-- antennas, which need to be set.  (e. g. set 'rpAntennas' to
+-- 'sparkFunAntennas')
 defaultReadPlan :: ReadPlan
 defaultReadPlan = U.unsafePerformIO $ do
   alloca $ \p -> do
     c_default_read_plan p
     peek p
 
--- | Like 'defaultReadPlan', but with the antenna list set to @[1]@.
--- This is the correct setting for the
--- <http://sparkfun.com/products/14066 Sparkfun Simultaneous RFID Reader>.
-antennaReadPlan :: ReadPlan
-antennaReadPlan = defaultReadPlan { rpAntennas = [1] }
+-- | The constant @[1]@, which is the correct value for 'rpAntennas'
+-- when using the
+-- <http://sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>.
+sparkFunAntennas :: [Word8]
+sparkFunAntennas = [1]
 
 -- | Get a list of parameters supported by the reader.
 paramList :: Reader -> IO [Param]

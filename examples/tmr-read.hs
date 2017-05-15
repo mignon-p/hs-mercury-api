@@ -45,7 +45,9 @@ main = do
 
   TMR.paramSet rdr TMR.PARAM_REGION_ID TMR.REGION_NA2
   TMR.paramSet rdr TMR.PARAM_RADIO_READPOWER (500 :: Int32)
-  let plan = TMR.antennaReadPlan { TMR.rpTagop = Just readUser }
+  let plan = TMR.defaultReadPlan { TMR.rpTagop = Just readUser
+                                 , TMR.rpAntennas = TMR.sparkFunAntennas
+                                 }
   TMR.paramSet rdr TMR.PARAM_READ_PLAN plan
 
   tags <- TMR.read rdr 1000
