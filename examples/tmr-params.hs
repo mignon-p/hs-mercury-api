@@ -40,5 +40,8 @@ main = do
         setSGR [SetColor Foreground Dull Green]
         T.putStr $ "  " <> txt
         setSGR [Reset]
-        T.putStrLn $ " :: " <> typ
+        T.putStr $ " :: " <> typ
+        case TMR.paramUnits param of
+          Nothing -> T.putStrLn ""
+          Just units -> T.putStrLn $ " (" <> units <> ")"
   TMR.destroy rdr

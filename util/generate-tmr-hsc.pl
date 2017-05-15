@@ -499,6 +499,22 @@ sub emitParams {
     emit "paramMax :: RawParam";
     emit "paramMax = #{const TMR_PARAM_MAX}";
     emit "";
+
+    emit "-- | For parameters which are expressed in physical units,";
+    emit "-- returns a string describing the units.  Returns 'Nothing'";
+    emit "-- for parameters which are not expressed in physical units.";
+    emit "-- This can be useful for displaying in a user interface,";
+    emit "-- for example.";
+    emit "paramUnits :: Param -> Maybe Text";
+    foreach my $param (@params) {
+        my $path = $paramPath{$param};
+        if (exists $extra{$path}) {
+            my $xtra = $extra{$path};
+            emit "paramUnits $param = Just \"$xtra\"";
+        }
+    }
+    emit "paramUnits _ = Nothing";
+    emit "";
 }
 
 sub emitStruct {

@@ -1375,6 +1375,29 @@ fromParam PARAM_LICENSED_FEATURES = #{const TMR_PARAM_LICENSED_FEATURES}
 paramMax :: RawParam
 paramMax = #{const TMR_PARAM_MAX}
 
+-- | For parameters which are expressed in physical units,
+-- returns a string describing the units.  Returns 'Nothing'
+-- for parameters which are not expressed in physical units.
+-- This can be useful for displaying in a user interface,
+-- for example.
+paramUnits :: Param -> Maybe Text
+paramUnits PARAM_COMMANDTIMEOUT = Just "milliseconds"
+paramUnits PARAM_TRANSPORTTIMEOUT = Just "milliseconds"
+paramUnits PARAM_GEN2_BLF = Just "kHz"
+paramUnits PARAM_READ_ASYNCOFFTIME = Just "milliseconds"
+paramUnits PARAM_READ_ASYNCONTIME = Just "milliseconds"
+paramUnits PARAM_RADIO_POWERMAX = Just "centi-dBm"
+paramUnits PARAM_RADIO_POWERMIN = Just "centi-dBm"
+paramUnits PARAM_RADIO_PORTREADPOWERLIST = Just "centi-dBm"
+paramUnits PARAM_RADIO_PORTWRITEPOWERLIST = Just "centi-dBm"
+paramUnits PARAM_RADIO_READPOWER = Just "centi-dBm"
+paramUnits PARAM_RADIO_WRITEPOWER = Just "centi-dBm"
+paramUnits PARAM_RADIO_TEMPERATURE = Just "degrees C"
+paramUnits PARAM_REGION_HOPTABLE = Just "kHz"
+paramUnits PARAM_REGION_HOPTIME = Just "milliseconds"
+paramUnits PARAM_READER_WRITE_REPLY_TIMEOUT = Just "microseconds"
+paramUnits _ = Nothing
+
 -- | The Haskell data type expected for a particular parameter.
 data ParamType =
     ParamTypeBool

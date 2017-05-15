@@ -55,6 +55,7 @@ module System.Hardware.MercuryApi
   , paramName
   , paramID
   , paramType
+  , paramUnits
     -- ** Hex conversion
   , bytesToHex
   , hexToBytes
