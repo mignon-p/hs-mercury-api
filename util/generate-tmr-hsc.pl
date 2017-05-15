@@ -443,7 +443,7 @@ sub emitParams {
     emit "";
 
     emit "data Param =";
-    emitEnum (\@params, \%params);
+    emitEnum ([sort compareParam @params], \%params);
     emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
     emit "";
 
@@ -1251,6 +1251,45 @@ sub emitBanks {
         emit "fromExtraBank $con = #{const TMR_${con}_ENABLED}";
     }
     emit "";
+}
+
+sub paramBase {
+    my ($x) = @_;
+    $x =~ s%/[^/]+$%%;
+    return $x;
+}
+
+sub paramTriple {
+    my ($param) = @_;
+    my $path = $paramPath{$param};
+    my $base = paramBase($path);
+
+    my $n;
+    my $x = $param;
+    my $y = $path;
+    if ($path ne "") {
+        $n = 1;
+        $x = $base;
+    } elsif ($param eq "PARAM_NONE") {
+        $n = 0;
+    } else {
+        $n = 2;
+    }
+
+    return ($n, $x, $y);
+}
+
+sub compareParam {
+    my ($n1, $x1, $y1) = paramTriple($a);
+    my ($n2, $x2, $y2) = paramTriple($b);
+
+    my $nc = $n1 <=> $n2;
+    my $xc = $x1 cmp $x2;
+    my $yc = $y1 cmp $y2;
+
+    return $nc if ($nc != 0);
+    return $xc if ($xc != 0);
+    return $yc;
 }
 
 sub emitParamHeader {
