@@ -37,6 +37,16 @@ static void free_all_transport_listeners (ReaderEtc *reader)
     }
 }
 
+/* These wrapper functions have at least two purposes:
+ * 1) Check whether the reader has been destroyed
+ * 2) Many of the reader methods are actually macros, so wrapping
+ *    them in a real function makes it possible to call them
+ *    from Haskell.
+ *
+ * Some of the wrapper functions also perform additional actions to
+ * make calling from Haskell easier.
+ */
+
 TMR_Status c_TMR_create (ReaderEtc *reader, const char *deviceUri)
 {
     reader->transportListeners = NULL;
@@ -101,6 +111,26 @@ TMR_Status c_TMR_executeTagOp (ReaderEtc *reader,
         return ERROR_ALREADY_DESTROYED;
     else
         return TMR_executeTagOp (&reader->reader, tagop, filter, data);
+}
+
+TMR_Status c_TMR_gpoSet (ReaderEtc *reader,
+                         uint8_t count,
+                         const TMR_GpioPin state[])
+{
+    if (reader->destroyed)
+        return ERROR_ALREADY_DESTROYED;
+    else
+        return TMR_gpoSet (&reader->reader, count, state);
+}
+
+TMR_Status c_TMR_gpiGet (ReaderEtc *reader,
+                         uint8_t *count,
+                         TMR_GpioPin state[])
+{
+    if (reader->destroyed)
+        return ERROR_ALREADY_DESTROYED;
+    else
+        return TMR_gpiGet (&reader->reader, count, state);
 }
 
 TMR_Status c_TMR_firmwareLoad (ReaderEtc *reader,

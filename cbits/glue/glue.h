@@ -105,6 +105,12 @@ TMR_Status c_TMR_executeTagOp (ReaderEtc *reader,
                                TMR_TagOp *tagop,
                                TMR_TagFilter *filter,
                                TMR_uint8List *data);
+TMR_Status c_TMR_gpoSet (ReaderEtc *reader,
+                         uint8_t count,
+                         const TMR_GpioPin state[]);
+TMR_Status c_TMR_gpiGet (ReaderEtc *reader,
+                         uint8_t *count,
+                         TMR_GpioPin state[]);
 TMR_Status c_TMR_firmwareLoad (ReaderEtc *reader,
                                uint8_t *firmwareStart,
                                uint32_t firmwareSize);

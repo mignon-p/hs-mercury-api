@@ -42,6 +42,17 @@ module System.Hardware.MercuryApi
     -- that prints the data to a 'Handle' is available from 'hexListener'.
   , addTransportListener
   , removeTransportListener
+    -- ** GPIO
+    -- | The M6e Nano has 4 GPIO pins that can be controlled by software,
+    -- numbered 1-4.  On the
+    -- <https://www.sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>,
+    -- GPIO 1 is available on the GPIO1 pin, and GPIOs 2, 3, and 4 are available
+    -- on the LV2, LV3, and LV4 pins.  The GPIO1 pin is 5V tolerant, but
+    -- <https://learn.sparkfun.com/tutorials/simultaneous-rfid-tag-reader-hookup-guide/hardware-overview the LV pins are 3.3V only>.
+    -- To configure GPIOs as inputs or outputs, use 'PARAM_GPIO_INPUTLIST'
+    -- and 'PARAM_GPIO_OUTPUTLIST'.
+  , gpiGet
+  , gpoSet
     -- ** Firmware
     -- | Firmware for the M6e Nano can be obtained
     -- <http://www.thingmagic.com/index.php/download-nano-firmware here>.
@@ -192,6 +203,18 @@ foreign import ccall safe "glue.h c_TMR_executeTagOp"
                        -> Ptr TagFilter
                        -> Ptr List16
                        -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_gpoSet"
+    c_TMR_gpoSet :: Ptr ReaderEtc
+                 -> Word8
+                 -> Ptr GpioPin
+                 -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_gpiGet"
+    c_TMR_gpiGet :: Ptr ReaderEtc
+                 -> Ptr Word8
+                 -> Ptr GpioPin
+                 -> IO RawStatus
 
 foreign import ccall safe "glue.h c_TMR_firmwareLoad"
     c_TMR_firmwareLoad :: Ptr ReaderEtc
@@ -482,6 +505,28 @@ executeTagOp rdr tagOp tagFilter = alloca $ \pOp -> alloca $ \pFilt -> do
     withReaderEtc rdr "executeTagOp" "" $ \pRdr -> do
       c_TMR_executeTagOp pRdr pOp pFilt' (castPtr pList)
   return $ B.pack results
+
+-- | Set the state of some GPO pins.
+gpoSet :: Reader -> [GpioPin] -> IO ()
+gpoSet rdr gpios = do
+  withArrayLen gpios $ \len gpioPtr -> do
+    eth <- try $ castLen "[GpioPin]" len
+    case eth of
+      Left err -> throwPE rdr err "gpoSet" ""
+      Right len' -> do
+        withReaderEtc rdr "gpoSet" "" $ \pRdr -> do
+          c_TMR_gpoSet pRdr len' gpioPtr
+
+-- | Get the state of all GPI pins.
+gpiGet :: Reader -> IO [GpioPin]
+gpiGet rdr = do
+  let maxLen = maxBound
+  with maxLen $ \lenPtr -> do
+    allocaArray (fromIntegral maxLen) $ \gpioPtr -> do
+      withReaderEtc rdr "gpiGet" "" $ \pRdr -> do
+        c_TMR_gpiGet pRdr lenPtr gpioPtr
+      len <- peek lenPtr
+      peekArray (fromIntegral len) gpioPtr
 
 -- | Attempts to install firmware on the reader, then restart and reinitialize.
 firmwareLoad :: Reader       -- ^ The reader being operated on
