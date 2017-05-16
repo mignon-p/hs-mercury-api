@@ -588,7 +588,10 @@ instance Storable GpioPin where
       <*> (toBool' <$> peek pHigh)
       <*> (toBool' <$> peek pOutput)
 
-  poke p x = error "poke not implemented for GpioPin"
+  poke p x = do
+    poke (#{ptr TMR_GpioPin, id} p) (gpId x)
+    poke (#{ptr TMR_GpioPin, high} p) (fromBool' $ gpHigh x)
+    poke (#{ptr TMR_GpioPin, output} p) (fromBool' $ gpOutput x)
 
 -- | A record to represent a read of an RFID tag.
 -- Provides access to the metadata of the read event,

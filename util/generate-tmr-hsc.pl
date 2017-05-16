@@ -962,7 +962,7 @@ sub emitGpio {
     wrapField (\%fields, "high", "toBool'", "fromBool'");
     wrapField (\%fields, "output", "toBool'", "fromBool'");
 
-    emitStruct2 ("GpioPin", "gp", $cName, \@fieldOrder, \%fields, 0);
+    emitStruct2 ("GpioPin", "gp", $cName, \@fieldOrder, \%fields, 1);
 }
 
 sub deleteUnderscoreFields {
