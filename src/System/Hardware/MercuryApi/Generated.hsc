@@ -22,6 +22,20 @@ import Foreign.C
 #include <glue.h>
 #include <stdbool.h>
 
+-- | A GPIO pin number.  On the M6e Nano, these are numbered 1-4.
+type PinNumber = Word8
+
+-- | An antenna number.  On the
+-- <https://www.sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>,
+-- there is a single antenna with the number 1.
+type AntennaPort = Word8
+
+-- | A 32-bit password (access or kill) in the Gen2 protocol.
+type GEN2_Password = Word32
+
+-- | milliseconds since 1\/1\/1970 UTC
+type MillisecondsSinceEpoch = Word64
+
 -- | Version number of the Mercury API C library.
 apiVersion :: Text
 apiVersion = #{const_str TMR_VERSION}

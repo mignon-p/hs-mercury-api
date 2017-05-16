@@ -80,10 +80,16 @@ module System.Hardware.MercuryApi
   , displayTagReadData
   , displayParamType
     -- * Types
+    -- ** Opaque types
   , Reader
   , ParamValue
-  , TransportListener
   , TransportListenerId
+    -- ** Typedefs
+  , TransportListener
+  , PinNumber
+  , AntennaPort
+  , GEN2_Password
+  , MillisecondsSinceEpoch
     -- ** Records
   , MercuryException (..)
   , ReadPlan (..)
@@ -630,7 +636,7 @@ paramGet rdr param = withReturnType $ \returnType -> do
 paramSetBasics :: Reader   -- ^ The reader being operated on
                -> Region   -- ^ The region
                -> Int32    -- ^ Power in centi-dBm
-               -> [Word8]  -- ^ Antenna list
+               -> [AntennaPort] -- ^ Antenna list
                -> IO ()
 paramSetBasics rdr rgn pwr ant = do
   paramSet rdr PARAM_REGION_ID rgn
@@ -667,7 +673,7 @@ defaultReadPlan = U.unsafePerformIO $ do
 -- | The constant @[1]@, which is the correct value for 'rpAntennas'
 -- when using the
 -- <http://sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>.
-sparkFunAntennas :: [Word8]
+sparkFunAntennas :: [AntennaPort]
 sparkFunAntennas = [1]
 
 -- | Get a list of parameters supported by the reader.
@@ -793,7 +799,7 @@ cLocale :: Ptr Locale
 {-# NOINLINE cLocale #-}
 cLocale = U.unsafePerformIO $ throwErrnoIfNull "newlocale" c_new_c_locale
 
-formatTimestamp :: Word64 -> CBool -> String -> IO T.Text
+formatTimestamp :: MillisecondsSinceEpoch -> CBool -> String -> IO T.Text
 formatTimestamp t local z = do
   let (seconds, millis) = t `divMod` 1000
       fmt = "%FT%H:%M:%S" ++ printf ".%03d" millis ++ z
@@ -807,13 +813,13 @@ formatTimestamp t local z = do
 
 -- | Convert a timestamp into
 -- <https://en.wikipedia.org/wiki/ISO_8601 ISO 8601> format in UTC.
-displayTimestamp :: Word64 -- ^ milliseconds since 1\/1\/1970 UTC
+displayTimestamp :: MillisecondsSinceEpoch -- ^ milliseconds since 1\/1\/1970 UTC
                  -> T.Text
 displayTimestamp t = U.unsafePerformIO $ formatTimestamp t cFalse "Z"
 
 -- | Convert a timestamp into <https://en.wikipedia.org/wiki/ISO_8601 ISO 8601>
 -- format in the local timezone.
-displayLocalTimestamp :: Word64 -- ^ milliseconds since 1\/1\/1970 UTC
+displayLocalTimestamp :: MillisecondsSinceEpoch -- ^ milliseconds since 1\/1\/1970 UTC
                       -> IO T.Text
 displayLocalTimestamp t = formatTimestamp t cTrue "%z"
 

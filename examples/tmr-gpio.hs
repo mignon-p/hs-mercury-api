@@ -19,7 +19,7 @@ import System.IO
 delayMillis :: Int
 delayMillis = 20
 
-mkPin :: Word8 -> Word8 -> TMR.GpioPin
+mkPin :: TMR.PinNumber -> TMR.PinNumber -> TMR.GpioPin
 mkPin highPin pin =
   TMR.GpioPin
   { TMR.gpId = pin
@@ -27,7 +27,7 @@ mkPin highPin pin =
   , TMR.gpOutput = True
   }
 
-gpioLoop :: TMR.Reader -> [Word8] -> Integer -> [TMR.GpioPin] -> IO ()
+gpioLoop :: TMR.Reader -> [TMR.PinNumber] -> Integer -> [TMR.GpioPin] -> IO ()
 gpioLoop rdr outPins millis oldPins = do
   pins <- TMR.gpiGet rdr
   when (pins /= oldPins) $ print pins
