@@ -38,7 +38,7 @@ module System.Hardware.MercuryApi
   , paramSetReadPlanTagop
     -- ** Listeners
     -- | Transport listeners can be used to monitor the raw serial data
-    -- going to and from the reader, for debugging purposed.  A listener
+    -- going to and from the reader, for debugging purposes.  A listener
     -- that prints the data to a 'Handle' is available from 'hexListener'.
   , addTransportListener
   , removeTransportListener
@@ -444,7 +444,8 @@ readLoop rdr tagCount trdPtr boolPtr !tagNum !trds = do
     else do
     return $ reverse trds
 
--- | Search for tags for a fixed duration.
+-- | Search for tags for a fixed duration.  Follows the 'ReadPlan'
+-- stored in 'PARAM_READ_PLAN'.
 read :: Reader -- ^ The reader being operated on
      -> Word32 -- ^ The number of milliseconds to search for tags
      -> IO [TagReadData]
@@ -577,8 +578,8 @@ paramGet rdr param = withReturnType $ \returnType -> do
 -- written into the 'rpAntennas' field of 'PARAM_READ_PLAN', and the first
 -- antenna in the list is written into 'PARAM_TAGOP_ANTENNA'.  For the
 -- <https://www.sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>,
--- the antenna list should be @[1]@, and if powering the reader off USB,
--- the power level should be 500
+-- the antenna list should be 'sparkFunAntennas', and if powering the reader
+-- off USB, the power level should be 500
 -- (<https://learn.sparkfun.com/tutorials/simultaneous-rfid-tag-reader-hookup-guide/power-supply-considerations 5 dBm>).
 -- (Higher power levels can be used with a separate power supply.)
 paramSetBasics :: Reader   -- ^ The reader being operated on
