@@ -32,7 +32,7 @@ gpioLoop rdr outPins millis oldPins = do
   pins <- TMR.gpiGet rdr
   when (pins /= oldPins) $ print pins
   let oLen = length outPins
-      pinNo = fromIntegral $ (millis `div` 1000) `mod` fromIntegral oLen
+      pinNo = outPins !! fromIntegral ((millis `div` 1000) `mod` fromIntegral oLen)
       gpoPins = map (mkPin pinNo) outPins
   TMR.gpoSet rdr gpoPins
   threadDelay $ delayMillis * 1000
@@ -40,8 +40,10 @@ gpioLoop rdr outPins millis oldPins = do
 
 main = do
   rdr <- TMR.create "tmr:///dev/ttyUSB0"
+{-
   listener <- TMR.hexListener stdout
   TMR.addTransportListener rdr listener
+-}
   TMR.paramSetTransportTimeout rdr 10000
   TMR.connect rdr
 
@@ -49,4 +51,5 @@ main = do
   let outPins = map read args
   TMR.paramSetGpioOutputList rdr outPins
 
+  putStrLn "running..."
   gpioLoop rdr outPins 0 [] `finally` TMR.destroy rdr
