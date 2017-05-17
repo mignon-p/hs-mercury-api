@@ -1430,6 +1430,7 @@ sub emitParamHelpers {
             $com = " (" . escapeHaddock($extra{$path}) . ")";
         }
         if ($type ne $nyi and $camel ne "") {
+            $type = $typedefs{$param} if (exists $typedefs{$param});
             if (not exists $paramReadOnly{$param}) {
                 emit "-- | Set parameter '$param' (\@$esc\@)$com";
                 emit "paramSet$camel :: Reader -> $type -> IO ()";

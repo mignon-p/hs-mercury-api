@@ -181,43 +181,43 @@ paramGetAntennaCheckPort :: Reader -> IO Bool
 paramGetAntennaCheckPort rdr = paramGet rdr PARAM_ANTENNA_CHECKPORT
 
 -- | Get parameter 'PARAM_ANTENNA_PORTLIST' (@\/reader\/antenna\/portList@)
-paramGetAntennaPortList :: Reader -> IO [Word8]
+paramGetAntennaPortList :: Reader -> IO [AntennaPort]
 paramGetAntennaPortList rdr = paramGet rdr PARAM_ANTENNA_PORTLIST
 
 -- | Get parameter 'PARAM_ANTENNA_CONNECTEDPORTLIST' (@\/reader\/antenna\/connectedPortList@)
-paramGetAntennaConnectedPortList :: Reader -> IO [Word8]
+paramGetAntennaConnectedPortList :: Reader -> IO [AntennaPort]
 paramGetAntennaConnectedPortList rdr = paramGet rdr PARAM_ANTENNA_CONNECTEDPORTLIST
 
 -- | Set parameter 'PARAM_ANTENNA_PORTSWITCHGPOS' (@\/reader\/antenna\/portSwitchGpos@)
-paramSetAntennaPortSwitchGpos :: Reader -> [Word8] -> IO ()
+paramSetAntennaPortSwitchGpos :: Reader -> [PinNumber] -> IO ()
 paramSetAntennaPortSwitchGpos rdr = paramSet rdr PARAM_ANTENNA_PORTSWITCHGPOS
 
 -- | Get parameter 'PARAM_ANTENNA_PORTSWITCHGPOS' (@\/reader\/antenna\/portSwitchGpos@)
-paramGetAntennaPortSwitchGpos :: Reader -> IO [Word8]
+paramGetAntennaPortSwitchGpos :: Reader -> IO [PinNumber]
 paramGetAntennaPortSwitchGpos rdr = paramGet rdr PARAM_ANTENNA_PORTSWITCHGPOS
 
 -- | Set parameter 'PARAM_GPIO_INPUTLIST' (@\/reader\/gpio\/inputList@)
-paramSetGpioInputList :: Reader -> [Word8] -> IO ()
+paramSetGpioInputList :: Reader -> [PinNumber] -> IO ()
 paramSetGpioInputList rdr = paramSet rdr PARAM_GPIO_INPUTLIST
 
 -- | Get parameter 'PARAM_GPIO_INPUTLIST' (@\/reader\/gpio\/inputList@)
-paramGetGpioInputList :: Reader -> IO [Word8]
+paramGetGpioInputList :: Reader -> IO [PinNumber]
 paramGetGpioInputList rdr = paramGet rdr PARAM_GPIO_INPUTLIST
 
 -- | Set parameter 'PARAM_GPIO_OUTPUTLIST' (@\/reader\/gpio\/outputList@)
-paramSetGpioOutputList :: Reader -> [Word8] -> IO ()
+paramSetGpioOutputList :: Reader -> [PinNumber] -> IO ()
 paramSetGpioOutputList rdr = paramSet rdr PARAM_GPIO_OUTPUTLIST
 
 -- | Get parameter 'PARAM_GPIO_OUTPUTLIST' (@\/reader\/gpio\/outputList@)
-paramGetGpioOutputList :: Reader -> IO [Word8]
+paramGetGpioOutputList :: Reader -> IO [PinNumber]
 paramGetGpioOutputList rdr = paramGet rdr PARAM_GPIO_OUTPUTLIST
 
 -- | Set parameter 'PARAM_GEN2_ACCESSPASSWORD' (@\/reader\/gen2\/accessPassword@)
-paramSetGen2AccessPassword :: Reader -> Word32 -> IO ()
+paramSetGen2AccessPassword :: Reader -> GEN2_Password -> IO ()
 paramSetGen2AccessPassword rdr = paramSet rdr PARAM_GEN2_ACCESSPASSWORD
 
 -- | Get parameter 'PARAM_GEN2_ACCESSPASSWORD' (@\/reader\/gen2\/accessPassword@)
-paramGetGen2AccessPassword :: Reader -> IO Word32
+paramGetGen2AccessPassword :: Reader -> IO GEN2_Password
 paramGetGen2AccessPassword rdr = paramGet rdr PARAM_GEN2_ACCESSPASSWORD
 
 -- | Set parameter 'PARAM_READ_ASYNCOFFTIME' (@\/reader\/read\/asyncOffTime@) (milliseconds)
@@ -313,11 +313,11 @@ paramGetTagReadDataUniqueByData :: Reader -> IO Bool
 paramGetTagReadDataUniqueByData rdr = paramGet rdr PARAM_TAGREADDATA_UNIQUEBYDATA
 
 -- | Set parameter 'PARAM_TAGOP_ANTENNA' (@\/reader\/tagop\/antenna@)
-paramSetTagopAntenna :: Reader -> Word8 -> IO ()
+paramSetTagopAntenna :: Reader -> AntennaPort -> IO ()
 paramSetTagopAntenna rdr = paramSet rdr PARAM_TAGOP_ANTENNA
 
 -- | Get parameter 'PARAM_TAGOP_ANTENNA' (@\/reader\/tagop\/antenna@)
-paramGetTagopAntenna :: Reader -> IO Word8
+paramGetTagopAntenna :: Reader -> IO AntennaPort
 paramGetTagopAntenna rdr = paramGet rdr PARAM_TAGOP_ANTENNA
 
 -- | Set parameter 'PARAM_TAGOP_PROTOCOL' (@\/reader\/tagop\/protocol@)
@@ -517,11 +517,11 @@ paramGetGen2WriteEarlyExit :: Reader -> IO Bool
 paramGetGen2WriteEarlyExit rdr = paramGet rdr PARAM_READER_WRITE_EARLY_EXIT
 
 -- | Set parameter 'PARAM_TRIGGER_READ_GPI' (@\/reader\/trigger\/read\/Gpi@)
-paramSetTriggerReadGpi :: Reader -> [Word8] -> IO ()
+paramSetTriggerReadGpi :: Reader -> [PinNumber] -> IO ()
 paramSetTriggerReadGpi rdr = paramSet rdr PARAM_TRIGGER_READ_GPI
 
 -- | Get parameter 'PARAM_TRIGGER_READ_GPI' (@\/reader\/trigger\/read\/Gpi@)
-paramGetTriggerReadGpi :: Reader -> IO [Word8]
+paramGetTriggerReadGpi :: Reader -> IO [PinNumber]
 paramGetTriggerReadGpi rdr = paramGet rdr PARAM_TRIGGER_READ_GPI
 
 -- | Set parameter 'PARAM_METADATAFLAG' (@\/reader\/metadataflags@)
