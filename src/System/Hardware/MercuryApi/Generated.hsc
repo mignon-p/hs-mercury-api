@@ -106,7 +106,7 @@ data ReadPlan =
   SimpleReadPlan
   { rpWeight        :: !Word32          -- ^ The relative weight of this read plan
   , rpEnableAutonomousRead :: !Bool     -- ^ Option for Autonomous read
-  , rpAntennas      :: ![Word8]         -- ^ The list of antennas to read on
+  , rpAntennas      :: ![AntennaPort]   -- ^ The list of antennas to read on
   , rpProtocol      :: !TagProtocol     -- ^ The protocol to use for reading
   , rpFilter        :: !(Maybe TagFilter) -- ^ The filter to apply to reading
   , rpTagop         :: !(Maybe TagOp)   -- ^ The tag operation to apply to
@@ -621,7 +621,7 @@ data TagReadData =
   , trReadCount :: !(Word32) -- ^ Number of times the tag was read
   , trRssi :: !(Int32) -- ^ Strength of the signal received from the tag  (in either dBm, or a number between 0 and 128, depending on 'PARAM_TAGREADDATA_REPORTRSSIINDBM')
   , trFrequency :: !(Word32) -- ^ RF carrier frequency the tag was read with
-  , trTimestamp :: !(Word64) -- ^ Absolute time of the read, in milliseconds since 1\/1\/1970 UTC
+  , trTimestamp :: !(MillisecondsSinceEpoch) -- ^ Absolute time of the read, in milliseconds since 1\/1\/1970 UTC
   , trData :: !(ByteString) -- ^ Data read from the tag
   , trEpcMemData :: !(ByteString) -- ^ Read EPC bank data bytes  (Only if 'GEN2_BANK_EPC' is present in 'opExtraBanks')
   , trTidMemData :: !(ByteString) -- ^ Read TID bank data bytes  (Only if 'GEN2_BANK_TID' is present in 'opExtraBanks')

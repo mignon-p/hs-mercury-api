@@ -106,7 +106,7 @@ data ReadPlan =
   SimpleReadPlan
   { rpWeight        :: !Word32          -- ^ The relative weight of this read plan
   , rpEnableAutonomousRead :: !Bool     -- ^ Option for Autonomous read
-  , rpAntennas      :: ![Word8]         -- ^ The list of antennas to read on
+  , rpAntennas      :: ![AntennaPort]   -- ^ The list of antennas to read on
   , rpProtocol      :: !TagProtocol     -- ^ The protocol to use for reading
   , rpFilter        :: !(Maybe TagFilter) -- ^ The filter to apply to reading
   , rpTagop         :: !(Maybe TagOp)   -- ^ The tag operation to apply to

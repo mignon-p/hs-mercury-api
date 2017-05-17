@@ -875,7 +875,7 @@ sub split64Field {
 
     my %info;
     $info{"c"} = [$lo, $hi];
-    $info{"type"} = "Word64";
+    $info{"type"} = "MillisecondsSinceEpoch";
     $info{"comment"} = $comment;
     $info{"marshall"} = ["peekSplit64", "pokeSplit64"];
 
