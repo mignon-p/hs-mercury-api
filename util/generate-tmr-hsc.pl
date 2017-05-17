@@ -66,6 +66,7 @@ my %toHaskellType = (
     "TMR_Region" => "Region",
     "TMR_TagProtocol" => "TagProtocol",
     "TMR_ReadPlan"    => "ReadPlan",
+    "TMR_GEN2_Password" => "Word32",
     "TMR_TRD_MetadataFlag" => "[MetadataFlag]",
     "TMR_String" => "Text",
     "TMR_uint8List"  => "[Word8]",
@@ -112,6 +113,18 @@ my %extra = (
     "/reader/read/asyncOnTime" => "milliseconds",
     "/reader/region/hopTable" => "kHz",
     "/reader/region/hopTime" => "milliseconds",
+    );
+
+# typedefs for parameters
+my %typedefs = (
+    "PARAM_GEN2_ACCESSPASSWORD" => "GEN2_Password",
+    "PARAM_ANTENNA_PORTLIST" => "[AntennaPort]",
+    "PARAM_ANTENNA_CONNECTEDPORTLIST" => "[AntennaPort]",
+    "PARAM_ANTENNA_PORTSWITCHGPOS" => "[PinNumber]",
+    "PARAM_GPIO_INPUTLIST" => "[PinNumber]",
+    "PARAM_GPIO_OUTPUTLIST" => "[PinNumber]",
+    "PARAM_TAGOP_ANTENNA" => "AntennaPort",
+    "PARAM_TRIGGER_READ_GPI" => "[PinNumber]",
     );
 
 sub readStatus {
@@ -167,6 +180,11 @@ sub parseParamComment {
         $linkedType =~ s/(\w+)/'$1'/ if ($linkedType ne $nyi);
         my $xtra = "";
         if ($linkedType ne $nyi) {
+            if (exists $typedefs{$param}) {
+                my $typedef = $typedefs{$param};
+                $typedef =~ s/(\w+)/'$1'/;
+                $linkedType .= ", or typedef $typedef";
+            }
             if (exists $extra{$quoted}) {
                 $xtra = escapeHaddock($extra{$quoted});
             }
@@ -1150,13 +1168,13 @@ sub emitParamTypes {
     emit "-- | A textual representation of the Haskell type corresponding";
     emit "-- to a particular 'ParamType'.";
     emit "displayParamType :: ParamType -> Text";
-    foreach my $paramType (sort values %toHaskellType) {
+    foreach my $paramType (sort keys %ptn) {
         my $name = $ptn{$paramType};
         emit "displayParamType $name = \"$paramType\"";
     }
     emit "displayParamType _ = \"$nyi\"";
 
-    foreach my $paramType (sort values %toHaskellType) {
+    foreach my $paramType (sort keys %ptn) {
         my $name = $ptn{$paramType};
         emit "";
         emit "instance ParamValue $paramType where";

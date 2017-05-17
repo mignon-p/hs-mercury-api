@@ -43,6 +43,8 @@ module System.Hardware.MercuryApi.Params
   , paramGetAntennaPortSwitchGpos
   , paramSetAntennaPortSwitchGpos
     -- ** \/reader\/gen2
+  , paramGetGen2AccessPassword
+  , paramSetGen2AccessPassword
   , paramGetGen2WriteEarlyExit
   , paramSetGen2WriteEarlyExit
   , paramGetGen2WriteReplyTimeout
@@ -209,6 +211,14 @@ paramSetGpioOutputList rdr = paramSet rdr PARAM_GPIO_OUTPUTLIST
 -- | Get parameter 'PARAM_GPIO_OUTPUTLIST' (@\/reader\/gpio\/outputList@)
 paramGetGpioOutputList :: Reader -> IO [Word8]
 paramGetGpioOutputList rdr = paramGet rdr PARAM_GPIO_OUTPUTLIST
+
+-- | Set parameter 'PARAM_GEN2_ACCESSPASSWORD' (@\/reader\/gen2\/accessPassword@)
+paramSetGen2AccessPassword :: Reader -> Word32 -> IO ()
+paramSetGen2AccessPassword rdr = paramSet rdr PARAM_GEN2_ACCESSPASSWORD
+
+-- | Get parameter 'PARAM_GEN2_ACCESSPASSWORD' (@\/reader\/gen2\/accessPassword@)
+paramGetGen2AccessPassword :: Reader -> IO Word32
+paramGetGen2AccessPassword rdr = paramGet rdr PARAM_GEN2_ACCESSPASSWORD
 
 -- | Set parameter 'PARAM_READ_ASYNCOFFTIME' (@\/reader\/read\/asyncOffTime@) (milliseconds)
 paramSetReadAsyncOffTime :: Reader -> Word32 -> IO ()
