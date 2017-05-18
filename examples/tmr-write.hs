@@ -31,7 +31,7 @@ main = do
   TMR.paramSet rdr TMR.PARAM_TRANSPORTTIMEOUT (10000 :: Word32)
   TMR.connect rdr
 
-  TMR.paramSetBasics rdr TMR.REGION_NA2 500 TMR.sparkFunAntennas
+  TMR.paramSetBasics rdr TMR.REGION_NA2 2300 TMR.sparkFunAntennas
   TMR.paramSetTagReadDataRecordHighestRssi rdr True
   TMR.paramSetReadPlanFilter rdr (Just emptyUserDataFilter)
 
