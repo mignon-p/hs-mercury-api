@@ -79,6 +79,8 @@ module System.Hardware.MercuryApi
   , displayTagData
   , displayTagReadData
   , displayParamType
+  , displayRegion
+  , parseRegion
     -- * Types
     -- ** Opaque types
   , Reader
@@ -134,6 +136,7 @@ import Text.Printf
 import System.Console.ANSI
 import System.IO
 import qualified System.IO.Unsafe as U
+import Text.Read (readMaybe)
 
 import System.Hardware.MercuryApi.Generated
 
@@ -855,6 +858,19 @@ displayTagReadData trd =
     dat name bs = if B.null bs
                   then []
                   else ["  " <> name <> " = " <> displayByteString bs]
+
+regionPrefix :: T.Text
+regionPrefix = "REGION_"
+
+-- | Like 'show' for 'Region', but in lower case and without the
+-- @REGION_@ prefix.
+displayRegion :: Region -> T.Text
+displayRegion = T.toLower . T.pack . drop (T.length regionPrefix) . show
+
+-- | Like 'readMaybe' for 'Region', but case-insenstive and without the
+-- @REGION_@ prefix.
+parseRegion :: T.Text -> Maybe Region
+parseRegion = readMaybe . T.unpack . T.toUpper . T.append regionPrefix
 
 -- | Convert a 'B.ByteString' into a list of 'Word16', in big-endian
 -- order.  Padded with 0 if the number of bytes is odd.

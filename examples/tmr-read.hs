@@ -12,10 +12,13 @@ import Data.Word
 import Options.Applicative
 import System.Console.ANSI
 import qualified System.Hardware.MercuryApi as TMR
+import qualified System.Hardware.MercuryApi.Params as TMR
+import System.Exit
 import System.IO
 
 data Opts = Opts
   { oUri :: String
+  , oRegion :: String
   , oPower :: Int32
   , oListen :: Bool
   }
@@ -27,6 +30,11 @@ opts = Opts
                  metavar "URI" <>
                  help ("Reader to connect to (default " ++ defUri ++ ")") <>
                  value defUri)
+  <*> strOption (long "region" <>
+                 short 'r' <>
+                 metavar "REGION" <>
+                 help ("Regulatory region (default " ++ defRegion ++ ")") <>
+                 value defRegion)
   <*> option auto (long "power" <>
                    short 'p' <>
                    metavar "CENTI-DBM" <>
@@ -37,6 +45,7 @@ opts = Opts
               help "Print bytes sent on serial port")
   where
     defUri = "tmr:///dev/ttyUSB0"
+    defRegion = "na2"
     defPower = 2300
 
 opts' = info (helper <*> opts)
@@ -58,6 +67,34 @@ printInColor xs n = do
   mapM_ T.putStrLn xs
   setSGR [Reset]
 
+printRegionsAndFail :: TMR.Reader -> IO a
+printRegionsAndFail rdr = do
+  rgns <- TMR.paramGetRegionSupportedRegions rdr
+  T.putStrLn "Region must be one of:"
+  forM_ rgns $ \rgn -> T.putStrLn $ "  " <> TMR.displayRegion rgn
+  exitFailure
+
+parseRegionOrFail :: TMR.Reader -> String -> IO TMR.Region
+parseRegionOrFail rdr s =
+  case TMR.parseRegion (T.pack s) of
+    Nothing -> printRegionsAndFail rdr
+    Just rgn -> return rgn
+
+printPowerAndFail :: TMR.Reader -> IO a
+printPowerAndFail rdr = do
+  lo <- TMR.paramGetRadioPowerMin rdr
+  hi <- TMR.paramGetRadioPowerMax rdr
+  putStrLn $ "Power must be between " ++ show lo ++ " and " ++ show hi
+  exitFailure
+
+handleParamError :: TMR.Reader -> Either TMR.MercuryException () -> IO ()
+handleParamError _ (Right _) = return ()
+handleParamError rdr (Left err) = hpe (TMR.meStatus err)
+  where hpe TMR.ERROR_INVALID_REGION = printRegionsAndFail rdr
+        hpe TMR.ERROR_MSG_POWER_TOO_HIGH = printPowerAndFail rdr
+        hpe TMR.ERROR_MSG_POWER_TOO_LOW = printPowerAndFail rdr
+        hpe _ = throw err
+
 main = do
   o <- execParser opts'
 
@@ -68,7 +105,9 @@ main = do
   TMR.paramSet rdr TMR.PARAM_TRANSPORTTIMEOUT (10000 :: Word32)
   TMR.connect rdr
 
-  TMR.paramSetBasics rdr TMR.REGION_NA2 (oPower o) TMR.sparkFunAntennas
+  rgn <- parseRegionOrFail rdr (oRegion o)
+  eth <- try $ TMR.paramSetBasics rdr rgn (oPower o) TMR.sparkFunAntennas
+  handleParamError rdr eth
   TMR.paramSetReadPlanTagop rdr (Just readUser)
 
   tags <- TMR.read rdr 1000
