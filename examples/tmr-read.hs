@@ -5,7 +5,9 @@ import Control.Exception
 import Control.Monad
 import qualified Data.ByteString as B
 import Data.Int
+import Data.List
 import Data.Monoid
+import Data.Ord
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Word
@@ -15,12 +17,14 @@ import qualified System.Hardware.MercuryApi as TMR
 import qualified System.Hardware.MercuryApi.Params as TMR
 import System.Exit
 import System.IO
+import Text.Printf
 
 data Opts = Opts
   { oUri :: String
   , oRegion :: String
   , oPower :: Int32
   , oListen :: Bool
+  , oLong :: Bool
   }
 
 opts :: Parser Opts
@@ -43,6 +47,9 @@ opts = Opts
   <*> switch (long "transport-listener" <>
               short 't' <>
               help "Print bytes sent on serial port")
+  <*> switch (long "long" <>
+              short 'l' <>
+              help "Print lots of information per tag")
   where
     defUri = "tmr:///dev/ttyUSB0"
     defRegion = "na2"
@@ -95,6 +102,13 @@ handleParamError rdr (Left err) = hpe (TMR.meStatus err)
         hpe TMR.ERROR_MSG_POWER_TOO_LOW = printPowerAndFail rdr
         hpe _ = throw err
 
+displayTag :: TMR.TagReadData -> T.Text
+displayTag trd = strength <> " <" <> epc <> "> " <> user
+  where
+    strength = T.pack $ printf "%3d" (TMR.trRssi trd)
+    epc = TMR.bytesToHex $ TMR.tdEpc $ TMR.trTag trd
+    user = T.pack $ show $ B.takeWhile (/= 0) (TMR.trData trd)
+
 main = do
   o <- execParser opts'
 
@@ -108,10 +122,15 @@ main = do
   rgn <- parseRegionOrFail rdr (oRegion o)
   eth <- try $ TMR.paramSetBasics rdr rgn (oPower o) TMR.sparkFunAntennas
   handleParamError rdr eth
+  TMR.paramSetTagReadDataRecordHighestRssi rdr True
+  TMR.paramSetTagReadDataReportRssiInDbm rdr False
   TMR.paramSetReadPlanTagop rdr (Just readUser)
 
   tags <- TMR.read rdr 1000
-  putStrLn $ "read " ++ show (length tags) ++ " tags"
-  zipWithM_ printInColor (map TMR.displayTagReadData tags) [0..]
+  let tags' = reverse $ sortBy (comparing TMR.trRssi) tags
+  putStrLn $ "read " ++ show (length tags') ++ " tags"
+  if oLong o
+    then zipWithM_ printInColor (map TMR.displayTagReadData tags') [0..]
+    else forM_ tags' (T.putStrLn . displayTag)
 
   TMR.destroy rdr
