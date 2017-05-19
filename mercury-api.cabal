@@ -128,6 +128,7 @@ executable tmr-firmware
 
 executable tmr-read
   main-is:             tmr-read.hs
+  other-modules:       ExampleUtil
   build-depends:       base >= 4.6 && < 5
                      , ansi-terminal >= 0.6.2.3 && < 0.7
                      , bytestring >= 0.10.4 && < 0.11

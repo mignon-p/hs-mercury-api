@@ -19,6 +19,8 @@ import System.Exit
 import System.IO
 import Text.Printf
 
+import ExampleUtil
+
 data Opts = Opts
   { oUri :: String
   , oRegion :: String
@@ -74,59 +76,12 @@ printInColor xs n = do
   mapM_ T.putStrLn xs
   setSGR [Reset]
 
-printRegionsAndFail :: TMR.Reader -> IO a
-printRegionsAndFail rdr = do
-  rgns <- TMR.paramGetRegionSupportedRegions rdr
-  T.putStrLn "Region must be one of:"
-  forM_ rgns $ \rgn -> T.putStrLn $ "  " <> TMR.displayRegion rgn
-  exitFailure
-
-parseRegionOrFail :: TMR.Reader -> String -> IO TMR.Region
-parseRegionOrFail rdr s =
-  case TMR.parseRegion (T.pack s) of
-    Nothing -> printRegionsAndFail rdr
-    Just rgn -> return rgn
-
-printPowerAndFail :: TMR.Reader -> IO a
-printPowerAndFail rdr = do
-  lo <- TMR.paramGetRadioPowerMin rdr
-  hi <- TMR.paramGetRadioPowerMax rdr
-  putStrLn $ "Power must be between " ++ show lo ++ " and " ++ show hi
-  exitFailure
-
-handleParamError :: TMR.Reader -> Either TMR.MercuryException () -> IO ()
-handleParamError _ (Right _) = return ()
-handleParamError rdr (Left err) = hpe (TMR.meStatus err)
-  where hpe TMR.ERROR_INVALID_REGION = printRegionsAndFail rdr
-        hpe TMR.ERROR_MSG_POWER_TOO_HIGH = printPowerAndFail rdr
-        hpe TMR.ERROR_MSG_POWER_TOO_LOW = printPowerAndFail rdr
-        hpe _ = throw err
-
 displayTag :: TMR.TagReadData -> T.Text
 displayTag trd = strength <> " <" <> epc <> "> " <> user
   where
     strength = T.pack $ printf "%3d" (TMR.trRssi trd)
     epc = TMR.bytesToHex $ TMR.tdEpc $ TMR.trTag trd
     user = T.pack $ show $ B.takeWhile (/= 0) (TMR.trData trd)
-
-createAndConnect :: String -> Bool -> IO TMR.Reader
-createAndConnect uri listen = do
-  rdr <- TMR.create $ T.pack uri
-  when (listen) $ do
-    listener <- TMR.hexListener stdout
-    void $ TMR.addTransportListener rdr listener
-  TMR.paramSet rdr TMR.PARAM_TRANSPORTTIMEOUT (10000 :: Word32)
-  TMR.connect rdr
-  return rdr
-
-createConnectAndParams :: String -> Bool -> String -> Int32 -> IO TMR.Reader
-createConnectAndParams uri listen region power = do
-  rdr <- createAndConnect uri listen
-  rgn <- parseRegionOrFail rdr region
-  eth <- try $ TMR.paramSetBasics rdr rgn power TMR.sparkFunAntennas
-  handleParamError rdr eth
-  TMR.paramSetTagReadDataRecordHighestRssi rdr True
-  return rdr
 
 main = do
   o <- execParser opts'
