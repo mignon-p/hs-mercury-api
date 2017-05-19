@@ -24,14 +24,8 @@ data Opts = Opts
 
 opts :: Parser Opts
 opts = Opts
-  <$> strOption (long "uri" <>
-                 short 'u' <>
-                 metavar "URI" <>
-                 help ("Reader to connect to (default " ++ defUri ++ ")") <>
-                 value defUri)
-  <*> switch (long "transport-listener" <>
-              short 't' <>
-              help "Print bytes sent on serial port")
+  <$> optUri
+  <*> optListen
 
 opts' = info (helper <*> opts)
   ( fullDesc <>

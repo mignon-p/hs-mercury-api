@@ -3,9 +3,10 @@
 module ExampleUtil
   ( createAndConnect
   , createConnectAndParams
-  , defUri
-  , defRegion
-  , defPower
+  , optUri
+  , optRegion
+  , optPower
+  , optListen
   ) where
 
 import Control.Exception
@@ -15,6 +16,7 @@ import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Word
+import Options.Applicative
 import qualified System.Hardware.MercuryApi as TMR
 import qualified System.Hardware.MercuryApi.Params as TMR
 import System.Exit
@@ -75,3 +77,29 @@ defRegion = "na2"
 
 defPower :: Int32
 defPower = 2300
+
+optUri :: Parser String
+optUri = strOption (long "uri" <>
+                    short 'u' <>
+                    metavar "URI" <>
+                    help ("Reader to connect to (default " ++ defUri ++ ")") <>
+                    value defUri)
+
+optRegion :: Parser String
+optRegion = strOption (long "region" <>
+                       short 'r' <>
+                       metavar "REGION" <>
+                       help ("Regulatory region (default " ++ defRegion ++ ")") <>
+                       value defRegion)
+
+optPower :: Parser Int32
+optPower = option auto (long "power" <>
+                        short 'p' <>
+                        metavar "CENTI-DBM" <>
+                        help ("Power level (0-2700, default " ++ show defPower ++ ")") <>
+                        value defPower)
+
+optListen :: Parser Bool
+optListen = switch (long "transport-listener" <>
+                    short 't' <>
+                    help "Print bytes sent on serial port")

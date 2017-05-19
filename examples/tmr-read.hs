@@ -31,24 +31,10 @@ data Opts = Opts
 
 opts :: Parser Opts
 opts = Opts
-  <$> strOption (long "uri" <>
-                 short 'u' <>
-                 metavar "URI" <>
-                 help ("Reader to connect to (default " ++ defUri ++ ")") <>
-                 value defUri)
-  <*> strOption (long "region" <>
-                 short 'r' <>
-                 metavar "REGION" <>
-                 help ("Regulatory region (default " ++ defRegion ++ ")") <>
-                 value defRegion)
-  <*> option auto (long "power" <>
-                   short 'p' <>
-                   metavar "CENTI-DBM" <>
-                   help ("Power level (0-2700, default " ++ show defPower ++ ")") <>
-                   value defPower)
-  <*> switch (long "transport-listener" <>
-              short 't' <>
-              help "Print bytes sent on serial port")
+  <$> optUri
+  <*> optRegion
+  <*> optPower
+  <*> optListen
   <*> switch (long "long" <>
               short 'l' <>
               help "Print lots of information per tag")
