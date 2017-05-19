@@ -109,20 +109,29 @@ displayTag trd = strength <> " <" <> epc <> "> " <> user
     epc = TMR.bytesToHex $ TMR.tdEpc $ TMR.trTag trd
     user = T.pack $ show $ B.takeWhile (/= 0) (TMR.trData trd)
 
-main = do
-  o <- execParser opts'
-
-  rdr <- TMR.create $ T.pack $ oUri o
-  when (oListen o) $ do
+createAndConnect :: String -> Bool -> IO TMR.Reader
+createAndConnect uri listen = do
+  rdr <- TMR.create $ T.pack uri
+  when (listen) $ do
     listener <- TMR.hexListener stdout
     void $ TMR.addTransportListener rdr listener
   TMR.paramSet rdr TMR.PARAM_TRANSPORTTIMEOUT (10000 :: Word32)
   TMR.connect rdr
+  return rdr
 
-  rgn <- parseRegionOrFail rdr (oRegion o)
-  eth <- try $ TMR.paramSetBasics rdr rgn (oPower o) TMR.sparkFunAntennas
+createConnectAndParams :: String -> Bool -> String -> Int32 -> IO TMR.Reader
+createConnectAndParams uri listen region power = do
+  rdr <- createAndConnect uri listen
+  rgn <- parseRegionOrFail rdr region
+  eth <- try $ TMR.paramSetBasics rdr rgn power TMR.sparkFunAntennas
   handleParamError rdr eth
   TMR.paramSetTagReadDataRecordHighestRssi rdr True
+  return rdr
+
+main = do
+  o <- execParser opts'
+
+  rdr <- createConnectAndParams (oUri o) (oListen o) (oRegion o) (oPower o)
   TMR.paramSetReadPlanTagop rdr (Just readUser)
 
   tags <- TMR.read rdr 1000
