@@ -11,9 +11,34 @@ import Data.Ord
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Word
+import Options.Applicative
 import qualified System.Hardware.MercuryApi as TMR
 import qualified System.Hardware.MercuryApi.Params as TMR
 import System.IO
+
+import ExampleUtil
+
+data Opts = Opts
+  { oUri :: String
+  , oRegion :: String
+  , oPower :: Int32
+  , oListen :: Bool
+  , oRewrite :: Bool
+  }
+
+opts :: Parser Opts
+opts = Opts
+  <$> optUri
+  <*> optRegion
+  <*> optPower
+  <*> optListen
+  <*> switch (long "rewrite" <>
+              short 'R' <>
+              help "Write to a tag even if written before")
+
+opts' = info (helper <*> opts)
+  ( fullDesc <>
+    header "tmr-write - write a string to user data of tag" )
 
 emptyUserDataFilter :: TMR.TagFilter
 emptyUserDataFilter = TMR.TagFilterGen2
@@ -25,15 +50,11 @@ emptyUserDataFilter = TMR.TagFilterGen2
   }
 
 main = do
-  rdr <- TMR.create "tmr:///dev/ttyUSB0"
-  listener <- TMR.hexListener stdout
-  TMR.addTransportListener rdr listener
-  TMR.paramSet rdr TMR.PARAM_TRANSPORTTIMEOUT (10000 :: Word32)
-  TMR.connect rdr
+  o <- execParser opts'
 
-  TMR.paramSetBasics rdr TMR.REGION_NA2 2300 TMR.sparkFunAntennas
-  TMR.paramSetTagReadDataRecordHighestRssi rdr True
-  TMR.paramSetReadPlanFilter rdr (Just emptyUserDataFilter)
+  rdr <- createConnectAndParams (oUri o) (oListen o) (oRegion o) (oPower o)
+  when (not $ oRewrite o) $
+    TMR.paramSetReadPlanFilter rdr (Just emptyUserDataFilter)
 
   tags <- TMR.read rdr 1000
   putStrLn $ "read " ++ show (length tags) ++ " tags"
