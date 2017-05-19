@@ -52,10 +52,6 @@ opts = Opts
   <*> switch (long "long" <>
               short 'l' <>
               help "Print lots of information per tag")
-  where
-    defUri = "tmr:///dev/ttyUSB0"
-    defRegion = "na2"
-    defPower = 2300
 
 opts' = info (helper <*> opts)
   ( fullDesc <>

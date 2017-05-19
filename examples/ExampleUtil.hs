@@ -3,6 +3,9 @@
 module ExampleUtil
   ( createAndConnect
   , createConnectAndParams
+  , defUri
+  , defRegion
+  , defPower
   ) where
 
 import Control.Exception
@@ -63,3 +66,12 @@ createConnectAndParams uri listen region power = do
   handleParamError rdr eth
   TMR.paramSetTagReadDataRecordHighestRssi rdr True
   return rdr
+
+defUri :: String
+defUri = "tmr:///dev/ttyUSB0"
+
+defRegion :: String
+defRegion = "na2"
+
+defPower :: Int32
+defPower = 2300

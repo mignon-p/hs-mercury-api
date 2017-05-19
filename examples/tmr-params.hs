@@ -9,20 +9,39 @@ import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Word
+import Options.Applicative
 import System.Console.ANSI
 import qualified System.Hardware.MercuryApi as TMR
 import qualified System.Hardware.MercuryApi.Params as TMR
 import System.IO
 
+import ExampleUtil
+
+data Opts = Opts
+  { oUri :: String
+  , oListen :: Bool
+  }
+
+opts :: Parser Opts
+opts = Opts
+  <$> strOption (long "uri" <>
+                 short 'u' <>
+                 metavar "URI" <>
+                 help ("Reader to connect to (default " ++ defUri ++ ")") <>
+                 value defUri)
+  <*> switch (long "transport-listener" <>
+              short 't' <>
+              help "Print bytes sent on serial port")
+
+opts' = info (helper <*> opts)
+  ( fullDesc <>
+    header "tmr-params - print parameters" )
+
 main = do
+  o <- execParser opts'
   T.putStrLn $ "API version: " <> TMR.apiVersion
-  rdr <- TMR.create "tmr:///dev/ttyUSB0"
-  {-
-  listener <- TMR.hexListener stdout
-  TMR.addTransportListener rdr listener
-  -}
-  TMR.paramSetTransportTimeout rdr 10000
-  TMR.connect rdr
+  rdr <- createAndConnect (oUri o) (oListen o)
+
   params <- TMR.paramList rdr
   forM_ params $ \param -> do
     setSGR [SetColor Foreground Vivid Blue]
