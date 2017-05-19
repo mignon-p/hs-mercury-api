@@ -123,8 +123,6 @@ main = do
   eth <- try $ TMR.paramSetBasics rdr rgn (oPower o) TMR.sparkFunAntennas
   handleParamError rdr eth
   TMR.paramSetTagReadDataRecordHighestRssi rdr True
-  -- doesn't seem to work:
-  -- TMR.paramSetTagReadDataReportRssiInDbm rdr False
   TMR.paramSetReadPlanTagop rdr (Just readUser)
 
   tags <- TMR.read rdr 1000

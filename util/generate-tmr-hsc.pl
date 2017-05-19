@@ -1012,11 +1012,6 @@ sub emitTagReadData {
     deleteUnderscoreFields (\%fields);
 
     # fields that need special handling:
-    # add to comment for rssi
-    $fields{"rssi"}{"comment"} .=
-        "  (in either dBm, or a number between 0 and 128, " .
-        "depending on 'PARAM_TAGREADDATA_REPORTRSSIINDBM')";
-
     # metadataFlags as list of flags
     wrapField (\%fields, "metadataFlags", "unpackFlags16", "packFlags16");
     $fields{"metadataFlags"}{"type"} = "[MetadataFlag]";
