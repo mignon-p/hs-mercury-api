@@ -9,6 +9,8 @@ import Data.List
 import Data.Monoid
 import Data.Ord
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
+import qualified Data.Text.Encoding.Error as T
 import qualified Data.Text.IO as T
 import Data.Word
 import Options.Applicative
@@ -24,6 +26,7 @@ data Opts = Opts
   , oPower :: Int32
   , oListen :: Bool
   , oRewrite :: Bool
+  , oString :: String
   }
 
 opts :: Parser Opts
@@ -35,6 +38,7 @@ opts = Opts
   <*> switch (long "rewrite" <>
               short 'R' <>
               help "Write to a tag even if written before")
+  <*> argument str (metavar "STRING")
 
 opts' = info (helper <*> opts)
   ( fullDesc <>
@@ -65,7 +69,8 @@ main = do
         hex = TMR.bytesToHex epc
     T.putStrLn $ "writing <" <> hex <> ">"
     let epcFilt = TMR.TagFilterEPC td
-        words = TMR.packBytesIntoWords "Hello, World!"
+        txt = T.pack (oString o)
+        words = TMR.packBytesIntoWords $ T.encodeUtf8 txt
         opWrite = TMR.TagOp_GEN2_WriteData
                   { TMR.opBank = TMR.GEN2_BANK_USER
                   , TMR.opWordAddress = 0
