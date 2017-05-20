@@ -703,6 +703,9 @@ data TagOp =
     , opAction :: !([GEN2_LockBits]) -- ^ New values of each bit specified in the mask
     , opAccessPassword :: !(GEN2_Password) -- ^ Access Password to use to lock the tag
     }
+  | TagOp_GEN2_Kill
+    { opPassword :: !(GEN2_Password) -- ^ Kill password to use to kill the tag
+    }
   deriving (Eq, Ord, Show, Read)
 
 instance Storable TagOp where
@@ -743,6 +746,10 @@ instance Storable TagOp where
           <$> (unpackLockBits16 <$> peek pTagop_u_gen2_u_lock_mask)
           <*> (unpackLockBits16 <$> peek pTagop_u_gen2_u_lock_action)
           <*> (peek pTagop_u_gen2_u_lock_accessPassword)
+      #{const TMR_TAGOP_GEN2_KILL} -> do
+        let pTagop_u_gen2_u_kill_password = #{ptr TagOpEtc, tagop.u.gen2.u.kill.password} p
+        TagOp_GEN2_Kill
+          <$> (peek pTagop_u_gen2_u_kill_password)
 
   poke p x@(TagOp_GEN2_WriteTag {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_WRITETAG} :: #{type TMR_TagOpType})
@@ -766,6 +773,10 @@ instance Storable TagOp where
     poke (#{ptr TagOpEtc, tagop.u.gen2.u.lock.mask} p) (packLockBits16 $ opMask x)
     poke (#{ptr TagOpEtc, tagop.u.gen2.u.lock.action} p) (packLockBits16 $ opAction x)
     poke (#{ptr TagOpEtc, tagop.u.gen2.u.lock.accessPassword} p) (opAccessPassword x)
+
+  poke p x@(TagOp_GEN2_Kill {}) = do
+    #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_KILL} :: #{type TMR_TagOpType})
+    poke (#{ptr TagOpEtc, tagop.u.gen2.u.kill.password} p) (opPassword x)
 
 -- | Indicates a general category of error.
 data StatusType =

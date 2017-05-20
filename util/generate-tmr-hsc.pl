@@ -1045,7 +1045,7 @@ sub emitTagReadData {
 }
 
 sub emitTagOp {
-    my @ops = (qw(writeTag writeData readData lock));
+    my @ops = (qw(writeTag writeData readData lock kill));
 
     my $hType = "TagOp";
     my $prefix = "op";
