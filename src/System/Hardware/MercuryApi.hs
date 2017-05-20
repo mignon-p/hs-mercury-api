@@ -47,7 +47,7 @@ module System.Hardware.MercuryApi
     -- numbered 1-4.  On the
     -- <https://www.sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>,
     -- GPIO 1 is available on the GPIO1 pin, and GPIOs 2, 3, and 4 are available
-    -- on the LV2, LV3, and LV4 pins.  The GPIO1 pin is 5V tolerant, but
+    -- on the LV2, LV3, and LV4 pins.  The GPIO1 pin is 5V, but
     -- <https://learn.sparkfun.com/tutorials/simultaneous-rfid-tag-reader-hookup-guide/hardware-overview the LV pins are 3.3V only>.
     -- To configure GPIOs as inputs or outputs, use 'PARAM_GPIO_INPUTLIST'
     -- and 'PARAM_GPIO_OUTPUTLIST'.
@@ -668,7 +668,7 @@ paramSetReadPlanTagop rdr op = do
   plan <- paramGet rdr PARAM_READ_PLAN
   paramSet rdr PARAM_READ_PLAN plan { rpTagop = op }
 
--- | Get the read plan that the reader starts out with by default.
+-- | The read plan that the reader starts out with by default.
 -- This has reasonable settings for most things, except for the
 -- antennas, which need to be set.  (e. g. set 'rpAntennas' to
 -- 'sparkFunAntennas')

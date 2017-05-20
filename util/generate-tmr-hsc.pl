@@ -201,7 +201,7 @@ sub parseParamComment {
         return ($haskellType, "\@$equoted\@ $linkedType$xtra", $quoted);
     } else {
         my $ec = escapeHaddock($c);
-        $ec =~ s/(return value from) TMR_paramID\(\)/$1 \@paramID\@/;
+        $ec =~ s/(return value from) TMR_paramID\(\)/$1 'System.Hardware.MercuryApi.paramID'/;
         return ("", $ec, "");
     }
 }
@@ -1021,6 +1021,9 @@ sub emitTagReadData {
     deleteUnderscoreFields (\%fields);
 
     # fields that need special handling:
+    # use AntennaPort typedef instead of Word8
+    $fields{"antenna"}{"type"} = "AntennaPort";
+
     # metadataFlags as list of flags
     wrapField (\%fields, "metadataFlags", "unpackFlags16", "packFlags16");
     $fields{"metadataFlags"}{"type"} = "[MetadataFlag]";

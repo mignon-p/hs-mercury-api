@@ -628,7 +628,7 @@ data TagReadData =
   { trTag :: !(TagData) -- ^ The tag that was read
   , trMetadataFlags :: !([MetadataFlag]) -- ^ The set of metadata items below that are valid
   , trPhase :: !(Word16) -- ^ Tag response phase
-  , trAntenna :: !(Word8) -- ^ Antenna where the tag was read
+  , trAntenna :: !(AntennaPort) -- ^ Antenna where the tag was read
   , trGpio :: !([GpioPin]) -- ^ State of GPIO pins at the moment of the tag read
   , trReadCount :: !(Word32) -- ^ Number of times the tag was read
   , trRssi :: !(Int32) -- ^ Strength of the signal received from the tag
@@ -1199,7 +1199,7 @@ type RawParam = #{type TMR_Param}
 -- binding.  Please file a Github issue if there is a parameter
 -- you need which is not implemented.
 data Param =
-    PARAM_NONE -- ^ No such parameter - used as a return value from @paramID@.
+    PARAM_NONE -- ^ No such parameter - used as a return value from 'System.Hardware.MercuryApi.paramID'.
   | PARAM_BAUDRATE -- ^ @\/reader\/baudRate@ 'Word32'
   | PARAM_COMMANDTIMEOUT -- ^ @\/reader\/commandTimeout@ 'Word32' (milliseconds)
   | PARAM_CURRENTTIME -- ^ @\/reader\/currentTime@ (Not yet implemented)
