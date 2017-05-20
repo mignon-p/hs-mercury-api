@@ -320,6 +320,18 @@ packExtraBanks = packBits fromExtraBank
 unpackExtraBanks :: RawBank -> [GEN2_Bank]
 unpackExtraBanks = unpackBits fromExtraBank
 
+packLockBits :: [GEN2_LockBits] -> RawLockBits
+packLockBits = packBits fromLockBits
+
+unpackLockBits :: RawLockBits -> [GEN2_LockBits]
+unpackLockBits = unpackBits fromLockBits
+
+packLockBits16 :: [GEN2_LockBits] -> Word16
+packLockBits16 = fromIntegral . packLockBits
+
+unpackLockBits16 :: Word16 -> [GEN2_LockBits]
+unpackLockBits16 = unpackLockBits . fromIntegral
+
 peekArrayAsByteString :: Ptr Word8 -> Ptr Word8 -> IO ByteString
 peekArrayAsByteString arrayPtr lenPtr = do
   len <- peek lenPtr

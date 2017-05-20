@@ -320,6 +320,18 @@ packExtraBanks = packBits fromExtraBank
 unpackExtraBanks :: RawBank -> [GEN2_Bank]
 unpackExtraBanks = unpackBits fromExtraBank
 
+packLockBits :: [GEN2_LockBits] -> RawLockBits
+packLockBits = packBits fromLockBits
+
+unpackLockBits :: RawLockBits -> [GEN2_LockBits]
+unpackLockBits = unpackBits fromLockBits
+
+packLockBits16 :: [GEN2_LockBits] -> Word16
+packLockBits16 = fromIntegral . packLockBits
+
+unpackLockBits16 :: Word16 -> [GEN2_LockBits]
+unpackLockBits16 = unpackLockBits . fromIntegral
+
 peekArrayAsByteString :: Ptr Word8 -> Ptr Word8 -> IO ByteString
 peekArrayAsByteString arrayPtr lenPtr = do
   len <- peek lenPtr
@@ -686,6 +698,11 @@ data TagOp =
     , opWordAddress :: !(Word32) -- ^ Word address to start reading at
     , opLen :: !(Word8) -- ^ Number of words to read
     }
+  | TagOp_GEN2_Lock
+    { opMask :: !([GEN2_LockBits]) -- ^ Bitmask indicating which lock bits to change
+    , opAction :: !([GEN2_LockBits]) -- ^ New values of each bit specified in the mask
+    , opAccessPassword :: !(GEN2_Password) -- ^ Access Password to use to lock the tag
+    }
   deriving (Eq, Ord, Show, Read)
 
 instance Storable TagOp where
@@ -718,6 +735,14 @@ instance Storable TagOp where
           <*> (unpackExtraBanks <$> peek pTagop_u_gen2_u_readData_bank)
           <*> (peek pTagop_u_gen2_u_readData_wordAddress)
           <*> (peek pTagop_u_gen2_u_readData_len)
+      #{const TMR_TAGOP_GEN2_LOCK} -> do
+        let pTagop_u_gen2_u_lock_mask = #{ptr TagOpEtc, tagop.u.gen2.u.lock.mask} p
+            pTagop_u_gen2_u_lock_action = #{ptr TagOpEtc, tagop.u.gen2.u.lock.action} p
+            pTagop_u_gen2_u_lock_accessPassword = #{ptr TagOpEtc, tagop.u.gen2.u.lock.accessPassword} p
+        TagOp_GEN2_Lock
+          <$> (unpackLockBits16 <$> peek pTagop_u_gen2_u_lock_mask)
+          <*> (unpackLockBits16 <$> peek pTagop_u_gen2_u_lock_action)
+          <*> (peek pTagop_u_gen2_u_lock_accessPassword)
 
   poke p x@(TagOp_GEN2_WriteTag {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_WRITETAG} :: #{type TMR_TagOpType})
@@ -735,6 +760,12 @@ instance Storable TagOp where
     pokeOr (#{ptr TagOpEtc, tagop.u.gen2.u.readData.bank} p) (packExtraBanks $ opExtraBanks x)
     poke (#{ptr TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p) (opWordAddress x)
     poke (#{ptr TagOpEtc, tagop.u.gen2.u.readData.len} p) (opLen x)
+
+  poke p x@(TagOp_GEN2_Lock {}) = do
+    #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_LOCK} :: #{type TMR_TagOpType})
+    poke (#{ptr TagOpEtc, tagop.u.gen2.u.lock.mask} p) (packLockBits16 $ opMask x)
+    poke (#{ptr TagOpEtc, tagop.u.gen2.u.lock.action} p) (packLockBits16 $ opAction x)
+    poke (#{ptr TagOpEtc, tagop.u.gen2.u.lock.accessPassword} p) (opAccessPassword x)
 
 -- | Indicates a general category of error.
 data StatusType =
@@ -1115,6 +1146,34 @@ fromExtraBank GEN2_BANK_RESERVED = #{const TMR_GEN2_BANK_RESERVED_ENABLED}
 fromExtraBank GEN2_BANK_EPC = #{const TMR_GEN2_BANK_EPC_ENABLED}
 fromExtraBank GEN2_BANK_TID = #{const TMR_GEN2_BANK_TID_ENABLED}
 fromExtraBank GEN2_BANK_USER = #{const TMR_GEN2_BANK_USER_ENABLED}
+
+type RawLockBits = #{type TMR_GEN2_LockBits}
+
+-- | Memory lock bits
+data GEN2_LockBits =
+    GEN2_LOCK_BITS_USER_PERM -- ^ User memory bank lock permalock bit
+  | GEN2_LOCK_BITS_USER -- ^ User memory bank lock bit
+  | GEN2_LOCK_BITS_TID_PERM -- ^ TID memory bank lock permalock bit
+  | GEN2_LOCK_BITS_TID -- ^ TID memory bank lock bit
+  | GEN2_LOCK_BITS_EPC_PERM -- ^ EPC memory bank lock permalock bit
+  | GEN2_LOCK_BITS_EPC -- ^ EPC memory bank lock bit
+  | GEN2_LOCK_BITS_ACCESS_PERM -- ^ Access password lock permalock bit
+  | GEN2_LOCK_BITS_ACCESS -- ^ Access password lock bit
+  | GEN2_LOCK_BITS_KILL_PERM -- ^ Kill password lock permalock bit
+  | GEN2_LOCK_BITS_KILL -- ^ Kill password lock bit
+  deriving (Eq, Ord, Show, Read, Bounded, Enum)
+
+fromLockBits :: GEN2_LockBits -> RawLockBits
+fromLockBits GEN2_LOCK_BITS_USER_PERM = #{const TMR_GEN2_LOCK_BITS_USER_PERM}
+fromLockBits GEN2_LOCK_BITS_USER = #{const TMR_GEN2_LOCK_BITS_USER}
+fromLockBits GEN2_LOCK_BITS_TID_PERM = #{const TMR_GEN2_LOCK_BITS_TID_PERM}
+fromLockBits GEN2_LOCK_BITS_TID = #{const TMR_GEN2_LOCK_BITS_TID}
+fromLockBits GEN2_LOCK_BITS_EPC_PERM = #{const TMR_GEN2_LOCK_BITS_EPC_PERM}
+fromLockBits GEN2_LOCK_BITS_EPC = #{const TMR_GEN2_LOCK_BITS_EPC}
+fromLockBits GEN2_LOCK_BITS_ACCESS_PERM = #{const TMR_GEN2_LOCK_BITS_ACCESS_PERM}
+fromLockBits GEN2_LOCK_BITS_ACCESS = #{const TMR_GEN2_LOCK_BITS_ACCESS}
+fromLockBits GEN2_LOCK_BITS_KILL_PERM = #{const TMR_GEN2_LOCK_BITS_KILL_PERM}
+fromLockBits GEN2_LOCK_BITS_KILL = #{const TMR_GEN2_LOCK_BITS_KILL}
 
 type RawParam = #{type TMR_Param}
 

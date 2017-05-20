@@ -36,6 +36,9 @@ my @metadataFlags = ();
 my @banks = ();
 my %banks = ();
 
+my @lockBits = ();
+my %lockBits = ();
+
 my %tagDataStructs = ();
 my %gen2Structs = ();
 my %gpioStructs = ();
@@ -84,6 +87,7 @@ my %toHaskellType2 = (
     "TMR_TagData" => "TagData",
     "TMR_GEN2_Bank" => "GEN2_Bank",
     "TMR_uint16List" => "[Word16]",
+    "TMR_GEN2_Password" => "GEN2_Password",
     );
 
 my %listSize = (
@@ -325,6 +329,11 @@ sub readGen2 {
             my $bank = $1;
             push @banks, $bank;
             $banks{$bank} = escapeHaddock($comment);
+            $comment = "";
+        } elsif (/^\s+TMR_(GEN2_LOCK_BITS_\w+)\s/) {
+            my $lockBit = $1;
+            push @lockBits, $lockBit;
+            $lockBits{$lockBit} = escapeHaddock($comment);
             $comment = "";
         } elsif (m%^\s+/\*\*\s*(.*?)\s*\*/%) {
             $comment = $1;
@@ -1036,7 +1045,7 @@ sub emitTagReadData {
 }
 
 sub emitTagOp {
-    my @ops = (qw(writeTag writeData readData));
+    my @ops = (qw(writeTag writeData readData lock));
 
     my $hType = "TagOp";
     my $prefix = "op";
@@ -1104,6 +1113,12 @@ sub emitTagOp {
     }
     @$readDataFields = @newFields;
     wrapField ($readDataInfo, "extraBanks", "unpackExtraBanks", "packExtraBanks");
+
+    my $lockInfo = $constInfo{"TagOp_GEN2_Lock"}{"info"};
+    foreach my $field ("mask", "action") {
+        wrapField ($lockInfo, $field, "unpackLockBits16", "packLockBits16");
+        $lockInfo->{$field}{'type'} = "[GEN2_LockBits]";
+    }
 
     emit "-- | An operation that can be performed on a tag.  Can be used";
     emit '-- as an argument to @executeTagOp@, or can be embedded into';
@@ -1319,6 +1334,21 @@ sub emitBanks {
     emit "";
 }
 
+sub emitLockBits {
+    emit "type RawLockBits = #{type TMR_GEN2_LockBits}";
+    emit "";
+
+    emit "-- | Memory lock bits";
+    emit "data GEN2_LockBits =";
+    emitEnum (\@lockBits, \%lockBits);
+    emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
+    emit "";
+
+    emit "fromLockBits :: GEN2_LockBits -> RawLockBits";
+    emitFrom ("fromLockBits", "TMR_", \@lockBits);
+    emit "";
+}
+
 sub paramBase {
     my ($x) = @_;
     $x =~ s%/[^/]+$%%;
@@ -1492,6 +1522,7 @@ emitRegion();
 emitTagProtocol();
 emitMetadataFlags();
 emitBanks();
+emitLockBits();
 emitParams();
 emitParamTypes();
 
