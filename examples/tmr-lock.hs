@@ -77,11 +77,20 @@ main = do
                   , TMR.opWordAddress = 0
                   , TMR.opData = TMR.packBytesIntoWords "This should fail"
                   }
-    void $ TMR.executeTagOp rdr opWrite2 (Just epcFilt)
-    {-
+    eth <- try $ TMR.executeTagOp rdr opWrite2 (Just epcFilt)
     case eth of
-      Nothing -> T.putStrLn "Write succeeded, but it shouldn't have."
-      Just err -> when (meStatus err /= TODO)
-    -}
+      Right _ ->
+        T.putStrLn "Write succeeded, but it shouldn't have."
+      Left err ->
+        when (TMR.meStatus err /= TMR.ERROR_PROTOCOL_WRITE_FAILED &&
+              TMR.meStatus err /= TMR.ERROR_PROTOCOL_BIT_DECODING_FAILED) $ throw err
+
+    T.putStrLn $ "unlocking <" <> hex <> ">"
+    let opUnlock = TMR.TagOp_GEN2_Lock
+                   { TMR.opMask   = [TMR.GEN2_LOCK_BITS_USER]
+                   , TMR.opAction = []
+                   , TMR.opAccessPassword = password
+                   }
+    void $ TMR.executeTagOp rdr opUnlock (Just epcFilt)
 
   TMR.destroy rdr
