@@ -1068,6 +1068,26 @@ fromRegion REGION_NA3 = #{const TMR_REGION_NA3}
 fromRegion REGION_IS = #{const TMR_REGION_IS}
 fromRegion REGION_OPEN = #{const TMR_REGION_OPEN}
 
+-- | A description of the given region, useful for a user interface.
+displayRegionDescription :: Region -> Text
+displayRegionDescription REGION_NONE = "Unspecified region"
+displayRegionDescription REGION_NA = "North America"
+displayRegionDescription REGION_EU = "European Union"
+displayRegionDescription REGION_KR = "Korea"
+displayRegionDescription REGION_IN = "India"
+displayRegionDescription REGION_JP = "Japan"
+displayRegionDescription REGION_PRC = "People's Republic of China"
+displayRegionDescription REGION_EU2 = "European Union 2"
+displayRegionDescription REGION_EU3 = "European Union 3"
+displayRegionDescription REGION_KR2 = "Korea 2"
+displayRegionDescription REGION_PRC2 = "People's Republic of China(840MHZ)"
+displayRegionDescription REGION_AU = "Australia"
+displayRegionDescription REGION_NZ = "New Zealand !!EXPERIMENTAL!!"
+displayRegionDescription REGION_NA2 = "Reduced FCC region"
+displayRegionDescription REGION_NA3 = "5MHZ FCC band"
+displayRegionDescription REGION_IS = "Israel"
+displayRegionDescription REGION_OPEN = "Open"
+
 type RawTagProtocol = #{type TMR_TagProtocol}
 
 -- | The protocol used by an RFID tag.  Only 'TAG_PROTOCOL_GEN2'

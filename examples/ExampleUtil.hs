@@ -26,7 +26,11 @@ printRegionsAndFail :: TMR.Reader -> IO a
 printRegionsAndFail rdr = do
   rgns <- TMR.paramGetRegionSupportedRegions rdr
   T.putStrLn "Region must be one of:"
-  forM_ rgns $ \rgn -> T.putStrLn $ "  " <> TMR.displayRegion rgn
+  forM_ rgns $ \rgn -> do
+    let dr = TMR.displayRegion rgn
+        nSpaces = 6 - T.length dr
+        spaces = T.replicate nSpaces " "
+    T.putStrLn $ "  " <> dr <> spaces <> TMR.displayRegionDescription rgn
   exitFailure
 
 parseRegionOrFail :: TMR.Reader -> String -> IO TMR.Region

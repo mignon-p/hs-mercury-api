@@ -79,6 +79,7 @@ module System.Hardware.MercuryApi
   , displayTagReadData
   , displayParamType
   , displayRegion
+  , displayRegionDescription
   , parseRegion
     -- * Constants
   , apiVersion

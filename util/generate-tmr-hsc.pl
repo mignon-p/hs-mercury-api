@@ -28,6 +28,7 @@ my %paramReadOnly = ();
 
 my @regions = ();
 my %regions = ();
+my %regionsUnescaped = ();
 
 my @tagProtocols = ();
 
@@ -258,6 +259,7 @@ sub readRegion {
         if (m%^\s*/\*\*\s*(.*?)\s*\*+/\s*TMR_(REGION_\w+)%) {
             push @regions, $2;
             $regions{$2} = escapeHaddock($1);
+            $regionsUnescaped{$2} = $1;
         }
     }
     close F;
@@ -1270,6 +1272,14 @@ sub emitRegion {
 
     emit "fromRegion :: Region -> RawRegion";
     emitFrom ("fromRegion", "TMR_", \@regions);
+    emit "";
+
+    emit "-- | A description of the given region, useful for a user interface.";
+    emit "displayRegionDescription :: Region -> Text";
+    foreach my $region (@regions) {
+        my $desc = $regionsUnescaped{$region};
+        emit "displayRegionDescription $region = \"$desc\"";
+    }
     emit "";
 }
 
