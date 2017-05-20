@@ -59,10 +59,9 @@ module System.Hardware.MercuryApi
   , firmwareLoad
   , firmwareLoadFile
     -- * Utility functions
-  , apiVersion
-  , sparkFunAntennas
   , hexListener
   , packBytesIntoWords
+  , passwordToWords
     -- ** Parameters
   , paramName
   , paramID
@@ -81,6 +80,12 @@ module System.Hardware.MercuryApi
   , displayParamType
   , displayRegion
   , parseRegion
+    -- * Constants
+  , apiVersion
+  , sparkFunAntennas
+  , defaultReadPlan
+  , killPasswordAddress
+  , accessPasswordAddress
     -- * Types
     -- ** Opaque types
   , Reader
@@ -95,7 +100,6 @@ module System.Hardware.MercuryApi
     -- ** Records
   , MercuryException (..)
   , ReadPlan (..)
-  , defaultReadPlan
   , TagOp (..)
   , TagFilter (..)
   , FilterOn (..)
@@ -112,6 +116,7 @@ module System.Hardware.MercuryApi
   , TagProtocol (..)
   , MetadataFlag (..)
   , GEN2_Bank (..)
+  , GEN2_LockBits (..)
   , TransportDirection (..)
   ) where
 
@@ -880,3 +885,16 @@ packBytesIntoWords bs = pbw (B.unpack bs)
         pbw [x] = [pk x 0]
         pbw (x1:x2:xs) = pk x1 x2 : pbw xs
         pk x1 x2 = (fromIntegral x1 `shiftL` 8) .|. fromIntegral x2
+
+-- | Split a password into two 16-bit words, suitable for writing
+-- into reserved memory.
+passwordToWords :: GEN2_Password -> [Word16]
+passwordToWords pwd = map fromIntegral [pwd `shiftR` 16, pwd .&. 0xffff]
+
+-- | Word address of kill password in reserved memory.
+killPasswordAddress :: Word32
+killPasswordAddress = 0
+
+-- | Word address of access password in reserved memory.
+accessPasswordAddress :: Word32
+accessPasswordAddress = 2
