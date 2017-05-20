@@ -70,7 +70,7 @@ main = do
     T.putStrLn $ "writing <" <> hex <> ">"
     let epcFilt = TMR.TagFilterEPC td
         txt = T.pack (oString o)
-        words = TMR.packBytesIntoWords $ T.encodeUtf8 txt
+        words = TMR.packBytesIntoWords $ T.encodeUtf8 txt `B.snoc` 0
         opWrite = TMR.TagOp_GEN2_WriteData
                   { TMR.opBank = TMR.GEN2_BANK_USER
                   , TMR.opWordAddress = 0
