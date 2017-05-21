@@ -51,12 +51,12 @@ readUser =
   , TMR.opLen = 32
   }
 
-printInColor :: [T.Text] -> Int -> IO ()
-printInColor xs n = do
-  let color = if n `mod` 2 == 0 then Blue else Green
-  setSGR [SetColor Foreground Vivid color]
-  mapM_ T.putStrLn xs
-  setSGR [Reset]
+putWithBold :: T.Text -> IO ()
+putWithBold txt = do
+  let bold = T.null $ T.takeWhile (== ' ') txt
+  when bold $ setSGR [SetConsoleIntensity BoldIntensity]
+  T.putStrLn txt
+  when bold $ setSGR [Reset]
 
 displayTag :: TMR.TagReadData -> T.Text
 displayTag trd = strength <> " <" <> epc <> "> " <> user
@@ -75,7 +75,7 @@ main = do
   let tags' = reverse $ sortBy (comparing TMR.trRssi) tags
   putStrLn $ "read " ++ show (length tags') ++ " tags"
   if oLong o
-    then zipWithM_ printInColor (map TMR.displayTagReadData tags') [0..]
+    then mapM_ putWithBold (concatMap TMR.displayTagReadData tags')
     else forM_ tags' (T.putStrLn . displayTag)
 
   TMR.destroy rdr
