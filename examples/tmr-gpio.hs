@@ -59,18 +59,17 @@ gpioLoop rdr outPins millis oldPins = do
 
 main = do
   o <- execParser opts'
-  rdr1 <- createAndConnect (oUri o) (oListen o)
-
-  -- reboot reader to reset the list of input and output pins
-  TMR.reboot rdr1
-  TMR.destroy rdr1
-
   rdr <- createAndConnect (oUri o) (oListen o)
 
+  -- set all the pins to input
+  TMR.paramSetGpioInputList rdr [1..4]
+
+  -- then set some to output
   let outPins = oGpos o
   TMR.paramSetGpioOutputList rdr outPins
   putStrLn $ "cycling among output pins " ++ show outPins
 
+  -- now see which inputs are left
   inPins <- TMR.paramGetGpioInputList rdr
   putStrLn $ "listening on input pins " ++ show inPins
 
