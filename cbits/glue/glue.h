@@ -114,10 +114,11 @@ TMR_Status c_TMR_gpiGet (ReaderEtc *reader,
 TMR_Status c_TMR_firmwareLoad (ReaderEtc *reader,
                                uint8_t *firmwareStart,
                                uint32_t firmwareSize);
-TMR_Status c_TMR_paramSet(ReaderEtc *reader,
-                          TMR_Param key,
-                          const void *value);
-TMR_Status c_TMR_paramGet(ReaderEtc *reader, TMR_Param key, void *value);
+TMR_Status c_TMR_paramSet (ReaderEtc *reader,
+                           TMR_Param key,
+                           const void *value);
+TMR_Status c_TMR_paramGet (ReaderEtc *reader, TMR_Param key, void *value);
+TMR_Status c_TMR_reboot (ReaderEtc *reader);
 void c_default_read_plan (TMR_ReadPlan *rp);
 TMR_Status c_TMR_paramList (ReaderEtc *reader, TMR_Param *keys, uint32_t *len);
 TMR_Status c_TMR_addTransportListener (ReaderEtc *reader,

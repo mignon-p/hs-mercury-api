@@ -61,6 +61,9 @@ main = do
   o <- execParser opts'
   rdr <- createAndConnect (oUri o) (oListen o)
 
+  -- reboot reader to reset the list of input and output pins
+  TMR.reboot rdr
+
   let outPins = oGpos o
   TMR.paramSetGpioOutputList rdr outPins
   putStrLn $ "cycling among output pins " ++ show outPins

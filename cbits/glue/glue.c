@@ -205,6 +205,14 @@ TMR_Status c_TMR_paramGet(ReaderEtc *reader, TMR_Param key, void *value)
     }
 }
 
+TMR_Status c_TMR_reboot (ReaderEtc *reader)
+{
+    if (reader->destroyed)
+        return ERROR_ALREADY_DESTROYED;
+    else
+        return TMR_reboot (&reader->reader);
+}
+
 void c_default_read_plan (TMR_ReadPlan *rp)
 {
     /* This should match the call to TMR_RP_init_simple() in

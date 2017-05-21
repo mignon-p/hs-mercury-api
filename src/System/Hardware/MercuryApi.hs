@@ -24,6 +24,7 @@ module System.Hardware.MercuryApi
   , connect
   , read
   , executeTagOp
+  , reboot
   , destroy
     -- ** Parameters
     -- | Although 'paramGet' and 'paramSet' are very flexible, they only
@@ -249,6 +250,10 @@ foreign import ccall safe "glue.h c_TMR_paramGet"
                    -> RawParam
                    -> Ptr ()
                    -> IO RawStatus
+
+foreign import ccall safe "glue.h c_TMR_reboot"
+    c_TMR_reboot :: Ptr ReaderEtc
+                 -> IO RawStatus
 
 foreign import ccall unsafe "glue.h c_default_read_plan"
     c_default_read_plan :: Ptr ReadPlan
@@ -685,6 +690,10 @@ defaultReadPlan = U.unsafePerformIO $ do
 -- <http://sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>.
 sparkFunAntennas :: [AntennaPort]
 sparkFunAntennas = [1]
+
+-- | Reboot the reader
+reboot :: Reader -> IO ()
+reboot rdr = withReaderEtc rdr "reboot" "" c_TMR_reboot
 
 -- | Get a list of parameters supported by the reader.
 paramList :: Reader -> IO [Param]
