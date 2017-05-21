@@ -679,7 +679,9 @@ sub emitData {
             my $ufield = ucfirst ($field);
             croak "comment undefined for $field" if (not defined $comment);
             $comment = makeComment ($comment);
-            emit "$indent$sep $prefix$ufield :: $bang($fieldType)$comment";
+            my ($openParen, $closeParen) = ("", "");
+            ($openParen, $closeParen) = ("(", ")") if ($fieldType =~ /\s/);
+            emit "$indent$sep $prefix$ufield :: $bang$openParen$fieldType$closeParen$comment";
             $sep = ",";
         }
     }
@@ -695,16 +697,19 @@ sub emitPeek {
             my $c = $info->{$field}{"c"};
             my $marshall = $info->{$field}{"marshall"}[0];
             my $filter = "";
+            my $closeParen = "";
             if (exists $info->{$field}{"filter"}) {
-                $filter = $info->{$field}{"filter"}[0];
+                $filter = "(";
+                $filter .= $info->{$field}{"filter"}[0];
                 $filter .= ' <$> ';
+                $closeParen = ")";
             }
             my @ptrs = map { "(#{ptr $cType, $_} p)" } @$c;
             if ($marshall eq 'peek' and scalar @ptrs == 1) {
                 my $cField = $c->[0];
-                emit ("$indent  $sep (${filter}#{peek $cType, $cField} p)");
+                emit ("$indent  $sep ${filter}#{peek $cType, $cField} p$closeParen");
             } else {
-                emit ("$indent  $sep ($filter$marshall " . join (" ", @ptrs) . ")");
+                emit ("$indent  $sep $filter$marshall " . join (" ", @ptrs) . $closeParen);
             }
             $sep = '<*>';
         }
