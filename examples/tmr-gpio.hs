@@ -11,13 +11,31 @@ import Data.Ord
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Data.Word
+import Options.Applicative
 import qualified System.Hardware.MercuryApi as TMR
 import qualified System.Hardware.MercuryApi.Params as TMR
-import System.Environment
 import System.IO
 
+import ExampleUtil
+
+data Opts = Opts
+  { oUri :: String
+  , oListen :: Bool
+  , oGpos :: [TMR.PinNumber]
+  }
+
+opts :: Parser Opts
+opts = Opts
+  <$> optUri
+  <*> optListen
+  <*> many (argument auto (metavar "OUTPUTS..."))
+
+opts' = info (helper <*> opts)
+  ( fullDesc <>
+    header "tmr-gpio - print GPIs and control GPOs" )
+
 delayMillis :: Int
-delayMillis = 20
+delayMillis = 100
 
 mkPin :: TMR.PinNumber -> TMR.PinNumber -> TMR.GpioPin
 mkPin highPin pin =
@@ -31,25 +49,23 @@ gpioLoop :: TMR.Reader -> [TMR.PinNumber] -> Integer -> [TMR.GpioPin] -> IO ()
 gpioLoop rdr outPins millis oldPins = do
   pins <- TMR.gpiGet rdr
   when (pins /= oldPins) $ print pins
-  let oLen = length outPins
-      pinNo = outPins !! fromIntegral ((millis `div` 1000) `mod` fromIntegral oLen)
-      gpoPins = map (mkPin pinNo) outPins
-  TMR.gpoSet rdr gpoPins
+  when (not $ null outPins) $ do
+    let oLen = length outPins
+        pinNo = outPins !! fromIntegral ((millis `div` 1000) `mod` fromIntegral oLen)
+        gpoPins = map (mkPin pinNo) outPins
+    TMR.gpoSet rdr gpoPins
   threadDelay $ delayMillis * 1000
   gpioLoop rdr outPins (millis + fromIntegral delayMillis) pins
 
 main = do
-  rdr <- TMR.create "tmr:///dev/ttyUSB0"
-{-
-  listener <- TMR.hexListener stdout
-  TMR.addTransportListener rdr listener
--}
-  TMR.paramSetTransportTimeout rdr 10000
-  TMR.connect rdr
+  o <- execParser opts'
+  rdr <- createAndConnect (oUri o) (oListen o)
 
-  args <- getArgs
-  let outPins = map read args
+  let outPins = oGpos o
   TMR.paramSetGpioOutputList rdr outPins
+  putStrLn $ "cycling among output pins " ++ show outPins
 
-  putStrLn "running..."
+  inPins <- TMR.paramGetGpioInputList rdr
+  putStrLn $ "listening on input pins " ++ show inPins
+
   gpioLoop rdr outPins 0 [] `finally` TMR.destroy rdr
