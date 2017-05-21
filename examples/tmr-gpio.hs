@@ -48,7 +48,7 @@ mkPin highPin pin =
 gpioLoop :: TMR.Reader -> [TMR.PinNumber] -> Integer -> [TMR.GpioPin] -> IO ()
 gpioLoop rdr outPins millis oldPins = do
   pins <- TMR.gpiGet rdr
-  when (pins /= oldPins) $ print pins
+  when (pins /= oldPins) $ mapM_ T.putStrLn $ TMR.displayGpio pins
   when (not $ null outPins) $ do
     let oLen = length outPins
         pinNo = outPins !! fromIntegral ((millis `div` 1000) `mod` fromIntegral oLen)

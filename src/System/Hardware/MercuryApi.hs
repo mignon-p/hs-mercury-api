@@ -75,6 +75,7 @@ module System.Hardware.MercuryApi
     -- format than 'show'.
   , displayTimestamp
   , displayLocalTimestamp
+  , displayGpio
   , displayTagData
   , displayTagReadData
   , displayParamType
@@ -832,6 +833,14 @@ displayLocalTimestamp :: MillisecondsSinceEpoch -- ^ milliseconds since 1\/1\/19
                       -> IO T.Text
 displayLocalTimestamp t = formatTimestamp t cTrue "%z"
 
+-- | Convert a list of 'GpioPin' to a human-readable list of lines.
+displayGpio :: [GpioPin] -> [T.Text]
+displayGpio gpios = "Gpio" : map dispGpio gpios
+  where
+    dispGpio gpio = "  pin " <> tShow (gpId gpio) <>
+                    (if (gpHigh gpio) then " high" else " low ") <>
+                    (if (gpOutput gpio) then " output" else "  input")
+
 -- | Convert a 'TagReadData' to a human-readable list of lines.
 displayTagReadData :: TagReadData -> [T.Text]
 displayTagReadData trd =
@@ -841,9 +850,8 @@ displayTagReadData trd =
   , [ "  metadataFlags = " <> T.intercalate "|" (map fl $ trMetadataFlags trd)
     , "  phase         = " <> tShow (trPhase trd)
     , "  antenna       = " <> tShow (trAntenna trd)
-    , "  Gpio"
     ]
-  , map dispGpio (trGpio trd)
+  , indent (displayGpio $ trGpio trd)
   , [ "  readCount     = " <> tShow (trReadCount trd)
     , "  rssi          = " <> tShow (trRssi trd)
     , "  frequency     = " <> tShow (trFrequency trd)
@@ -858,9 +866,6 @@ displayTagReadData trd =
   where
     nDrop = T.length "METADATA_FLAG_"
     fl = T.drop nDrop . tShow
-    dispGpio gpio = "    pin " <> tShow (gpId gpio) <>
-                    (if (gpHigh gpio) then " high" else " low ") <>
-                    (if (gpOutput gpio) then " output" else "  input")
     dat name bs = if B.null bs
                   then []
                   else ["  " <> name <> " = " <> displayByteString bs]
