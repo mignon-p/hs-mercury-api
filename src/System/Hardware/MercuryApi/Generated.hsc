@@ -655,8 +655,8 @@ instance Storable TagReadData where
   poke p x = error "poke not implemented for TagReadData"
 
 -- | An operation that can be performed on a tag.  Can be used
--- as an argument to @executeTagOp@, or can be embedded into
--- a read plan.
+-- as an argument to 'System.Hardware.MercuryApi.executeTagOp',
+-- or can be embedded into a 'System.Hardware.MercuryApi.ReadPlan'.
 data TagOp =
     TagOp_GEN2_WriteTag
     { opEpc :: !TagData -- ^ Tag EPC

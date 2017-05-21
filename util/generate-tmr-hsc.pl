@@ -1126,8 +1126,8 @@ sub emitTagOp {
     }
 
     emit "-- | An operation that can be performed on a tag.  Can be used";
-    emit '-- as an argument to @executeTagOp@, or can be embedded into';
-    emit "-- a read plan.";
+    emit "-- as an argument to 'System.Hardware.MercuryApi.executeTagOp',";
+    emit "-- or can be embedded into a 'System.Hardware.MercuryApi.ReadPlan'.";
     emitUnion ($hType, $prefix, $cType,
                \%discriminator, \@constructors, \%constInfo);
 }
