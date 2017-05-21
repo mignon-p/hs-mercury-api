@@ -1,0 +1,24 @@
+commit ba33abff4b3bed6adf444a15661b4a6219686a4c
+Author: Patrick Pelletier <code@funwithsoftware.org>
+Date:   Sun May 21 14:13:29 2017 -0700
+
+    Treat TMR_PARAM_METADATAFLAG as the same size in paramGet and paramSet.
+    
+    paramSet treated TMR_PARAM_METADATAFLAG as TMR_TRD_MetadataFlag, while
+    paramGet treated TMR_PARAM_METADATAFLAG as uint16_t.  Since
+    sizeof(TMR_TRD_MetadataFlag) is 4 but sizeof(uint16_t) is 2, the sizes
+    didn't match.
+
+diff --git a/serial_reader.c b/serial_reader.c
+index 1fdf25b..a9b978b 100644
+--- a/serial_reader.c
++++ b/serial_reader.c
+@@ -4178,7 +4178,7 @@ TMR_SR_paramGet(struct TMR_Reader *reader, TMR_Param key, 
+     break;
+   case TMR_PARAM_METADATAFLAG:
+          {
+-               *(uint16_t *)value = reader->userMetadataFlag;
++               *(TMR_TRD_MetadataFlag *)value = reader->userMetadataFlag;
+                break;
+          }
+                    
