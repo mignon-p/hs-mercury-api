@@ -700,7 +700,12 @@ sub emitPeek {
                 $filter .= ' <$> ';
             }
             my @ptrs = map { "(#{ptr $cType, $_} p)" } @$c;
-            emit ("$indent  $sep ($filter$marshall " . join (" ", @ptrs) . ")");
+            if ($marshall eq 'peek' and scalar @ptrs == 1) {
+                my $cField = $c->[0];
+                emit ("$indent  $sep (${filter}#{peek $cType, $cField} p)");
+            } else {
+                emit ("$indent  $sep ($filter$marshall " . join (" ", @ptrs) . ")");
+            }
             $sep = '<*>';
         }
     }
@@ -720,7 +725,12 @@ sub emitPoke {
             }
             my $hField = $prefix . ucfirst ($field);
             my @ptrs = map ("(#{ptr $cType, $_} p)", @$c);
-            emit ("$indent$marshall " . join (" ", @ptrs) . " ($filter$hField x)");
+            if ($marshall eq 'poke' and scalar @ptrs == 1) {
+                my $cField = $c->[0];
+                emit ("${indent}#{poke $cType, $cField} p ($filter$hField x)");
+            } else {
+                emit ("$indent$marshall " . join (" ", @ptrs) . " ($filter$hField x)");
+            }
         }
     }
 }
