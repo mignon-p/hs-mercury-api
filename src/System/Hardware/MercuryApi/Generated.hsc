@@ -553,11 +553,9 @@ instance Storable GEN2_TagData where
   sizeOf _ = #{size TMR_GEN2_TagData}
   alignment _ = 8
 
-  peek p = do
-    let pPc = #{ptr TMR_GEN2_TagData, pc} p
-        pPcByteCount = #{ptr TMR_GEN2_TagData, pcByteCount} p
+  peek p =
     GEN2_TagData
-      <$> (peekArrayAsByteString pPc pPcByteCount)
+      <$> (peekArrayAsByteString (#{ptr TMR_GEN2_TagData, pc} p) (#{ptr TMR_GEN2_TagData, pcByteCount} p))
 
   poke p x = do
     pokeArrayAsByteString "pc" #{const TMR_GEN2_MAX_PC_BYTE_COUNT} (#{ptr TMR_GEN2_TagData, pc} p) (#{ptr TMR_GEN2_TagData, pcByteCount} p) (g2Pc x)
@@ -575,17 +573,12 @@ instance Storable TagData where
   sizeOf _ = #{size TMR_TagData}
   alignment _ = 8
 
-  peek p = do
-    let pEpc = #{ptr TMR_TagData, epc} p
-        pEpcByteCount = #{ptr TMR_TagData, epcByteCount} p
-        pProtocol = #{ptr TMR_TagData, protocol} p
-        pCrc = #{ptr TMR_TagData, crc} p
-        pU_gen2 = #{ptr TMR_TagData, u.gen2} p
+  peek p =
     TagData
-      <$> (peekArrayAsByteString pEpc pEpcByteCount)
-      <*> (toTagProtocol <$> peek pProtocol)
-      <*> (peek pCrc)
-      <*> (peekMaybe (peek) (== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)) pU_gen2 pProtocol)
+      <$> (peekArrayAsByteString (#{ptr TMR_TagData, epc} p) (#{ptr TMR_TagData, epcByteCount} p))
+      <*> (toTagProtocol <$> peek (#{ptr TMR_TagData, protocol} p))
+      <*> (peek (#{ptr TMR_TagData, crc} p))
+      <*> (peekMaybe (peek) (== (#{const TMR_TAG_PROTOCOL_GEN2} :: RawTagProtocol)) (#{ptr TMR_TagData, u.gen2} p) (#{ptr TMR_TagData, protocol} p))
 
   poke p x = do
     pokeArrayAsByteString "epc" #{const TMR_MAX_EPC_BYTE_COUNT} (#{ptr TMR_TagData, epc} p) (#{ptr TMR_TagData, epcByteCount} p) (tdEpc x)
@@ -605,14 +598,11 @@ instance Storable GpioPin where
   sizeOf _ = #{size TMR_GpioPin}
   alignment _ = 8
 
-  peek p = do
-    let pId = #{ptr TMR_GpioPin, id} p
-        pHigh = #{ptr TMR_GpioPin, high} p
-        pOutput = #{ptr TMR_GpioPin, output} p
+  peek p =
     GpioPin
-      <$> (peek pId)
-      <*> (toBool' <$> peek pHigh)
-      <*> (toBool' <$> peek pOutput)
+      <$> (peek (#{ptr TMR_GpioPin, id} p))
+      <*> (toBool' <$> peek (#{ptr TMR_GpioPin, high} p))
+      <*> (toBool' <$> peek (#{ptr TMR_GpioPin, output} p))
 
   poke p x = do
     poke (#{ptr TMR_GpioPin, id} p) (gpId x)
@@ -645,38 +635,22 @@ instance Storable TagReadData where
   sizeOf _ = #{size TMR_TagReadData}
   alignment _ = 8
 
-  peek p = do
-    let pTag = #{ptr TMR_TagReadData, tag} p
-        pMetadataFlags = #{ptr TMR_TagReadData, metadataFlags} p
-        pPhase = #{ptr TMR_TagReadData, phase} p
-        pAntenna = #{ptr TMR_TagReadData, antenna} p
-        pGpio = #{ptr TMR_TagReadData, gpio} p
-        pGpioCount = #{ptr TMR_TagReadData, gpioCount} p
-        pReadCount = #{ptr TMR_TagReadData, readCount} p
-        pRssi = #{ptr TMR_TagReadData, rssi} p
-        pFrequency = #{ptr TMR_TagReadData, frequency} p
-        pTimestampLow = #{ptr TMR_TagReadData, timestampLow} p
-        pTimestampHigh = #{ptr TMR_TagReadData, timestampHigh} p
-        pData = #{ptr TMR_TagReadData, data} p
-        pEpcMemData = #{ptr TMR_TagReadData, epcMemData} p
-        pTidMemData = #{ptr TMR_TagReadData, tidMemData} p
-        pUserMemData = #{ptr TMR_TagReadData, userMemData} p
-        pReservedMemData = #{ptr TMR_TagReadData, reservedMemData} p
+  peek p =
     TagReadData
-      <$> (peek pTag)
-      <*> (unpackFlags16 <$> peek pMetadataFlags)
-      <*> (peek pPhase)
-      <*> (peek pAntenna)
-      <*> (peekArrayAsList pGpio pGpioCount)
-      <*> (peek pReadCount)
-      <*> (peek pRssi)
-      <*> (peek pFrequency)
-      <*> (peekSplit64 pTimestampLow pTimestampHigh)
-      <*> (peekListAsByteString pData)
-      <*> (peekListAsByteString pEpcMemData)
-      <*> (peekListAsByteString pTidMemData)
-      <*> (peekListAsByteString pUserMemData)
-      <*> (peekListAsByteString pReservedMemData)
+      <$> (peek (#{ptr TMR_TagReadData, tag} p))
+      <*> (unpackFlags16 <$> peek (#{ptr TMR_TagReadData, metadataFlags} p))
+      <*> (peek (#{ptr TMR_TagReadData, phase} p))
+      <*> (peek (#{ptr TMR_TagReadData, antenna} p))
+      <*> (peekArrayAsList (#{ptr TMR_TagReadData, gpio} p) (#{ptr TMR_TagReadData, gpioCount} p))
+      <*> (peek (#{ptr TMR_TagReadData, readCount} p))
+      <*> (peek (#{ptr TMR_TagReadData, rssi} p))
+      <*> (peek (#{ptr TMR_TagReadData, frequency} p))
+      <*> (peekSplit64 (#{ptr TMR_TagReadData, timestampLow} p) (#{ptr TMR_TagReadData, timestampHigh} p))
+      <*> (peekListAsByteString (#{ptr TMR_TagReadData, data} p))
+      <*> (peekListAsByteString (#{ptr TMR_TagReadData, epcMemData} p))
+      <*> (peekListAsByteString (#{ptr TMR_TagReadData, tidMemData} p))
+      <*> (peekListAsByteString (#{ptr TMR_TagReadData, userMemData} p))
+      <*> (peekListAsByteString (#{ptr TMR_TagReadData, reservedMemData} p))
 
   poke p x = error "poke not implemented for TagReadData"
 
@@ -716,40 +690,27 @@ instance Storable TagOp where
     x <- #{peek TagOpEtc, tagop.type} p :: IO #{type TMR_TagOpType}
     case x of
       #{const TMR_TAGOP_GEN2_WRITETAG} -> do
-        let pTagop_u_gen2_u_writeTag_epcptr = #{ptr TagOpEtc, tagop.u.gen2.u.writeTag.epcptr} p
-            pEpc = #{ptr TagOpEtc, epc} p
         TagOp_GEN2_WriteTag
-          <$> (peekPtr pTagop_u_gen2_u_writeTag_epcptr pEpc)
+          <$> (peekPtr (#{ptr TagOpEtc, tagop.u.gen2.u.writeTag.epcptr} p) (#{ptr TagOpEtc, epc} p))
       #{const TMR_TAGOP_GEN2_WRITEDATA} -> do
-        let pTagop_u_gen2_u_writeData_bank = #{ptr TagOpEtc, tagop.u.gen2.u.writeData.bank} p
-            pTagop_u_gen2_u_writeData_wordAddress = #{ptr TagOpEtc, tagop.u.gen2.u.writeData.wordAddress} p
-            pTagop_u_gen2_u_writeData_data = #{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p
-            pData16 = #{ptr TagOpEtc, data16} p
         TagOp_GEN2_WriteData
-          <$> ((toBank . (.&. 3)) <$> peek pTagop_u_gen2_u_writeData_bank)
-          <*> (peek pTagop_u_gen2_u_writeData_wordAddress)
-          <*> (peekListAsList pTagop_u_gen2_u_writeData_data pData16)
+          <$> ((toBank . (.&. 3)) <$> peek (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.bank} p))
+          <*> (peek (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.wordAddress} p))
+          <*> (peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p) (#{ptr TagOpEtc, data16} p))
       #{const TMR_TAGOP_GEN2_READDATA} -> do
-        let pTagop_u_gen2_u_readData_bank = #{ptr TagOpEtc, tagop.u.gen2.u.readData.bank} p
-            pTagop_u_gen2_u_readData_wordAddress = #{ptr TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p
-            pTagop_u_gen2_u_readData_len = #{ptr TagOpEtc, tagop.u.gen2.u.readData.len} p
         TagOp_GEN2_ReadData
-          <$> ((toBank . (.&. 3)) <$> peek pTagop_u_gen2_u_readData_bank)
-          <*> (unpackExtraBanks <$> peek pTagop_u_gen2_u_readData_bank)
-          <*> (peek pTagop_u_gen2_u_readData_wordAddress)
-          <*> (peek pTagop_u_gen2_u_readData_len)
+          <$> ((toBank . (.&. 3)) <$> peek (#{ptr TagOpEtc, tagop.u.gen2.u.readData.bank} p))
+          <*> (unpackExtraBanks <$> peek (#{ptr TagOpEtc, tagop.u.gen2.u.readData.bank} p))
+          <*> (peek (#{ptr TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p))
+          <*> (peek (#{ptr TagOpEtc, tagop.u.gen2.u.readData.len} p))
       #{const TMR_TAGOP_GEN2_LOCK} -> do
-        let pTagop_u_gen2_u_lock_mask = #{ptr TagOpEtc, tagop.u.gen2.u.lock.mask} p
-            pTagop_u_gen2_u_lock_action = #{ptr TagOpEtc, tagop.u.gen2.u.lock.action} p
-            pTagop_u_gen2_u_lock_accessPassword = #{ptr TagOpEtc, tagop.u.gen2.u.lock.accessPassword} p
         TagOp_GEN2_Lock
-          <$> (unpackLockBits16 <$> peek pTagop_u_gen2_u_lock_mask)
-          <*> (unpackLockBits16 <$> peek pTagop_u_gen2_u_lock_action)
-          <*> (peek pTagop_u_gen2_u_lock_accessPassword)
+          <$> (unpackLockBits16 <$> peek (#{ptr TagOpEtc, tagop.u.gen2.u.lock.mask} p))
+          <*> (unpackLockBits16 <$> peek (#{ptr TagOpEtc, tagop.u.gen2.u.lock.action} p))
+          <*> (peek (#{ptr TagOpEtc, tagop.u.gen2.u.lock.accessPassword} p))
       #{const TMR_TAGOP_GEN2_KILL} -> do
-        let pTagop_u_gen2_u_kill_password = #{ptr TagOpEtc, tagop.u.gen2.u.kill.password} p
         TagOp_GEN2_Kill
-          <$> (peek pTagop_u_gen2_u_kill_password)
+          <$> (peek (#{ptr TagOpEtc, tagop.u.gen2.u.kill.password} p))
 
   poke p x@(TagOp_GEN2_WriteTag {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_WRITETAG} :: #{type TMR_TagOpType})

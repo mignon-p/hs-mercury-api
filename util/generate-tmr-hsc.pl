@@ -688,23 +688,8 @@ sub emitData {
 sub emitPeek {
     my ($constructor, $cType, $fields, $info, $indent) = @_;
 
-    my %already;
-    my $sep = "let";
-    foreach my $field (@$fields) {
-        if (exists $info->{$field}) {
-            my $c = $info->{$field}{"c"};
-            foreach my $cField (@$c) {
-                if (not exists $already{$cField}) {
-                    my $pfield = makePfield ($cField);
-                    emit "$indent$sep $pfield = #{ptr $cType, $cField} p";
-                    $sep = "   ";
-                    $already{$cField} = 1;
-                }
-            }
-        }
-    }
     emit "$indent$constructor";
-    $sep = '<$>';
+    my $sep = '<$>';
     foreach my $field (@$fields) {
         if (exists $info->{$field}) {
             my $c = $info->{$field}{"c"};
@@ -714,7 +699,7 @@ sub emitPeek {
                 $filter = $info->{$field}{"filter"}[0];
                 $filter .= ' <$> ';
             }
-            my @ptrs = map { makePfield $_ } @$c;
+            my @ptrs = map { "(#{ptr $cType, $_} p)" } @$c;
             emit ("$indent  $sep ($filter$marshall " . join (" ", @ptrs) . ")");
             $sep = '<*>';
         }
@@ -765,7 +750,7 @@ sub emitStruct2 {
     emit "  sizeOf _ = #{size $cType}";
     emit "  alignment _ = 8"; # because "#alignment" doesn't work for me
     emit "";
-    emit "  peek p = do";
+    emit "  peek p =";
     emitPeek ($hType, $cType, $fields, $info, "    ");
     emit "";
 
