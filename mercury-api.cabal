@@ -86,6 +86,7 @@ library
                      , cbits/glue
 
   cc-options:          -DTMR_ENABLE_SERIAL_READER_ONLY=1
+                       -DTMR_USE_HOST_C_LIBRARY=1
 
   -- Other library packages from which modules are imported.
   build-depends:       base >= 4.6 && < 5
