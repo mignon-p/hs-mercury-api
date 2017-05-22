@@ -585,7 +585,7 @@ instance Storable TagData where
 -- | The identity and state of a single GPIO pin.
 data GpioPin =
   GpioPin
-  { gpId :: !Word8 -- ^ The ID number of the pin.
+  { gpId :: !PinNumber -- ^ The ID number of the pin.
   , gpHigh :: !Bool -- ^ Whether the pin is in the high state.
   , gpOutput :: !Bool -- ^ The direction of the pin
   } deriving (Eq, Ord, Show, Read)

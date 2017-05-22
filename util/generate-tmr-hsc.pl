@@ -1016,6 +1016,7 @@ sub emitGpio {
 
     convertStruct ($cStruct, \@fieldOrder, \%fields);
 
+    $fields{"id"}{"type"} = "PinNumber";
     wrapField (\%fields, "high", "toBool'", "fromBool'");
     wrapField (\%fields, "output", "toBool'", "fromBool'");
 
