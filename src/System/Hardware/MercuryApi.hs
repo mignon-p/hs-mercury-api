@@ -809,7 +809,7 @@ displayData bytes
   | otherwise =
     let (bs1, bs2) = B.splitAt 16 bytes
         (bs1a, bs1b) = B.splitAt 8 bs1
-        pad x bs = T.replicate (x - T.length bs) " "
+        pad x t = t <> T.replicate (x - T.length t) " "
         dotify x = if x < 0x20 || x >= 0x7f then 0x2e else x
         hex = map (pad 25 . bytesToHexWithSpaces) [bs1a, bs1b]
         ascii = B.map dotify bs1
