@@ -1188,6 +1188,13 @@ sub emitParamTypes {
         emit "displayParamType $name = \"$paramType\"";
     }
     emit "displayParamType _ = \"$nyi\"";
+}
+
+sub emitParamValues {
+    my %ptn;
+    foreach my $paramType (values %toHaskellType) {
+        $ptn{$paramType} = paramTypeName ($paramType);
+    }
 
     foreach my $paramType (sort keys %ptn) {
         my $name = $ptn{$paramType};
@@ -1538,6 +1545,7 @@ emitBanks();
 emitLockBits();
 emitParams();
 emitParamTypes();
+emitParamValues();
 
 dumpOutput ($generatedFile);
 
