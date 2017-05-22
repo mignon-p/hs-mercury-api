@@ -149,6 +149,7 @@ import System.IO
 import qualified System.IO.Unsafe as U
 import Text.Read (readMaybe)
 
+import System.Hardware.MercuryApi.Enums
 import System.Hardware.MercuryApi.Generated
 import System.Hardware.MercuryApi.ParamValue
 

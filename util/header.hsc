@@ -18,6 +18,8 @@ import Data.Word
 import Foreign
 import Foreign.C
 
+import System.Hardware.MercuryApi.Enums
+
 #include <tm_reader.h>
 #include <glue.h>
 #include <stdbool.h>
