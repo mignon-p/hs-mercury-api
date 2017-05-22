@@ -92,12 +92,6 @@ castLen' bound description x = do
 castLen :: (Integral a, Bounded a) => Text -> Int -> IO a
 castLen = castLen' maxBound
 
--- | A class for types which can be used as parameter values.
-class ParamValue a where
-  pType :: a -> ParamType
-  pGet :: (Ptr () -> IO ()) -> IO a
-  pSet :: a -> (Ptr () -> IO ()) -> IO ()
-
 -- | A ReadPlan record specifies the antennas, protocols, and filters
 -- to use for a search (read).
 --

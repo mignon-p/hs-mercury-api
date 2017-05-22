@@ -147,6 +147,7 @@ import qualified System.IO.Unsafe as U
 import Text.Read (readMaybe)
 
 import System.Hardware.MercuryApi.Generated
+import System.Hardware.MercuryApi.ParamValue
 
 -- | An opaque type which represents a connection to an RFID reader.
 newtype Reader = Reader (ForeignPtr ReaderEtc)
