@@ -150,7 +150,7 @@ import qualified System.IO.Unsafe as U
 import Text.Read (readMaybe)
 
 import System.Hardware.MercuryApi.Enums
-import System.Hardware.MercuryApi.Generated
+import System.Hardware.MercuryApi.Records
 import System.Hardware.MercuryApi.ParamValue
 
 -- | An opaque type which represents a connection to an RFID reader.

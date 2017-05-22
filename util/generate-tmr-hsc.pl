@@ -10,7 +10,7 @@ my $apiDir = "$rootDir/cbits/api";
 my $glueDir = "$rootDir/cbits/glue";
 my $outputDir = "$rootDir/src/System/Hardware/MercuryApi";
 my $enumFile = "$outputDir/Enums.hsc";
-my $generatedFile = "$outputDir/Generated.hsc";
+my $recordFile = "$outputDir/Records.hsc";
 my $paramValueFile = "$outputDir/ParamValue.hs";
 my $paramFile = "$outputDir/Params.hs";
 
@@ -405,7 +405,7 @@ sub emitEnumHeader {
     emit '';
 }
 
-sub emitHeader {
+sub emitRecordHeader {
     open F, "$utilDir/header.hsc" or die;
 
     while (<F>) {
@@ -1240,7 +1240,7 @@ sub emitParamValueHeader {
     emit 'import Foreign.C';
     emit '';
     emit 'import System.Hardware.MercuryApi.Enums';
-    emit 'import System.Hardware.MercuryApi.Generated';
+    emit 'import System.Hardware.MercuryApi.Records';
     emit '';
     emit '-- | A class for types which can be used as parameter values.';
     emit 'class ParamValue a where';
@@ -1606,10 +1606,10 @@ emitParamTypes();
 
 dumpOutput ($enumFile);
 
-emitHeader();
+emitRecordHeader();
 emitStructs();
 
-dumpOutput ($generatedFile);
+dumpOutput ($recordFile);
 
 emitParamValueHeader();
 emitParamValues();

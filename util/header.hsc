@@ -1,6 +1,6 @@
 -- This file is inserted at the top of Generated.hsc by generate-tmr-hsc.pl
 {-# LANGUAGE OverloadedStrings, FlexibleInstances, DeriveDataTypeable #-}
-module System.Hardware.MercuryApi.Generated where
+module System.Hardware.MercuryApi.Records where
 
 import Control.Applicative
 import Control.Exception

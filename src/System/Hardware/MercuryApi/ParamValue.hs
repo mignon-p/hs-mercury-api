@@ -19,7 +19,7 @@ import Foreign
 import Foreign.C
 
 import System.Hardware.MercuryApi.Enums
-import System.Hardware.MercuryApi.Generated
+import System.Hardware.MercuryApi.Records
 
 -- | A class for types which can be used as parameter values.
 class ParamValue a where

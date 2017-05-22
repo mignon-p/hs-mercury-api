@@ -62,7 +62,7 @@ library
 
   -- Modules included in this library but not exported.
   other-modules:       System.Hardware.MercuryApi.Enums
-                     , System.Hardware.MercuryApi.Generated
+                     , System.Hardware.MercuryApi.Records
                      , System.Hardware.MercuryApi.ParamValue
 
   -- LANGUAGE extensions used by modules in this package.
