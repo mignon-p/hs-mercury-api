@@ -139,6 +139,7 @@ import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.Text.Encoding.Error as T
+import qualified Data.Text.IO as T
 import Data.Typeable
 import Data.Word
 import Foreign
@@ -758,7 +759,7 @@ hexListener h = do
 hexListener' :: Handle -> Bool -> TransportListener
 hexListener' h useColor dir dat _ = do
   setColors useColor [SetColor Foreground Vivid Magenta]
-  lstn dat (prefix dir)
+  mapM_ (T.hPutStrLn h) $ lstn dat (prefix dir)
   setColors useColor [Reset]
   flushColor useColor
   where
@@ -768,11 +769,7 @@ hexListener' h useColor dir dat _ = do
     flushColor True = hFlush h
     prefix Tx = "Sending: "
     prefix Rx = "Received:"
-    lstn bs pfx = do
-      let (bs1, bs2) = B.splitAt 16 bs
-          hex = concatMap (printf " %02x") (B.unpack bs1)
-      hPutStrLn h $ pfx ++ hex
-      when (not $ B.null bs2) $ lstn bs2 "         "
+    lstn bs pfx = zipWith T.append (pfx : repeat "         ") (displayData bs)
 
 -- | Convert a hexadecimal string into a 'B.ByteString'.  The hex string may
 -- optionally include a "0x" prefix, which will be ignored.  If the input
