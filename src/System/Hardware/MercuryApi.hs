@@ -70,12 +70,14 @@ module System.Hardware.MercuryApi
   , paramUnits
     -- ** Hex conversion
   , bytesToHex
+  , bytesToHexWithSpaces
   , hexToBytes
     -- ** Display
     -- | Some functions to format data in a more human-friendly
     -- format than 'show'.
   , displayTimestamp
   , displayLocalTimestamp
+  , displayData
   , displayGpio
   , displayTagData
   , displayTagReadData
@@ -132,6 +134,7 @@ import Control.Monad
 import qualified Data.ByteString as B
 import qualified Data.HashMap.Strict as H
 import Data.IORef
+import Data.List
 import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
@@ -794,6 +797,25 @@ bytesToHex bytes = U.unsafePerformIO $ do
     c_TMR_bytesToHex (castPtr cs) (fromIntegral bytesLen) buf
     textFromBS <$> B.packCString buf
 
+-- | Like 'bytesToHex', but with a space between each byte.
+bytesToHexWithSpaces :: B.ByteString -> T.Text
+bytesToHexWithSpaces = T.pack . intercalate " " . map (printf "%02x") . B.unpack
+
+-- | Format a 'B.ByteString' as 16 bytes per line, with both hex and ascii
+-- on the line.
+displayData :: B.ByteString -> [T.Text]
+displayData bytes
+  | B.null bytes = []
+  | otherwise =
+    let (bs1, bs2) = B.splitAt 16 bytes
+        (bs1a, bs1b) = B.splitAt 8 bs1
+        pad x bs = T.replicate (x - T.length bs) " "
+        dotify x = if x < 0x20 || x >= 0x7f then 0x2e else x
+        hex = map (pad 25 . bytesToHexWithSpaces) [bs1a, bs1b]
+        ascii = B.map dotify bs1
+        txt = T.concat $ hex ++ ["|", textFromBS ascii, "|"]
+    in txt : displayData bs2
+
 displayByteString :: B.ByteString -> T.Text
 displayByteString bs =
   "<" <> bytesToHex bs <> "> (" <> T.pack (show $ B.length bs) <> " bytes)"
@@ -867,18 +889,20 @@ displayTagReadData trd =
     , "  frequency     = " <> tShow (trFrequency trd)
     , "  timestamp     = " <> displayTimestamp (trTimestamp trd)
     ]
-  , dat "data         " (trData trd)
-  , dat "epcMemData   " (trEpcMemData trd)
-  , dat "tidMemData   " (trTidMemData trd)
-  , dat "userMemData  " (trUserMemData trd)
+  , dat "data" (trData trd)
+  , dat "epcMemData" (trEpcMemData trd)
+  , dat "tidMemData" (trTidMemData trd)
+  , dat "userMemData" (trUserMemData trd)
   , dat "reservedMemData" (trReservedMemData trd)
   ]
   where
     nDrop = T.length "METADATA_FLAG_"
     fl = T.drop nDrop . tShow
-    dat name bs = if B.null bs
-                  then []
-                  else ["  " <> name <> " = " <> displayByteString bs]
+    dat name bs =
+      if B.null bs
+      then []
+      else indent ((name <> ": " <> T.pack (show $ B.length bs) <> " bytes")
+                   : indent (displayData bs))
 
 regionPrefix :: T.Text
 regionPrefix = "REGION_"
