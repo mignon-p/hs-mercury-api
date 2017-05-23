@@ -52,7 +52,7 @@ index 86f74d5..2e918f5 100644
   */
  TMR_TimeStructure tmr_gettimestructure(void);
 diff --git a/serial_reader.c b/serial_reader.c
-index 1fdf25b..0b3baa2 100644
+index 1fdf25b..d28f72f 100644
 --- a/serial_reader.c
 +++ b/serial_reader.c
 @@ -228,7 +228,7 @@ TMR_SR_boot(TMR_Reader *reader, uint32_t currentBaudRate)
@@ -64,6 +64,33 @@ index 1fdf25b..0b3baa2 100644
     **/
    if ((TMR_SR_MODEL_M6E == reader->u.serialReader.versionInfo.hardware[0]) ||
        (TMR_SR_MODEL_M6E_I == reader->u.serialReader.versionInfo.hardware[0]) ||
+@@ -426,7 +426,7 @@ TMR_SR_boot(TMR_Reader *reader, uint32_t currentBaudRate)
+       {
+         /*
+          * Modules with firmware older than wilder will throw 0x105 error, as it was not 
+-         * implemented. Catch this error and but do not return.
++         * implemented. Catch this error but do not return.
+          */
+ 		sr->productId = 0xFFFF;
+       }
+@@ -497,7 +497,7 @@ TMR_SR_boot(TMR_Reader *reader, uint32_t currentBaudRate)
+ 
+   /**
+    * Enable the extended EPC flag in case
+-   * of M5E and its varients
++   * of M5E and its variants
+    */
+   if ((TMR_SR_MODEL_M6E != sr->versionInfo.hardware[0]) &&
+       (TMR_SR_MODEL_MICRO != sr->versionInfo.hardware[0]) &&
+@@ -4020,7 +4020,7 @@ TMR_SR_paramGet(struct TMR_Reader *reader, TMR_Param key, void *value)
+     case TMR_SR_MODEL_MICRO:
+       {
+         /**
+-         * Micro has following varients.
++         * Micro has following variants.
+          **/
+         switch (sr->versionInfo.hardware[3])
+         {
 @@ -4751,7 +4751,7 @@ TMR_SR_executeTagOp(struct TMR_Reader *reader, TMR_TagOp *tagop, TMR_TagFilter *
      {
        TMR_TagOp_GEN2_IDS_SL900A_GetSensorValue op;
@@ -461,6 +488,44 @@ index 685f065..b5a2858 100644
   */ 
  TMR_Status
  TMR_fillReaderStats(TMR_Reader *reader, TMR_Reader_StatsValues* stats, uint16_t flag, uint8_t* msg, uint8_t offset)
+diff --git a/tm_config.h b/tm_config.h
+index a749b26..4105d8f 100644
+--- a/tm_config.h
++++ b/tm_config.h
+@@ -152,14 +152,14 @@ Note:To run readsync_baremetal codelet you have to
+ 
+ /**
+  * Enabling  this option will enable the support for the parameters defined 
+- * in stdio.h header file like FILE *. This check is required as stdio.h doese not
++ * in stdio.h header file like FILE *. This check is required as stdio.h does not
+  * exist in some of the embedded  architectures.
+  */
+ #define  TMR_ENABLE_STDIO
+   
+ /**
+  * Enabling  this option will enable the support for the parameters defined 
+- * in string.h header file like sterror(). This check is required as string.h doese not
++ * in string.h header file like strerror(). This check is required as string.h does not
+  * exist in some of the embedded  architectures.
+  */
+ #define  TMR_USE_STRERROR
+@@ -210,14 +210,14 @@ Note:To run readsync_baremetal codelet you have to
+ 
+ /**
+  * Enabling  this option will enable the support for the parameters defined 
+- * in stdio.h header file like FILE *. This check is required as stdio.h doese not
++ * in stdio.h header file like FILE *. This check is required as stdio.h does not
+  * exist in some of the embedded  architectures.
+  */
+ #undef  TMR_ENABLE_STDIO
+   
+ /**
+  * Enabling  this option will enable the support for the parameters defined 
+- * in string.h header file like sterror(). This check is required as string.h doese not
++ * in string.h header file like strerror(). This check is required as string.h does not
+  * exist in some of the embedded  architectures.
+  */
+ #undef  TMR_USE_STRERROR
 diff --git a/tm_reader.c b/tm_reader.c
 index 5d50db9..a39ea3a 100644
 --- a/tm_reader.c
@@ -596,7 +661,7 @@ index 311ad27..9696f61 100644
    /** The length (in bits) of the mask */
    uint16_t maskBitLength;
 diff --git a/tmr_params.h b/tmr_params.h
-index 82fd0c6..e9fdc7b 100644
+index 82fd0c6..1bbdf0e 100644
 --- a/tmr_params.h
 +++ b/tmr_params.h
 @@ -67,7 +67,7 @@ typedef enum TMR_Param
@@ -608,6 +673,27 @@ index 82fd0c6..e9fdc7b 100644
    TMR_PARAM_ANTENNA_RETURNLOSS,
    /** "/reader/antenna/txRxMap", TMR_AntennaMapList  */
    TMR_PARAM_ANTENNA_TXRXMAP,
+@@ -85,15 +85,15 @@ typedef enum TMR_Param
+   TMR_PARAM_GEN2_SESSION,
+   /** "/reader/gen2/target", TMR_GEN2_Target */
+   TMR_PARAM_GEN2_TARGET,
+-  /** "/reader/gen2/BLF", TMR_Gen2_LinkFrequency */
++  /** "/reader/gen2/BLF", TMR_GEN2_LinkFrequency */
+   TMR_PARAM_GEN2_BLF,
+-  /** "/reader/gen2/tari", TMR_Gen2_Tari */
++  /** "/reader/gen2/tari", TMR_GEN2_Tari */
+   TMR_PARAM_GEN2_TARI,
+-  /**"/reader/gen2/writeMode", TMR_Gen2_WriteMode*/
++  /**"/reader/gen2/writeMode", TMR_GEN2_WriteMode */
+   TMR_PARAM_GEN2_WRITEMODE,
+-  /** "/reader/gen2/bap", TMR_Gen2_Bap */
++  /** "/reader/gen2/bap", TMR_GEN2_Bap */
+   TMR_PARAM_GEN2_BAP,
+-  /** "/reader/gen2/protocolExtension", TMR_PARAM_GEN2_PROTOCOLEXTENSION */
++  /** "/reader/gen2/protocolExtension", TMR_GEN2_ProtocolExtension */
+   TMR_PARAM_GEN2_PROTOCOLEXTENSION,
+   /** "/reader/iso180006b/BLF", TMR_ISO180006B_LinkFrequency */
+   TMR_PARAM_ISO180006B_BLF,
 @@ -107,7 +107,7 @@ typedef enum TMR_Param
    TMR_PARAM_READ_ASYNCONTIME,
    /** "/reader/read/plan", TMR_ReadPlan */
@@ -644,7 +730,7 @@ index 82fd0c6..e9fdc7b 100644
    TMR_PARAM_READER_HOSTNAME,
    /** "/reader/currentTime", struct tm */
    TMR_PARAM_CURRENTTIME,
-@@ -201,7 +201,7 @@ typedef enum TMR_Param
+@@ -201,12 +201,13 @@ typedef enum TMR_Param
  	TMR_PARAM_READER_WRITE_REPLY_TIMEOUT,
  	/** "/reader/gen2/writeEarlyExit", bool */
  	TMR_PARAM_READER_WRITE_EARLY_EXIT,
@@ -653,10 +739,47 @@ index 82fd0c6..e9fdc7b 100644
    TMR_PARAM_READER_STATS_ENABLE,
    /** "/reader/trigger/read/Gpi", TMR_uint8List */
    TMR_PARAM_TRIGGER_READ_GPI,
+   /** "/reader/metadataflags", TMR_TRD_MetadataFlag*/
+   TMR_PARAM_METADATAFLAG,
++  /** "/reader/licensedFeatures", TMR_uint8List */
+   TMR_PARAM_LICENSED_FEATURES,
+   TMR_PARAM_END,
+   TMR_PARAM_MAX = TMR_PARAM_END-1,
+diff --git a/tmr_serial_reader.h b/tmr_serial_reader.h
+index b246277..bca3fe9 100644
+--- a/tmr_serial_reader.h
++++ b/tmr_serial_reader.h
+@@ -169,7 +169,7 @@ typedef struct TMR_SR_GEN2_Q
+ } TMR_SR_GEN2_Q;
+ 
+ 
+-/** An antenna port with an associated uint16_t value. */
++/** An antenna port with an associated int32_t value. */
+ typedef struct TMR_PortValue
+ {
+   /** The port number */
+@@ -309,7 +309,7 @@ typedef struct TM_SR_SerialReader
+   int tagsRemaining;
+   /* Buffer tag records fetched from module but not yet passed to caller. */
+   uint8_t bufResponse[TMR_SR_MAX_PACKET_SIZE];
+-  /* bufResopnse read index */
++  /* bufResponse read index */
+   uint8_t bufPointer;
+   /* Number of tag records in buffer but not yet passed to caller */
+   uint8_t tagsRemainingInBuffer;
 diff --git a/tmr_serial_transport.h b/tmr_serial_transport.h
-index 7d082ad..a45e68c 100644
+index 7d082ad..0686f77 100644
 --- a/tmr_serial_transport.h
 +++ b/tmr_serial_transport.h
+@@ -78,7 +78,7 @@ struct TMR_SR_SerialTransport
+   /**
+    * This callback causes the communication interface to be opened but
+    * does not transmit any serial-layer data. This should perform
+-   * actionms such as opening a serial port device or establishing a
++   * actions such as opening a serial port device or establishing a
+    * network connection within a wrapper protocol.
+    *
+    * @param this The TMR_SR_SerialTransport structure.
 @@ -107,7 +107,7 @@ struct TMR_SR_SerialTransport
     * @param this The TMR_SR_SerialTransport structure.
     * @param length The number of bytes to receive.

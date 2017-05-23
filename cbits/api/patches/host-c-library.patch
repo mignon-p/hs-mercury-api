@@ -1,0 +1,43 @@
+commit 3960a8ef94f0772de9a740f39a32793347a2ce4e
+Author: Patrick Pelletier <code@funwithsoftware.org>
+Date:   Mon May 22 14:51:37 2017 -0700
+
+    fix build failure when TMR_USE_HOST_C_LIBRARY is defined
+    
+    There was a warning because string.h wasn't included in
+    tm_reader_async.c, and there was a fatal error because tm_memcpy was
+    an undefined symbol.
+
+diff --git a/tm_reader_async.c b/tm_reader_async.c
+index 76045b9..d8fcc28 100644
+--- a/tm_reader_async.c
++++ b/tm_reader_async.c
+@@ -37,6 +37,7 @@
+ #include <semaphore.h>
+ #include <time.h>
+ #include <stdio.h>
++#include <string.h>
+ 
+ #ifndef WIN32
+ #include <sys/time.h>
+diff --git a/tmr_utils.c b/tmr_utils.c
+index 194a63a..80c7ce9 100644
+--- a/tmr_utils.c
++++ b/tmr_utils.c
+@@ -28,6 +28,7 @@
+  */
+ 
+ #include <stddef.h>
++#include <string.h>
+ 
+ #include "osdep.h"
+ #include "tmr_types.h"
+@@ -171,7 +172,7 @@ TMR_stringCopy(TMR_String *dest, const char *src, int len)
+   }
+   if (dest->max > 0)
+   {
+-    tm_memcpy(dest->value, src, len);
++    memcpy(dest->value, src, len);
+     dest->value[len] = '\0';
+   }
+ }
