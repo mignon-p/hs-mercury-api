@@ -421,8 +421,11 @@ paramID :: T.Text -> Param
 paramID name = H.lookupDefault PARAM_NONE name paramMapReverse
 
 -- | Create a new 'Reader' with the specified URI.  The reader is
--- not contacted at this point.
-create :: T.Text -- ^ a reader URI, such as @tmr:\/\/\/dev\/ttyUSB0@
+-- not contacted at this point.  On Mac OS X, be sure to use the
+-- serial device that starts with @cu.@, not the one that starts with
+-- @tty.@.
+create :: T.Text -- ^ a reader URI, such as @tmr:\/\/\/dev\/ttyUSB0@ on Linux
+                 -- or @tmr:\/\/\/dev\/cu.SLAB_USBtoUART@ on Mac OS X
        -> IO Reader
 create deviceUri = do
   B.useAsCString (textToBS deviceUri) $ \cs -> do

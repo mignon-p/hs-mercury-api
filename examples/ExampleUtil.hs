@@ -20,6 +20,7 @@ import Options.Applicative
 import qualified System.Hardware.MercuryApi as TMR
 import qualified System.Hardware.MercuryApi.Params as TMR
 import System.Exit
+import System.Info
 import System.IO
 
 printRegionsAndFail :: TMR.Reader -> IO a
@@ -74,7 +75,9 @@ createConnectAndParams uri listen region power = do
   return rdr
 
 defUri :: String
-defUri = "tmr:///dev/ttyUSB0"
+defUri = case os of
+           "darwin" -> "tmr:///dev/cu.SLAB_USBtoUART"
+           _ -> "tmr:///dev/ttyUSB0"
 
 defRegion :: String
 defRegion = "na2"
