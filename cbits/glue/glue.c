@@ -280,10 +280,14 @@ const char *c_TMR_strerr (ReaderEtc *reader, TMR_Status status)
     else
         tmr = NULL;
 
-    if (status == ERROR_ALREADY_DESTROYED)
+    switch (status) {
+    case ERROR_ALREADY_DESTROYED:
         return "Attempt to use reader after it was destroyed";
-    else
+    case ERROR_TEST_FAILURE:
+        return "Test failure";
+    default:
         return TMR_strerr (tmr, status);
+    }
 }
 
 void *c_new_c_locale (void)
