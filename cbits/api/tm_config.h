@@ -56,7 +56,7 @@ extern "C" {
 /**
  * The longest possible name for a reader.
  */
-#define TMR_MAX_READER_NAME_LENGTH 64
+#define TMR_MAX_READER_NAME_LENGTH 256
 
 /**
  * The maximum number of protocols supported in a multiprotocol search command
