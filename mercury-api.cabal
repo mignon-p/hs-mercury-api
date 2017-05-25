@@ -187,3 +187,16 @@ executable tmr-gpio
   hs-source-dirs:      examples
   default-language:    Haskell2010
   ghc-options:         -threaded
+
+
+executable replay
+  main-is:             replay.hs
+  build-depends:       base >= 4.6 && < 5
+                     , bytestring >= 0.10.4 && < 0.11
+                     , directory >= 1.2.2 && < 1.4
+                     , mercury-api
+                     , optparse-applicative >= 0.13 && < 0.14
+                     , text >= 1.2 && < 1.3
+  hs-source-dirs:      tests
+  default-language:    Haskell2010
+  ghc-options:         -threaded
