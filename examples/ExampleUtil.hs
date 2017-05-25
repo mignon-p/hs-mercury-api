@@ -61,7 +61,7 @@ createAndConnect uri listen = do
   when (listen) $ do
     listener <- TMR.hexListener stdout
     void $ TMR.addTransportListener rdr listener
-  TMR.paramSet rdr TMR.PARAM_TRANSPORTTIMEOUT (10000 :: Word32)
+  TMR.paramSetTransportTimeout rdr 10000
   TMR.connect rdr
   return rdr
 
