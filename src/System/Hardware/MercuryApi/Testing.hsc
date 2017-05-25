@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module System.Hardware.MercuryApi.Testing where
+module System.Hardware.MercuryApi.Testing
+  ( registerTransportInit
+  ) where
 
 import Control.Applicative
 import Control.Concurrent
@@ -72,6 +74,11 @@ instance Storable SerialTransport where
     #{poke TMR_SR_SerialTransport, setBaudRate}  p (stSetBaudRate x)
     #{poke TMR_SR_SerialTransport, shutdown}     p (stShutdown x)
     #{poke TMR_SR_SerialTransport, flush}        p (stFlush x)
+
+foreign import ccall "tm_reader.h TMR_setSerialTransport"
+    c_TMR_setSerialTransport :: CString
+                             -> FunPtr (Ptr SerialTransport -> Ptr () -> CString -> IO RawStatus)
+                             -> IO RawStatus
 
 foreign import ccall "wrapper"
     wrapOneArg :: (Ptr SerialTransport -> IO RawStatus)
@@ -245,3 +252,9 @@ testTransportInit p _ cstr = do
   let st = mkSerialTransport $ castStablePtrToPtr stable
   poke p st
   return successStatus
+
+registerTransportInit :: IO ()
+registerTransportInit = do
+  withCAString "test" $ \name -> do
+    status <- c_TMR_setSerialTransport name funTransportInit
+    when (status /= successStatus) $ fail "TMR_setSerialTransport failed"
