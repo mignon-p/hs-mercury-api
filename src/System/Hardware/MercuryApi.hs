@@ -26,6 +26,7 @@ module System.Hardware.MercuryApi
   , executeTagOp
   , reboot
   , destroy
+  , withReader
     -- ** Parameters
     -- | Although 'paramGet' and 'paramSet' are very flexible, they only
     -- check that the parameter type is correct at runtime.  You may
@@ -388,6 +389,7 @@ checkStatus rdr rstat loc param =
   checkStatus' rdr rstat loc param (textFromCString $ uriPtr rdr)
 
 uniqueCounter :: IORef Integer
+{-# NOINLINE uniqueCounter #-}
 uniqueCounter = U.unsafePerformIO $ newIORef 0
 
 newUnique :: IO Integer
@@ -460,6 +462,14 @@ connect rdr = withReaderEtc rdr "connect" "" c_TMR_connect
 -- 'destroy' will be called automatically if it has not already been called.
 destroy :: Reader -> IO ()
 destroy rdr = withReaderEtc rdr "destroy" "" c_TMR_destroy
+
+-- | Create a new 'Reader' with the specified URI, pass it to the given
+-- computation, and destroy it when the computation exits.
+withReader :: T.Text -- ^ a reader URI, such as @tmr:\/\/\/dev\/ttyUSB0@ on
+                     -- Linux or @tmr:\/\/\/dev\/cu.SLAB_USBtoUART@ on Mac OS X
+           -> (Reader -> IO a) -- ^ computation to run with Reader
+           -> IO a
+withReader uri = bracket (create uri) destroy
 
 hasMoreTags :: Ptr CBool -> Ptr ReaderEtc -> IO RawStatus
 hasMoreTags boolPtr rdrPtr = do
