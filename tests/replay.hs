@@ -87,7 +87,16 @@ readUser =
 testRead :: TestFunc
 testRead rdr ts = do
   setRegionAndPower rdr
-  -- TMR.paramSetReadPlanTagop rdr (Just readUser)
+
+  tags <- TMR.read rdr 1000
+  check ts $ return $ length tags
+  forM_ tags $ \tag -> do
+    check ts $ return tag { TMR.trTimestamp = 0 }
+
+testReadUser :: TestFunc
+testReadUser rdr ts = do
+  setRegionAndPower rdr
+  TMR.paramSetReadPlanTagop rdr (Just readUser)
 
   tags <- TMR.read rdr 1000
   check ts $ return $ length tags
@@ -97,6 +106,7 @@ testRead rdr ts = do
 tests :: [(String, TestFunc)]
 tests =
   [ ("read", testRead)
+  , ("readUser", testReadUser)
   ]
 
 allTests = map fst tests
