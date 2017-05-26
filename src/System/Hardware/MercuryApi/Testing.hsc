@@ -162,9 +162,9 @@ parseTransportLine txt =
                      [x] -> (Nothing, x)
                      [d, x] -> (Just (f d), x)
                      _ -> (Nothing, "")
-      mbs = hexToBytes hex
+      mbs = hexToBytes $ T.filter (/= ' ') hex
   in case mbs of
-       Nothing -> (dir, "")
+       Nothing -> (dir, "barf!")
        Just bs -> (dir, bs)
 
 parseTransport :: [T.Text] -> Maybe (TransportDirection, B.ByteString, [T.Text])
@@ -184,6 +184,7 @@ takeNext ss = do
   case result of
     Nothing -> return Nothing
     Just (dir, bs, ts') -> do
+      print (dir, bs) -- debugging
       writeIORef ref ts'
       return $ Just (dir, bs)
 
