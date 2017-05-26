@@ -70,9 +70,33 @@ runTest uri dir name func = do
           TMR.connect rdr
           func rdr (TestState dir hResult)
 
+setRegionAndPower :: TMR.Reader -> IO ()
+setRegionAndPower rdr = do
+  -- pwr <- TMR.paramGetRadioPowerMax rdr
+  TMR.paramSetBasics rdr TMR.REGION_NA2 2200 TMR.sparkFunAntennas
+  TMR.paramSetTagReadDataRecordHighestRssi rdr True
+
+readUser =
+  TMR.TagOp_GEN2_ReadData
+  { TMR.opBank = TMR.GEN2_BANK_USER
+  , TMR.opExtraBanks = []
+  , TMR.opWordAddress = 0
+  , TMR.opLen = 32
+  }
+
+testRead :: TestFunc
+testRead rdr ts = do
+  setRegionAndPower rdr
+  -- TMR.paramSetReadPlanTagop rdr (Just readUser)
+
+  tags <- TMR.read rdr 1000
+  check ts $ return $ length tags
+  forM_ tags $ \tag -> do
+    check ts $ return tag
+
 tests :: [(String, TestFunc)]
 tests =
-  [ ("", undefined)
+  [ ("read", testRead)
   ]
 
 allTests = map fst tests

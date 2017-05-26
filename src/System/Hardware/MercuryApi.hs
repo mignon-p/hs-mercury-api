@@ -184,9 +184,10 @@ newtype TransportListenerId = TransportListenerId Integer deriving (Eq)
 newtype Locale = Locale ()
 
 -- Many of these need to be safe because they could call back
--- into Haskell via the transport listener.
+-- into Haskell via the transport listener.  (Or via the custom
+-- transport we use for testing.)
 
-foreign import ccall unsafe "glue.h c_TMR_create"
+foreign import ccall safe "glue.h c_TMR_create"
     c_TMR_create :: Ptr ReaderEtc
                  -> CString
                  -> IO RawStatus
@@ -195,7 +196,7 @@ foreign import ccall safe "glue.h c_TMR_connect"
     c_TMR_connect :: Ptr ReaderEtc
                   -> IO RawStatus
 
-foreign import ccall unsafe "glue.h c_TMR_destroy"
+foreign import ccall safe "glue.h c_TMR_destroy"
     c_TMR_destroy :: Ptr ReaderEtc
                   -> IO RawStatus
 
