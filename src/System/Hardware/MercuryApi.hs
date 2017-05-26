@@ -149,6 +149,7 @@ import Data.Word
 import Foreign
 import Foreign.C
 import Text.Printf
+import System.Clock
 import System.Console.ANSI
 import System.IO
 import qualified System.IO.Unsafe as U
@@ -773,7 +774,9 @@ hexListener h = do
   useColor <- hSupportsANSI h
   return (listenerImpl h useColor False)
 
--- | Identical to 'hexListener', but also prints the opcode of each packet.
+-- | Identical to 'hexListener', but also prints the opcode of each packet,
+-- and a timestamp.  (The timestamp is relative to an arbitrary point in
+-- time, so is only useful for computing differences between timestamps.)
 opcodeListener :: Handle -> IO TransportListener
 opcodeListener h = do
   useColor <- hSupportsANSI h
@@ -782,7 +785,10 @@ opcodeListener h = do
 listenerImpl :: Handle -> Bool -> Bool -> TransportListener
 listenerImpl h useColor printOpcode dir dat _ = do
   setColors useColor [SetColor Foreground Vivid (color dir)]
-  mapM_ (T.hPutStrLn h) $ lstn dat (prefix dir)
+  opc <- if printOpcode
+         then opcodeAndTime dat
+         else return []
+  mapM_ (T.hPutStrLn h) $ lstn opc (prefix dir)
   setColors useColor [Reset]
   flushColor useColor
   where
@@ -794,15 +800,20 @@ listenerImpl h useColor printOpcode dir dat _ = do
     prefix Rx = "Received:"
     color Tx = Magenta
     color Rx = Cyan
-    lstn bs pfx =
-      zipWith T.append (pfx : repeat "         ")
-      (extractOpcode printOpcode bs ++ displayData bs)
+    lstn opc pfx =
+      zipWith T.append (pfx : repeat "         ") (opc ++ displayData dat)
 
-extractOpcode :: Bool -> B.ByteString -> [T.Text]
-extractOpcode False _ = []
-extractOpcode True bs
-  | B.length bs < 3 = ["too short"]
-  | otherwise = [opcodeName (bs `B.index` 2)]
+extractOpcode :: B.ByteString -> T.Text
+extractOpcode bs
+  | B.length bs < 3 = "too short"
+  | otherwise = opcodeName (bs `B.index` 2)
+
+opcodeAndTime :: B.ByteString -> IO [T.Text]
+opcodeAndTime bs = do
+  now <- getTime Monotonic
+  let opcode = extractOpcode bs
+      tm = printf "%d.%09d" (sec now) (nsec now)
+  return [pad 30 opcode <> T.pack tm]
 
 -- | Convert a hexadecimal string into a 'B.ByteString'.  The hex string may
 -- optionally include a "0x" prefix, which will be ignored.  If the input
@@ -832,6 +843,9 @@ bytesToHex bytes = U.unsafePerformIO $ do
 bytesToHexWithSpaces :: B.ByteString -> T.Text
 bytesToHexWithSpaces = T.pack . intercalate " " . map (printf "%02x") . B.unpack
 
+pad :: Int -> T.Text -> T.Text
+pad x t = t <> T.replicate (x - T.length t) " "
+
 -- | Format a 'B.ByteString' as 16 bytes per line, with both hex and ascii
 -- on the line.
 displayData :: B.ByteString -> [T.Text]
@@ -840,7 +854,6 @@ displayData bytes
   | otherwise =
     let (bs1, bs2) = B.splitAt 16 bytes
         (bs1a, bs1b) = B.splitAt 8 bs1
-        pad x t = t <> T.replicate (x - T.length t) " "
         dotify x = if x < 0x20 || x >= 0x7f then 0x2e else x
         hex = map (pad 25 . bytesToHexWithSpaces) [bs1a, bs1b]
         ascii = B.map dotify bs1
