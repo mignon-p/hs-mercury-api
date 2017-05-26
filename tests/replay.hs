@@ -57,7 +57,7 @@ runTest uri dir name func = do
       withFile transportFile WriteMode $ \hTransport -> do
         withFile resultFile WriteMode $ \hResult -> do
           TMR.withReader (T.pack uri) $ \rdr -> do
-            listener <- TMR.hexListener hTransport
+            listener <- TMR.opcodeListener hTransport
             TMR.addTransportListener rdr listener
             TMR.paramSetTransportTimeout rdr 10000
             TMR.connect rdr
@@ -92,7 +92,7 @@ testRead rdr ts = do
   tags <- TMR.read rdr 1000
   check ts $ return $ length tags
   forM_ tags $ \tag -> do
-    check ts $ return tag
+    check ts $ return tag { TMR.trTimestamp = 0 }
 
 tests :: [(String, TestFunc)]
 tests =

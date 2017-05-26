@@ -190,7 +190,6 @@ takeNext ss = do
   case result of
     Nothing -> return Nothing
     Just (dir, bs, tm, ts') -> do
-      print (dir, bs) -- debugging
       writeIORef ref ts'
       return $ Just (dir, bs, tm)
 
