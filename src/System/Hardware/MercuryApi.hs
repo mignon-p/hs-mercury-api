@@ -767,7 +767,7 @@ removeTransportListener rdr (TransportListenerId unique) = do
 
 -- | Given a 'Handle', returns a 'TransportListener' which prints
 -- transport data to that handle in hex.  If the handle is a terminal,
--- prints the data in magenta.
+-- prints transmitted data in magenta and received data in cyan.
 hexListener :: Handle -> IO TransportListener
 hexListener h = do
   useColor <- hSupportsANSI h
@@ -781,7 +781,7 @@ opcodeListener h = do
 
 listenerImpl :: Handle -> Bool -> Bool -> TransportListener
 listenerImpl h useColor printOpcode dir dat _ = do
-  setColors useColor [SetColor Foreground Vivid Magenta]
+  setColors useColor [SetColor Foreground Vivid (color dir)]
   mapM_ (T.hPutStrLn h) $ lstn dat (prefix dir)
   setColors useColor [Reset]
   flushColor useColor
@@ -792,6 +792,8 @@ listenerImpl h useColor printOpcode dir dat _ = do
     flushColor True = hFlush h
     prefix Tx = "Sending: "
     prefix Rx = "Received:"
+    color Tx = Magenta
+    color Rx = Cyan
     lstn bs pfx =
       zipWith T.append (pfx : repeat "         ")
       (extractOpcode printOpcode bs ++ displayData bs)
