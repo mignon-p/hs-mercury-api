@@ -40,6 +40,7 @@ data SerialState =
   SerialState
   { ssFilename :: String
   , ssNext :: IORef [T.Text]
+  , ssLeftover :: IORef B.ByteString
   }
 
 data SerialTransport =
@@ -211,6 +212,19 @@ testSendBytes p len msg _ = do
       -- threadDelay 500000
       return failureStatus
 
+getNextBytes :: SerialState -> IO (Either RawStatus B.ByteString)
+getNextBytes ss = do
+  leftover <- readIORef (ssLeftover ss)
+  if B.null leftover
+    then do
+    nxt <- takeNext ss
+    case nxt of
+      Just (Rx, bs) -> return $ Right bs
+      x -> do
+        putStrLn $ "expected Rx, but got " ++ show x
+        return $ Left failureStatus
+    else return $ Right leftover
+
 testReceiveBytes :: Ptr SerialTransport
                  -> Word32
                  -> Ptr Word32
@@ -219,22 +233,16 @@ testReceiveBytes :: Ptr SerialTransport
                  -> IO RawStatus
 testReceiveBytes p len returnLen msg _ = do
   ss <- getState p
-  nxt <- takeNext ss
-  case nxt of
-    Just (Rx, bs) -> do
-      B.useAsCStringLen bs $ \(pChar, bsLen) -> do
-        if (fromIntegral len < bsLen)
-          then do
-          putStrLn ("needed " ++ show bsLen ++ " bytes, but only " ++
-                    show len ++ " available")
-          return failureStatus
-          else do
-          poke returnLen (fromIntegral len)
-          copyArray msg (castPtr pChar) bsLen
-          return successStatus
-    x -> do
-      putStrLn $ "expected Rx, but got " ++ show x
-      return failureStatus
+  eth <- getNextBytes ss
+  case eth of
+    Left status -> return status
+    Right bs -> do
+      let (bs1, bs2) = B.splitAt (fromIntegral len) bs
+      B.useAsCStringLen bs1 $ \(pChar, bsLen) -> do
+        poke returnLen (fromIntegral len)
+        copyArray msg (castPtr pChar) bsLen
+      writeIORef (ssLeftover ss) bs2
+      return successStatus
 
 testFlush :: Ptr SerialTransport -> IO RawStatus
 testFlush _ = return successStatus
@@ -251,7 +259,8 @@ testTransportInit :: Ptr SerialTransport -> Ptr () -> CString -> IO RawStatus
 testTransportInit p _ cstr = do
   fname <- peekCAString cstr
   ref <- newIORef []
-  let ss = SerialState fname ref
+  ref2 <- newIORef ""
+  let ss = SerialState fname ref ref2
   stable <- newStablePtr ss
   let st = mkSerialTransport $ castStablePtrToPtr stable
   poke p st
