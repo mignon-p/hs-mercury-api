@@ -9,6 +9,8 @@ import Control.Concurrent
 import Control.Exception
 import Control.Monad
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as B8
+import Data.Char
 import Data.IORef
 import Data.List
 import Data.Monoid
@@ -22,7 +24,7 @@ import Foreign.C
 import System.IO
 import qualified System.IO.Unsafe as U
 
-import System.Hardware.MercuryApi
+import System.Hardware.MercuryApi hiding (read)
 
 #include <tm_reader.h>
 #include <glue.h>
@@ -41,6 +43,7 @@ data SerialState =
   { ssFilename :: String
   , ssNext :: IORef [T.Text]
   , ssLeftover :: IORef B.ByteString
+  , ssSendTime :: IORef Double
   }
 
 data SerialTransport =
@@ -159,35 +162,37 @@ parseTransportLine :: T.Text -> (Maybe TransportDirection, B.ByteString)
 parseTransportLine txt =
   let txt' = T.takeWhile (/= '|') txt
       f d = if d == "Sending" then Tx else Rx
-      (dir, hex) = case T.splitOn ":" txt' of
-                     [x] -> (Nothing, x)
-                     [d, x] -> (Just (f d), x)
-                     _ -> (Nothing, "")
-      mbs = hexToBytes $ T.filter (/= ' ') hex
+      (dir, mbs) = case T.splitOn ":" txt' of
+                     [x] -> (Nothing, hexToBytes $ T.filter (/= ' ') x)
+                     [d, x] -> (Just (f d),
+                                Just $ T.encodeUtf8 $ T.dropWhile (not . isDigit) x)
+                     _ -> (Nothing, Just "")
   in case mbs of
        Nothing -> (dir, "barf!")
        Just bs -> (dir, bs)
 
-parseTransport :: [T.Text] -> Maybe (TransportDirection, B.ByteString, [T.Text])
+parseTransport :: [T.Text]
+               -> Maybe (TransportDirection, B.ByteString, Double, [T.Text])
 parseTransport [] = Nothing
 parseTransport (t:ts) =
   let (Just dir, bs) = parseTransportLine t
       rest = takeWhile ((== Nothing) . fst) $ map parseTransportLine ts
       leftover = drop (length rest) ts
-      bss = bs : map snd rest
-  in Just (dir, B.concat bss, leftover)
+      bss = map snd rest
+      tm = read $ B8.unpack bs
+  in Just (dir, B.concat bss, tm, leftover)
 
-takeNext :: SerialState -> IO (Maybe (TransportDirection, B.ByteString))
+takeNext :: SerialState -> IO (Maybe (TransportDirection, B.ByteString, Double))
 takeNext ss = do
   let ref = ssNext ss
   ts <- readIORef ref
   let result = parseTransport ts
   case result of
     Nothing -> return Nothing
-    Just (dir, bs, ts') -> do
+    Just (dir, bs, tm, ts') -> do
       print (dir, bs) -- debugging
       writeIORef ref ts'
-      return $ Just (dir, bs)
+      return $ Just (dir, bs, tm)
 
 testSendBytes :: Ptr SerialTransport
               -> Word32
@@ -198,19 +203,23 @@ testSendBytes p len msg _ = do
   ss <- getState p
   nxt <- takeNext ss
   case nxt of
-    Just (Tx, expected) -> do
+    Just (Tx, expected, tm) -> do
+      writeIORef (ssSendTime ss) tm
       actual <- B.packCStringLen (castPtr msg, fromIntegral len)
       if actual == expected
         then return successStatus
         else do
         T.putStrLn ("expected <" <> bytesToHex expected <>
                     ">, but got <" <> bytesToHex actual <> ">")
-        -- threadDelay 500000
         return failureStatus
     x -> do
       putStrLn $ "expected Tx, but got " ++ show x
-      -- threadDelay 500000
       return failureStatus
+
+computeDelay :: Double -> Double -> Int
+computeDelay oldTime newTime =
+  -- convert seconds to microseconds, and add a fudge factor of 10%
+  ceiling $ (newTime - oldTime) * 1.1e6
 
 getNextBytes :: SerialState -> IO (Either RawStatus B.ByteString)
 getNextBytes ss = do
@@ -219,7 +228,10 @@ getNextBytes ss = do
     then do
     nxt <- takeNext ss
     case nxt of
-      Just (Rx, bs) -> return $ Right bs
+      Just (Rx, bs, tm) -> do
+        sendTime <- readIORef (ssSendTime ss)
+        threadDelay $ computeDelay sendTime tm
+        return $ Right bs
       x -> do
         putStrLn $ "expected Rx, but got " ++ show x
         return $ Left failureStatus
@@ -260,7 +272,8 @@ testTransportInit p _ cstr = do
   fname <- peekCAString cstr
   ref <- newIORef []
   ref2 <- newIORef ""
-  let ss = SerialState fname ref ref2
+  ref3 <- newIORef 0
+  let ss = SerialState fname ref ref2 ref3
   stable <- newStablePtr ss
   let st = mkSerialTransport $ castStablePtrToPtr stable
   poke p st
