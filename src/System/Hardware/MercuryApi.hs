@@ -61,7 +61,10 @@ module System.Hardware.MercuryApi
   , firmwareLoad
   , firmwareLoadFile
     -- * Utility functions
+    -- ** Listeners
   , hexListener
+  , opcodeListener
+    -- ** Byte shuffling
   , packBytesIntoWords
   , passwordToWords
     -- ** Parameters
@@ -768,10 +771,16 @@ removeTransportListener rdr (TransportListenerId unique) = do
 hexListener :: Handle -> IO TransportListener
 hexListener h = do
   useColor <- hSupportsANSI h
-  return (hexListener' h useColor)
+  return (listenerImpl h useColor False)
 
-hexListener' :: Handle -> Bool -> TransportListener
-hexListener' h useColor dir dat _ = do
+-- | Identical to 'hexListener', but also prints the opcode of each packet.
+opcodeListener :: Handle -> IO TransportListener
+opcodeListener h = do
+  useColor <- hSupportsANSI h
+  return (listenerImpl h useColor True)
+
+listenerImpl :: Handle -> Bool -> Bool -> TransportListener
+listenerImpl h useColor printOpcode dir dat _ = do
   setColors useColor [SetColor Foreground Vivid Magenta]
   mapM_ (T.hPutStrLn h) $ lstn dat (prefix dir)
   setColors useColor [Reset]
@@ -783,7 +792,15 @@ hexListener' h useColor dir dat _ = do
     flushColor True = hFlush h
     prefix Tx = "Sending: "
     prefix Rx = "Received:"
-    lstn bs pfx = zipWith T.append (pfx : repeat "         ") (displayData bs)
+    lstn bs pfx =
+      zipWith T.append (pfx : repeat "         ")
+      (extractOpcode printOpcode bs ++ displayData bs)
+
+extractOpcode :: Bool -> B.ByteString -> [T.Text]
+extractOpcode False _ = []
+extractOpcode True bs
+  | B.length bs < 3 = ["too short"]
+  | otherwise = [opcodeName (bs `B.index` 2)]
 
 -- | Convert a hexadecimal string into a 'B.ByteString'.  The hex string may
 -- optionally include a "0x" prefix, which will be ignored.  If the input

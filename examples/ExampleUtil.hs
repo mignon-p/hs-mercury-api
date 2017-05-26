@@ -59,7 +59,7 @@ createAndConnect :: String -> Bool -> IO TMR.Reader
 createAndConnect uri listen = do
   rdr <- TMR.create $ T.pack uri
   when (listen) $ do
-    listener <- TMR.hexListener stdout
+    listener <- TMR.opcodeListener stdout
     void $ TMR.addTransportListener rdr listener
   TMR.paramSetTransportTimeout rdr 10000
   TMR.connect rdr

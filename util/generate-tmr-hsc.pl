@@ -42,6 +42,8 @@ my %banks = ();
 my @lockBits = ();
 my %lockBits = ();
 
+my @opcodes = ();
+
 my %tagDataStructs = ();
 my %gen2Structs = ();
 my %gpioStructs = ();
@@ -374,6 +376,16 @@ sub readSerialReader {
     close F;
 }
 
+sub readSerialReaderImp {
+    open F, "$apiDir/serial_reader_imp.h" or die;
+    while (<F>) {
+        if (/^\s+TMR_SR_OPCODE_(\w+)/) {
+            push @opcodes, $1;
+        }
+    }
+    close F;
+}
+
 sub emit {
     my ($s) = @_;
     push @lines, $s;
@@ -399,8 +411,10 @@ sub emitEnumHeader {
     emit 'import Data.Word';
     emit 'import Foreign';
     emit 'import Foreign.C';
+    emit 'import Text.Printf';
     emit '';
     emit '#include <tm_reader.h>';
+    emit '#include <serial_reader_imp.h>';
     emit '#include <glue.h>';
     emit '';
 }
@@ -1429,6 +1443,14 @@ sub emitLockBits {
     emit "";
 }
 
+sub emitOpcodes {
+    emit "opcodeName :: Word8 -> Text";
+    foreach my $opcode (@opcodes) {
+        emit "opcodeName #{const TMR_SR_OPCODE_$opcode} = \"$opcode\"";
+    }
+    emit 'opcodeName x = "Unknown opcode " <> T.pack (printf "0x%02X" x)';
+}
+
 sub paramBase {
     my ($x) = @_;
     $x =~ s%/[^/]+$%%;
@@ -1594,6 +1616,7 @@ readTagData();
 readGen2();
 readGpio();
 readTagop();
+readSerialReaderImp();
 
 emitEnumHeader();
 emitStatus();
@@ -1602,6 +1625,7 @@ emitTagProtocol();
 emitMetadataFlags();
 emitBanks();
 emitLockBits();
+emitOpcodes();
 emitParams();
 emitParamTypes();
 
