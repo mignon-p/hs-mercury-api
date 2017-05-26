@@ -205,6 +205,29 @@ testLock rdr ts = do
                  }
   void $ check ts $ TMR.executeTagOp rdr opWrite3 (Just epcFilt)
 
+mkPin :: TMR.PinNumber -> TMR.PinNumber -> TMR.GpioPin
+mkPin highPin pin =
+  TMR.GpioPin
+  { TMR.gpId = pin
+  , TMR.gpHigh = highPin == pin
+  , TMR.gpOutput = True
+  }
+
+testGpo :: TestFunc
+testGpo rdr ts = do
+  let pins = [1..4]
+
+  TMR.paramSetGpioOutputList rdr pins
+  forM_ pins $ \pin -> do
+    TMR.gpoSet rdr $ map (mkPin pin) pins
+
+testGpi :: TestFunc
+testGpi rdr ts = do
+  let pins = [1..4]
+
+  TMR.paramSetGpioInputList rdr pins
+  void $ check ts $ TMR.gpiGet rdr
+
 tests :: [(String, TestFunc)]
 tests =
   [ ("params", testParams)
@@ -212,6 +235,8 @@ tests =
   , ("readUser", testReadUser)
   , ("write", testWrite)
   , ("lock", testLock)
+  , ("gpo", testGpo)
+  , ("gpi", testGpi)
   ]
 
 allTests = map fst tests
