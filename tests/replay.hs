@@ -1,7 +1,9 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 import Control.Concurrent
 import Control.Exception
 import Control.Monad
--- import qualified Data.ByteString as B
+import qualified Data.ByteString as B
 import Data.Int
 import Data.List
 import Data.Monoid
@@ -89,6 +91,15 @@ readUser =
   , TMR.opLen = 32
   }
 
+emptyUserDataFilter :: TMR.TagFilter
+emptyUserDataFilter = TMR.TagFilterGen2
+  { TMR.tfInvert = False
+  , TMR.tfFilterOn = TMR.FilterOnBank TMR.GEN2_BANK_USER
+  , TMR.tfBitPointer = 0
+  , TMR.tfMaskBitLength = 16
+  , TMR.tfMask = B.pack [0, 0]
+  }
+
 testParams :: TestFunc
 testParams rdr ts = do
   params <- check ts $ TMR.paramList rdr
@@ -115,11 +126,38 @@ testReadUser rdr ts = do
   forM_ tags $ \tag -> do
     check ts $ return tag { TMR.trTimestamp = 0 }
 
+testWrite :: TestFunc
+testWrite rdr ts = do
+  setRegionAndPower rdr
+  TMR.paramSetReadPlanFilter rdr (Just emptyUserDataFilter)
+
+  tags <- TMR.read rdr 1000
+  check ts $ return $ length tags
+  let trd = maximumBy (comparing TMR.trRssi) tags
+  check ts $ return trd { TMR.trTimestamp = 0 }
+
+  let epcFilt = TMR.TagFilterEPC (TMR.trTag trd)
+      words = TMR.packBytesIntoWords "I am Groot"
+      opWrite = TMR.TagOp_GEN2_WriteData
+                { TMR.opBank = TMR.GEN2_BANK_USER
+                , TMR.opWordAddress = 0
+                , TMR.opData = words
+                }
+  check ts $ TMR.executeTagOp rdr opWrite (Just epcFilt)
+
+  TMR.paramSetReadPlanFilter rdr Nothing
+  TMR.paramSetReadPlanTagop rdr (Just readUser)
+  tags2 <- TMR.read rdr 1000
+  check ts $ return $ length tags2
+  forM_ tags2 $ \tag -> do
+    check ts $ return tag { TMR.trTimestamp = 0 }
+
 tests :: [(String, TestFunc)]
 tests =
   [ ("params", testParams)
   , ("read", testRead)
   , ("readUser", testReadUser)
+  , ("write", testWrite)
   ]
 
 allTests = map fst tests
