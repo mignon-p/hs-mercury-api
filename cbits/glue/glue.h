@@ -15,9 +15,6 @@
 /** Attempt to use reader after it was destroyed. */
 #define ERROR_ALREADY_DESTROYED         ERROR_BINDING(1)
 
-/** Test failure; should not occur outside automated tests. */
-#define ERROR_TEST_FAILURE              ERROR_BINDING(2)
-
 typedef struct TransportListenerEtc TransportListenerEtc;
 typedef struct ReaderEtc ReaderEtc;
 typedef struct List16 List16;

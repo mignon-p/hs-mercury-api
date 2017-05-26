@@ -283,8 +283,6 @@ const char *c_TMR_strerr (ReaderEtc *reader, TMR_Status status)
     switch (status) {
     case ERROR_ALREADY_DESTROYED:
         return "Attempt to use reader after it was destroyed";
-    case ERROR_TEST_FAILURE:
-        return "Test failure";
     default:
         return TMR_strerr (tmr, status);
     }
