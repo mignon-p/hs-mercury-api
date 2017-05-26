@@ -1,0 +1,213 @@
+Sending: VERSION                       1607163.193409655
+         ff 00 03 1d 0c                                    |.....|
+Received:VERSION                       1607163.198017314
+         ff 14 03 00 00 14 12 08  00 30 00 00 02 20 16 12  |.........0... ..|
+         13 01 07 01 02 00 00 00  10 1b 05                 |...........|
+Sending: GET_CURRENT_PROGRAM           1607163.198520323
+         ff 00 0c 1d 03                                    |.....|
+Received:GET_CURRENT_PROGRAM           1607163.200096640
+         ff 01 0c 00 00 52 63 03                           |.....Rc.|
+Sending: GET_POWER_MODE                1607163.200213295
+         ff 00 68 1d 67                                    |..h.g|
+Received:GET_POWER_MODE                1607163.201750349
+         ff 01 68 00 00 00 a4 bf                           |..h.....|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.201843803
+         ff 02 6a 01 0e 2e 40                              |..j...@|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.203779097
+         ff 03 6a 00 00 01 0e 00  30 44                    |..j.....0D|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.209860887
+         ff 02 6a 01 12 2e 5c                              |..j...\|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.212151319
+         ff 04 6a 00 00 01 12 00  00 69 af                 |..j......i.|
+Sending: GET_TAG_PROTOCOL              1607163.212303820
+         ff 00 63 1d 6c                                    |..c.l|
+Received:GET_TAG_PROTOCOL              1607163.214220949
+         ff 02 63 00 00 00 05 21  46                       |..c....!F|
+Sending: GET_ANTENNA_PORT              1607163.214384690
+         ff 01 61 05 bd b8                                 |..a...|
+Received:GET_ANTENNA_PORT              1607163.216477126
+         ff 03 61 00 00 05 01 00  61 df                    |..a.....a.|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.216687794
+         ff 02 6a 01 0c 2e 42                              |..j...B|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.218831223
+         ff 03 6a 00 00 01 0c 01  32 45                    |..j.....2E|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.218994053
+         ff 02 6a 01 0d 2e 43                              |..j...C|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.221493834
+         ff 06 6a 00 00 01 0d 00  00 00 00 15 43           |..j.........C|
+Sending: GET_PROTOCOL_PARAM            1607163.221785083
+         ff 02 6b 05 10 3a 7f                              |..k..:.|
+Received:GET_PROTOCOL_PARAM            1607163.223991402
+         ff 03 6b 00 00 05 10 00  18 74                    |..k......t|
+Sending: GET_PROTOCOL_PARAM            1607163.224199490
+         ff 02 6b 05 11 3a 7e                              |..k..:~|
+Received:GET_PROTOCOL_PARAM            1607163.226358685
+         ff 03 6b 00 00 05 11 00  19 74                    |..k......t|
+Sending: GET_PROTOCOL_PARAM            1607163.226496325
+         ff 02 6b 03 10 3c 7f                              |..k..<.|
+Received:GET_PROTOCOL_PARAM            1607163.228550600
+         ff 02 6b 04 02 03 10 67  74                       |..k....gt|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.229007879
+         ff 02 6a 01 04 2e 4a                              |..j...J|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.231194178
+         ff 03 6a 00 00 01 04 00  3a 44                    |..j.....:D|
+Sending: GET_ANTENNA_PORT              1607163.231385713
+         ff 01 61 05 bd b8                                 |..a...|
+Received:GET_ANTENNA_PORT              1607163.233399618
+         ff 03 61 00 00 05 01 00  61 df                    |..a.....a.|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.233732135
+         ff 02 6a 01 03 2e 4d                              |..j...M|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.235900665
+         ff 03 6a 00 00 01 03 00  3d 44                    |..j.....=D|
+Sending: GET_USER_GPIO_INPUTS          1607163.236149669
+         ff 01 66 01 ba bc                                 |..f...|
+Received:GET_USER_GPIO_INPUTS          1607163.239087452
+         ff 0d 66 00 00 01 01 00  00 02 00 00 03 00 00 04  |..f.............|
+         00 01 64 46                                       |..dF|
+Sending: SET_USER_GPIO_OUTPUTS         1607163.239355332
+         ff 01 96 01 4a bc                                 |....J.|
+Received:SET_USER_GPIO_OUTPUTS         1607163.241343094
+         ff 02 96 00 00 01 00 28  e1                       |.......(.|
+Sending: SET_USER_GPIO_OUTPUTS         1607163.241477368
+         ff 01 96 02 4a bf                                 |....J.|
+Received:SET_USER_GPIO_OUTPUTS         1607163.243435747
+         ff 02 96 00 00 02 00 2b  e1                       |.......+.|
+Sending: SET_USER_GPIO_OUTPUTS         1607163.243576508
+         ff 01 96 03 4a be                                 |....J.|
+Received:SET_USER_GPIO_OUTPUTS         1607163.245555315
+         ff 02 96 00 00 03 00 2a  e1                       |.......*.|
+Sending: SET_USER_GPIO_OUTPUTS         1607163.245736216
+         ff 01 96 04 4a b9                                 |....J.|
+Received:SET_USER_GPIO_OUTPUTS         1607163.247719349
+         ff 02 96 00 00 04 00 2d  e1                       |.......-.|
+Sending: GET_USER_GPIO_INPUTS          1607163.247878956
+         ff 01 66 01 ba bc                                 |..f...|
+Received:GET_USER_GPIO_INPUTS          1607163.250865720
+         ff 0d 66 00 00 01 01 00  00 02 00 00 03 00 00 04  |..f.............|
+         00 01 64 46                                       |..dF|
+Sending: SET_USER_GPIO_OUTPUTS         1607163.251088558
+         ff 01 96 01 4a bc                                 |....J.|
+Received:SET_USER_GPIO_OUTPUTS         1607163.253100279
+         ff 02 96 00 00 01 00 28  e1                       |.......(.|
+Sending: SET_USER_GPIO_OUTPUTS         1607163.253242022
+         ff 01 96 02 4a bf                                 |....J.|
+Received:SET_USER_GPIO_OUTPUTS         1607163.255213014
+         ff 02 96 00 00 02 00 2b  e1                       |.......+.|
+Sending: SET_USER_GPIO_OUTPUTS         1607163.255349298
+         ff 01 96 03 4a be                                 |....J.|
+Received:SET_USER_GPIO_OUTPUTS         1607163.257199556
+         ff 02 96 00 00 03 00 2a  e1                       |.......*.|
+Sending: SET_USER_GPIO_OUTPUTS         1607163.257337761
+         ff 01 96 04 4a b9                                 |....J.|
+Received:SET_USER_GPIO_OUTPUTS         1607163.259171408
+         ff 02 96 00 00 04 00 2d  e1                       |.......-.|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.259898539
+         ff 02 6a 01 01 2e 4f                              |..j...O|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.262009437
+         ff 03 6a 00 00 01 01 00  3f 44                    |..j.....?D|
+Sending: GET_READ_TX_POWER             1607163.262279600
+         ff 01 62 01 be bc                                 |..b...|
+Received:GET_READ_TX_POWER             1607163.264688468
+         ff 07 62 00 00 01 08 98  0a 8c 00 00 26 7f        |..b.........&.|
+Sending: GET_READ_TX_POWER             1607163.264870338
+         ff 01 62 01 be bc                                 |..b...|
+Received:GET_READ_TX_POWER             1607163.267169535
+         ff 07 62 00 00 01 08 98  0a 8c 00 00 26 7f        |..b.........&.|
+Sending: GET_READ_TX_POWER             1607163.267419571
+         ff 01 62 00 be bd                                 |..b...|
+Received:GET_READ_TX_POWER             1607163.269237363
+         ff 03 62 00 00 00 08 98  a3 3e                    |..b......>|
+Sending: GET_WRITE_TX_POWER            1607163.269342513
+         ff 01 64 00 b8 bd                                 |..d...|
+Received:GET_WRITE_TX_POWER            1607163.271207694
+         ff 03 64 00 00 00 08 98  84 a7                    |..d.......|
+Sending: GET_TEMPERATURE               1607163.271340010
+         ff 00 72 1d 7d                                    |..r.}|
+Received:GET_TEMPERATURE               1607163.273007658
+         ff 01 72 00 00 25 48 22                           |..r..%H"|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.273175016
+         ff 02 6a 01 06 2e 48                              |..j...H|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.275169489
+         ff 03 6a 00 00 01 06 01  38 45                    |..j.....8E|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.275290019
+         ff 02 6a 01 09 2e 47                              |..j...G|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.277443229
+         ff 03 6a 00 00 01 09 01  37 45                    |..j.....7E|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.277610369
+         ff 02 6a 01 00 2e 4e                              |..j...N|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.279819816
+         ff 03 6a 00 00 01 00 00  3e 44                    |..j.....>D|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.280173013
+         ff 02 6a 01 08 2e 46                              |..j...F|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.282375278
+         ff 03 6a 00 00 01 08 01  36 45                    |..j.....6E|
+Sending: HW_VERSION                    1607163.282564777
+         ff 02 10 00 40 f0 d3                              |....@..|
+Received:HW_VERSION                    1607163.286543377
+         ff 16 10 00 00 00 40 40  12 34 35 31 36 30 30 36  |......@@.4516006|
+         37 37 30 31 31 33 30 33  32 34 41 49 5b           |7701130324AI[|
+Sending: GET_AVAILABLE_PROTOCOLS       1607163.286884753
+         ff 00 70 1d 7f                                    |..p..|
+Received:GET_AVAILABLE_PROTOCOLS       1607163.288798988
+         ff 02 70 00 00 00 05 3b  75                       |..p....;u|
+Sending: GET_FREQ_HOP_TABLE            1607163.288987124
+         ff 00 65 1d 6a                                    |..e.j|
+Received:GET_FREQ_HOP_TABLE            1607163.308543005
+         ff c8 65 00 00 00 0e 21  30 00 0e 08 30 00 0e 1c  |..e....!0...0...|
+         80 00 0e 13 e8 00 0e 10  00 00 0e 1e 10 00 0e 03  |................|
+         80 00 0e 06 a0 00 0e 17  d0 00 0e 10 c8 00 0e 16  |................|
+         40 00 0e 0a 88 00 0e 07  68 00 0e 0e 70 00 0e 23  |@.......h...p..#|
+         88 00 0e 24 50 00 0e 0c  e0 00 0e 1a f0 00 0e 18  |...$P...........|
+         98 00 0e 0d a8 00 0e 1b  b8 00 0e 11 90 00 0e 01  |................|
+         28 00 0e 14 b0 00 0e 05  d8 00 0d ff 98 00 0e 22  |(.............."|
+         c0 00 0e 19 60 00 0e 08  f8 00 0e 21 f8 00 0e 1d  |....`......!....|
+         48 00 0e 04 48 00 0e 05  10 00 0e 15 78 00 0e 02  |H...H.......x...|
+         b8 00 0e 25 18 00 0e 1e  d8 00 0e 12 58 00 0e 13  |...%........X...|
+         20 00 0e 00 60 00 0e 0b  50 00 0e 20 68 00 0e 0c  | ...`...P.. h...|
+         18 00 0e 1a 28 00 0e 01  f0 00 0e 25 e0 00 0e 09  |....(......%....|
+         c0 00 0e 0f 38 00 0e 17  08 00 0e 1f a0 5f f6     |....8........_.|
+Sending: GET_FREQ_HOP_TABLE            1607163.310645400
+         ff 01 65 01 b9 bc                                 |..e...|
+Received:GET_FREQ_HOP_TABLE            1607163.312829142
+         ff 05 65 00 00 01 00 00  01 77 4b 8b              |..e......wK.|
+Sending: GET_REGION                    1607163.313061975
+         ff 00 67 1d 68                                    |..g.h|
+Received:GET_REGION                    1607163.314867323
+         ff 01 67 00 00 0d b4 8c                           |..g.....|
+Sending: GET_AVAILABLE_REGIONS         1607163.315072464
+         ff 00 71 1d 7e                                    |..q.~|
+Received:GET_AVAILABLE_REGIONS         1607163.317697575
+         ff 0a 71 00 00 0d 0e 04  05 06 08 09 0b 0c ff 1f  |..q.............|
+         dd                                                |.|
+Sending: GET_REGION                    1607163.318055093
+         ff 02 67 01 40 ff a3                              |..g.@..|
+Received:GET_REGION                    1607163.319961064
+         ff 00 67 01 05 99 84                              |..g....|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.320254659
+         ff 02 6a 01 0a 2e 44                              |..j...D|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.322273690
+         ff 01 6a 01 05 01 d7 fd                           |..j.....|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.322618098
+         ff 02 6a 01 12 2e 5c                              |..j...\|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.324969495
+         ff 04 6a 00 00 01 12 00  00 69 af                 |..j......i.|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.325205049
+         ff 02 6a 01 13 2e 5d                              |..j...]|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.327550780
+         ff 04 6a 00 00 01 13 00  11 79 9f                 |..j......y.|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.327787019
+         ff 02 6a 01 0b 2e 45                              |..j...E|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.329998367
+         ff 03 6a 00 00 01 0b 00  35 44                    |..j.....5D|
+Sending: GET_PROTOCOL_PARAM            1607163.330257368
+         ff 02 6b 05 3f 3a 50                              |..k.?:P|
+Received:GET_PROTOCOL_PARAM            1607163.332552421
+         ff 05 6b 00 00 05 3f 00  4e 20 4d 14              |..k...?.N M.|
+Sending: GET_PROTOCOL_PARAM            1607163.332766455
+         ff 02 6b 05 3f 3a 50                              |..k.?:P|
+Received:GET_PROTOCOL_PARAM            1607163.335117099
+         ff 05 6b 00 00 05 3f 00  4e 20 4d 14              |..k...?.N M.|
+Sending: GET_READER_OPTIONAL_PARAMS    1607163.335359223
+         ff 02 6a 01 1e 2e 50                              |..j...P|
+Received:GET_READER_OPTIONAL_PARAMS    1607163.337598323
+         ff 03 6a 00 00 01 1e 00  20 44                    |..j..... D|

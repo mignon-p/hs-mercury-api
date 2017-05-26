@@ -28,9 +28,14 @@ data TestState =
 
 type TestFunc = TMR.Reader -> TestState -> IO ()
 
+suppressUri :: Either TMR.MercuryException a -> Either TMR.MercuryException a
+suppressUri (Left exc) = Left exc { TMR.meUri = T.empty }
+suppressUri x = x
+
 check :: (Read a, Show a, Eq a) => TestState -> IO a -> IO a
 check ts f = do
-  eth <- try f
+  eth' <- try f
+  let eth = suppressUri eth'
   case tsDirection ts of
     Record -> hPutStrLn (tsHandle ts) (show eth)
     Playback -> do
@@ -84,6 +89,13 @@ readUser =
   , TMR.opLen = 32
   }
 
+testParams :: TestFunc
+testParams rdr ts = do
+  params <- check ts $ TMR.paramList rdr
+  let params' = TMR.PARAM_URI `delete` params -- because URI will be different
+  forM_ params' $ \param -> do
+    check ts $ TMR.paramGetString rdr param
+
 testRead :: TestFunc
 testRead rdr ts = do
   setRegionAndPower rdr
@@ -105,7 +117,8 @@ testReadUser rdr ts = do
 
 tests :: [(String, TestFunc)]
 tests =
-  [ ("read", testRead)
+  [ ("params", testParams)
+  , ("read", testRead)
   , ("readUser", testReadUser)
   ]
 

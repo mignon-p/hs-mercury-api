@@ -1,0 +1,77 @@
+Right [PARAM_BAUDRATE,PARAM_PROBEBAUDRATES,PARAM_COMMANDTIMEOUT,PARAM_TRANSPORTTIMEOUT,PARAM_POWERMODE,PARAM_USERMODE,PARAM_ANTENNA_CHECKPORT,PARAM_ANTENNA_PORTLIST,PARAM_ANTENNA_CONNECTEDPORTLIST,PARAM_ANTENNA_PORTSWITCHGPOS,PARAM_ANTENNA_SETTLINGTIMELIST,PARAM_ANTENNA_RETURNLOSS,PARAM_ANTENNA_TXRXMAP,PARAM_GPIO_INPUTLIST,PARAM_GPIO_OUTPUTLIST,PARAM_GEN2_ACCESSPASSWORD,PARAM_GEN2_Q,PARAM_GEN2_TAGENCODING,PARAM_GEN2_SESSION,PARAM_GEN2_TARGET,PARAM_GEN2_BLF,PARAM_GEN2_TARI,PARAM_GEN2_WRITEMODE,PARAM_GEN2_BAP,PARAM_GEN2_PROTOCOLEXTENSION,PARAM_ISO180006B_MODULATION_DEPTH,PARAM_ISO180006B_DELIMITER,PARAM_READ_ASYNCOFFTIME,PARAM_READ_ASYNCONTIME,PARAM_READ_PLAN,PARAM_RADIO_ENABLEPOWERSAVE,PARAM_RADIO_POWERMAX,PARAM_RADIO_POWERMIN,PARAM_RADIO_PORTREADPOWERLIST,PARAM_RADIO_PORTWRITEPOWERLIST,PARAM_RADIO_READPOWER,PARAM_RADIO_WRITEPOWER,PARAM_RADIO_TEMPERATURE,PARAM_TAGREADDATA_RECORDHIGHESTRSSI,PARAM_TAGREADDATA_REPORTRSSIINDBM,PARAM_TAGREADDATA_UNIQUEBYANTENNA,PARAM_TAGREADDATA_UNIQUEBYDATA,PARAM_TAGOP_ANTENNA,PARAM_TAGOP_PROTOCOL,PARAM_VERSION_HARDWARE,PARAM_VERSION_SERIAL,PARAM_VERSION_MODEL,PARAM_VERSION_SOFTWARE,PARAM_VERSION_SUPPORTEDPROTOCOLS,PARAM_REGION_HOPTABLE,PARAM_REGION_HOPTIME,PARAM_REGION_ID,PARAM_REGION_SUPPORTEDREGIONS,PARAM_REGION_LBT_ENABLE,PARAM_LICENSE_KEY,PARAM_USER_CONFIG,PARAM_RADIO_ENABLESJC,PARAM_EXTENDEDEPC,PARAM_READER_STATISTICS,PARAM_READER_STATS,PARAM_URI,PARAM_PRODUCT_GROUP_ID,PARAM_PRODUCT_GROUP,PARAM_PRODUCT_ID,PARAM_TAGREADATA_TAGOPSUCCESSCOUNT,PARAM_TAGREADATA_TAGOPFAILURECOUNT,PARAM_STATUS_ENABLE_ANTENNAREPORT,PARAM_STATUS_ENABLE_FREQUENCYREPORT,PARAM_STATUS_ENABLE_TEMPERATUREREPORT,PARAM_TAGREADDATA_ENABLEREADFILTER,PARAM_TAGREADDATA_READFILTERTIMEOUT,PARAM_TAGREADDATA_UNIQUEBYPROTOCOL,PARAM_READER_WRITE_REPLY_TIMEOUT,PARAM_READER_WRITE_EARLY_EXIT,PARAM_READER_STATS_ENABLE,PARAM_TRIGGER_READ_GPI,PARAM_METADATAFLAG]
+Right "115200"
+Right "[9600,115200,921600,19200,38400,57600,230400,460800]"
+Right "1000"
+Right "10000"
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_POWERMODE", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_USERMODE", meUri = ""})
+Right "False"
+Right "[1]"
+Right "[]"
+Right "[]"
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_ANTENNA_SETTLINGTIMELIST", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_ANTENNA_RETURNLOSS", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_ANTENNA_TXRXMAP", meUri = ""})
+Right "[1,2,3,4]"
+Right "[]"
+Right "0"
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_GEN2_Q", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_GEN2_TAGENCODING", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_GEN2_SESSION", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_GEN2_TARGET", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_GEN2_BLF", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_GEN2_TARI", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_GEN2_WRITEMODE", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_GEN2_BAP", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_GEN2_PROTOCOLEXTENSION", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_ISO180006B_MODULATION_DEPTH", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_ISO180006B_DELIMITER", meUri = ""})
+Right "0"
+Right "250"
+Right "SimpleReadPlan {rpWeight = 1, rpEnableAutonomousRead = False, rpAntennas = [], rpProtocol = TAG_PROTOCOL_GEN2, rpFilter = Nothing, rpTagop = Nothing, rpUseFastSearch = False, rpStopOnCount = Nothing, rpTriggerRead = Nothing}"
+Right "False"
+Right "2700"
+Right "0"
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_RADIO_PORTREADPOWERLIST", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_RADIO_PORTWRITEPOWERLIST", meUri = ""})
+Right "2200"
+Right "2200"
+Right "37"
+Right "True"
+Right "True"
+Right "True"
+Right "False"
+Right "0"
+Right "TAG_PROTOCOL_GEN2"
+Right "\"30.00.00.02\""
+Right "\"45160067701130324A\""
+Right "\"M6e Nano\""
+Right "\"01.07.01.02-20.16.12.13-BL14.12.08.00\""
+Right "[TAG_PROTOCOL_GEN2]"
+Right "[926000,919600,924800,922600,921600,925200,918400,919200,923600,921800,923200,920200,919400,921200,926600,926800,920800,924400,923800,921000,924600,922000,917800,922800,919000,917400,926400,924000,919800,926200,925000,918600,918800,923000,918200,927000,925400,922200,922400,917600,920400,925800,920600,924200,918000,927200,920000,921400,923400,925600]"
+Right "375"
+Right "REGION_NA2"
+Right "[REGION_NA2,REGION_NA3,REGION_IN,REGION_JP,REGION_PRC,REGION_EU3,REGION_KR2,REGION_AU,REGION_NZ,REGION_OPEN]"
+Right "False"
+Left (MercuryException {meStatusType = ERROR_TYPE_MISC, meStatus = ERROR_UNSUPPORTED, meMessage = "Unsupported operation", meLocation = "paramGet", meParam = "PARAM_LICENSE_KEY", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_USER_CONFIG", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_CODE, meStatus = ERROR_MSG_INVALID_PARAMETER_VALUE, meMessage = "Parameter to command is invalid", meLocation = "paramGet", meParam = "PARAM_RADIO_ENABLESJC", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_MISC, meStatus = ERROR_UNSUPPORTED, meMessage = "Unsupported operation", meLocation = "paramGet", meParam = "PARAM_EXTENDEDEPC", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_READER_STATISTICS", meUri = ""})
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_READER_STATS", meUri = ""})
+Right "0"
+Right "\"Embedded Reader\""
+Right "17"
+Right "0"
+Right "0"
+Right "False"
+Right "False"
+Right "False"
+Right "True"
+Right "-1"
+Right "True"
+Right "20000"
+Right "True"
+Left (MercuryException {meStatusType = ERROR_TYPE_BINDING, meStatus = ERROR_UNIMPLEMENTED_PARAM, meMessage = "The given parameter is not yet implemented in the Haskell binding.", meLocation = "paramGet", meParam = "PARAM_READER_STATS_ENABLE", meUri = ""})
+Right "[]"
+Right "[METADATA_FLAG_READCOUNT,METADATA_FLAG_RSSI,METADATA_FLAG_ANTENNAID,METADATA_FLAG_FREQUENCY,METADATA_FLAG_TIMESTAMP,METADATA_FLAG_PHASE,METADATA_FLAG_PROTOCOL,METADATA_FLAG_DATA,METADATA_FLAG_GPIO_STATUS]"
