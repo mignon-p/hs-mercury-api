@@ -152,12 +152,66 @@ testWrite rdr ts = do
   forM_ tags2 $ \tag -> do
     check ts $ return tag { TMR.trTimestamp = 0 }
 
+testLock :: TestFunc
+testLock rdr ts = do
+  setRegionAndPower rdr
+  TMR.paramSetReadPlanFilter rdr (Just emptyUserDataFilter)
+
+  -- find a tag
+  tags <- TMR.read rdr 1000
+  check ts $ return $ length tags
+  let trd = maximumBy (comparing TMR.trRssi) tags
+  check ts $ return trd { TMR.trTimestamp = 0 }
+
+  -- write access password
+  let password = 12345
+      epcFilt = TMR.TagFilterEPC (TMR.trTag trd)
+      opWrite = TMR.TagOp_GEN2_WriteData
+                { TMR.opBank = TMR.GEN2_BANK_RESERVED
+                , TMR.opWordAddress = TMR.accessPasswordAddress
+                , TMR.opData = TMR.passwordToWords password
+                }
+  check ts $ TMR.executeTagOp rdr opWrite (Just epcFilt)
+
+  -- lock user bank
+  let opLock = TMR.TagOp_GEN2_Lock
+               { TMR.opMask   = [TMR.GEN2_LOCK_BITS_USER]
+               , TMR.opAction = [TMR.GEN2_LOCK_BITS_USER]
+               , TMR.opAccessPassword = password
+               }
+  check ts $ TMR.executeTagOp rdr opLock (Just epcFilt)
+
+  -- attempt to write data; should fail
+  let opWrite2 = TMR.TagOp_GEN2_WriteData
+                 { TMR.opBank = TMR.GEN2_BANK_USER
+                 , TMR.opWordAddress = 0
+                 , TMR.opData = TMR.packBytesIntoWords "This should fail"
+                 }
+  check ts $ TMR.executeTagOp rdr opWrite2 (Just epcFilt)
+
+  -- unlock user bank
+  let opUnlock = TMR.TagOp_GEN2_Lock
+                 { TMR.opMask   = [TMR.GEN2_LOCK_BITS_USER]
+                 , TMR.opAction = []
+                 , TMR.opAccessPassword = password
+                 }
+  check ts $ TMR.executeTagOp rdr opUnlock (Just epcFilt)
+
+  -- attempt to write data; should succeed
+  let opWrite3 = TMR.TagOp_GEN2_WriteData
+                 { TMR.opBank = TMR.GEN2_BANK_USER
+                 , TMR.opWordAddress = 0
+                 , TMR.opData = TMR.packBytesIntoWords "This should succeed"
+                 }
+  void $ check ts $ TMR.executeTagOp rdr opWrite3 (Just epcFilt)
+
 tests :: [(String, TestFunc)]
 tests =
   [ ("params", testParams)
   , ("read", testRead)
   , ("readUser", testReadUser)
   , ("write", testWrite)
+  , ("lock", testLock)
   ]
 
 allTests = map fst tests
