@@ -33,7 +33,8 @@ successStatus :: RawStatus
 successStatus = #{const TMR_SUCCESS}
 
 failureStatus :: RawStatus
-failureStatus = #{const ERROR_TEST_FAILURE}
+-- failureStatus = #{const ERROR_TEST_FAILURE}
+failureStatus = #{const TMR_ERROR_TIMEOUT}
 
 data SerialState =
   SerialState
@@ -200,11 +201,13 @@ testSendBytes p len msg _ = do
       if actual == expected
         then return successStatus
         else do
-        T.putStrLn ("expected " <> bytesToHex expected <>
-                    ", but got " <> bytesToHex actual)
+        T.putStrLn ("expected <" <> bytesToHex expected <>
+                    ">, but got <" <> bytesToHex actual <> ">")
+        -- threadDelay 500000
         return failureStatus
     x -> do
       putStrLn $ "expected Tx, but got " ++ show x
+      -- threadDelay 500000
       return failureStatus
 
 testReceiveBytes :: Ptr SerialTransport
