@@ -28,6 +28,7 @@ struct ReaderEtc {
     TransportListenerEtc *transportListeners;
     ReadPlanEtc *readPlan;
     bool destroyed;
+    char uri[1]; // must be last
 };
 
 struct TransportListenerEtc {

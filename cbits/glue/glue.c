@@ -52,6 +52,7 @@ TMR_Status c_TMR_create (ReaderEtc *reader, const char *deviceUri)
     reader->transportListeners = NULL;
     reader->readPlan = NULL;
     reader->destroyed = false;
+    strcpy (reader->uri, deviceUri);
     return TMR_create (&reader->reader, deviceUri);
 }
 

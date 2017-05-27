@@ -59,7 +59,7 @@ sizeofReaderEtc :: Int
 sizeofReaderEtc = #{size ReaderEtc}
 
 uriPtr :: Ptr ReaderEtc -> CString
-uriPtr = #{ptr ReaderEtc, reader.uri}
+uriPtr = #{ptr ReaderEtc, uri}
 
 -- I'm not sure what encoding MercuryApi uses for its strings.
 -- I'm guessing UTF-8 for now, but the encoding is encapsulated in

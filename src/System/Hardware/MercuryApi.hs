@@ -435,8 +435,8 @@ create :: T.Text -- ^ a reader URI, such as @tmr:\/\/\/dev\/ttyUSB0@ on Linux
                  -- or @tmr:\/\/\/dev\/cu.SLAB_USBtoUART@ on Mac OS X
        -> IO Reader
 create deviceUri = do
-  B.useAsCString (textToBS deviceUri) $ \cs -> do
-    fp <- mallocForeignPtrBytes sizeofReaderEtc
+  B.useAsCStringLen (textToBS deviceUri) $ \(cs, len) -> do
+    fp <- mallocForeignPtrBytes (sizeofReaderEtc + len)
     withForeignPtr fp $ \p -> do
       status <- c_TMR_create p cs
       checkStatus' p status "create" "" (return deviceUri)
