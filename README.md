@@ -1,3 +1,6 @@
+(I haven't released this package to Hackage yet, so consider it
+alpha-quality.)
+
 This package is a Haskell binding to the [Mercury API][5] C API for
 [ThingMagic][6] brand RFID readers.  It is especially geared toward
 the [SparkFun Simultaneous RFID Reader][1], which uses ThingMagic's
@@ -29,6 +32,7 @@ tagops, please file an issue in GitHub and I will add them.
 
 Additional resources:
 
+* [RFID Basics][8]
 * [SparkFun Simultaneous RFID Reader hookup guide][3]
 * [ThingMagic manuals and firmware][4]
 
@@ -39,3 +43,4 @@ Additional resources:
 [5]: http://www.thingmagic.com/index.php/manuals-firmware#Mercury_API
 [6]: http://www.thingmagic.com/
 [7]: http://www.thingmagic.com/index.php/embedded-rfid-readers/thingmagic-nano-module
+[8]: https://learn.sparkfun.com/tutorials/rfid-basics
