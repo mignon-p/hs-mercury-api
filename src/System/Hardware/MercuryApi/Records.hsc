@@ -59,7 +59,7 @@ sizeofReaderEtc :: Int
 sizeofReaderEtc = #{size ReaderEtc}
 
 uriPtr :: Ptr ReaderEtc -> CString
-uriPtr = #{ptr ReaderEtc, reader.uri}
+uriPtr = #{ptr ReaderEtc, uri}
 
 -- I'm not sure what encoding MercuryApi uses for its strings.
 -- I'm guessing UTF-8 for now, but the encoding is encapsulated in
@@ -653,6 +653,8 @@ instance Storable TagReadData where
 -- | An operation that can be performed on a tag.  Can be used
 -- as an argument to 'System.Hardware.MercuryApi.executeTagOp',
 -- or can be embedded into a 'System.Hardware.MercuryApi.ReadPlan'.
+-- (However, on the M6e Nano, only 'TagOp_GEN2_ReadData' may be
+-- embedded in a 'System.Hardware.MercuryApi.ReadPlan'.
 data TagOp =
     TagOp_GEN2_WriteTag
     { opEpc :: !TagData -- ^ Tag EPC
