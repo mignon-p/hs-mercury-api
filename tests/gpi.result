@@ -1,0 +1,1 @@
+Right [GpioPin {gpId = 1, gpHigh = False, gpOutput = False},GpioPin {gpId = 2, gpHigh = False, gpOutput = False},GpioPin {gpId = 3, gpHigh = False, gpOutput = False},GpioPin {gpId = 4, gpHigh = True, gpOutput = False}]

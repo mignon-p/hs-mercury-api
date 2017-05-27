@@ -1,0 +1,117 @@
+Sending: VERSION                       1618318.942992850
+         ff 00 03 1d 0c                                    |.....|
+Received:VERSION                       1618318.946535066
+         ff 14 03 00 00 14 12 08  00 30 00 00 02 20 16 12  |.........0... ..|
+         13 01 07 01 02 00 00 00  10 1b 05                 |...........|
+Sending: GET_CURRENT_PROGRAM           1618318.947020444
+         ff 00 0c 1d 03                                    |.....|
+Received:GET_CURRENT_PROGRAM           1618318.948566726
+         ff 01 0c 00 00 52 63 03                           |.....Rc.|
+Sending: GET_POWER_MODE                1618318.948717066
+         ff 00 68 1d 67                                    |..h.g|
+Received:GET_POWER_MODE                1618318.950309705
+         ff 01 68 00 00 00 a4 bf                           |..h.....|
+Sending: GET_READER_OPTIONAL_PARAMS    1618318.950404769
+         ff 02 6a 01 0e 2e 40                              |..j...@|
+Received:GET_READER_OPTIONAL_PARAMS    1618318.952376555
+         ff 03 6a 00 00 01 0e 00  30 44                    |..j.....0D|
+Sending: GET_READER_OPTIONAL_PARAMS    1618318.953236827
+         ff 02 6a 01 12 2e 5c                              |..j...\|
+Received:GET_READER_OPTIONAL_PARAMS    1618318.955499201
+         ff 04 6a 00 00 01 12 00  00 69 af                 |..j......i.|
+Sending: GET_TAG_PROTOCOL              1618318.955666882
+         ff 00 63 1d 6c                                    |..c.l|
+Received:GET_TAG_PROTOCOL              1618318.957566645
+         ff 02 63 00 00 00 05 21  46                       |..c....!F|
+Sending: GET_ANTENNA_PORT              1618318.957735305
+         ff 01 61 05 bd b8                                 |..a...|
+Received:GET_ANTENNA_PORT              1618318.959879076
+         ff 03 61 00 00 05 01 00  61 df                    |..a.....a.|
+Sending: GET_READER_OPTIONAL_PARAMS    1618318.960104443
+         ff 02 6a 01 0c 2e 42                              |..j...B|
+Received:GET_READER_OPTIONAL_PARAMS    1618318.962299514
+         ff 03 6a 00 00 01 0c 01  32 45                    |..j.....2E|
+Sending: GET_READER_OPTIONAL_PARAMS    1618318.962561529
+         ff 02 6a 01 0d 2e 43                              |..j...C|
+Received:GET_READER_OPTIONAL_PARAMS    1618318.965031538
+         ff 06 6a 00 00 01 0d 00  00 00 00 15 43           |..j.........C|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.965276377
+         ff 04 96 01 01 01 00 2c  68                       |.......,h|
+Received:SET_USER_GPIO_OUTPUTS         1618318.967228964
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.967416136
+         ff 04 96 01 02 01 00 1c  0b                       |.........|
+Received:SET_USER_GPIO_OUTPUTS         1618318.969281000
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.969370599
+         ff 04 96 01 03 01 00 0c  2a                       |........*|
+Received:SET_USER_GPIO_OUTPUTS         1618318.971406485
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.971538137
+         ff 04 96 01 04 01 00 7c  cd                       |.......|.|
+Received:SET_USER_GPIO_OUTPUTS         1618318.973585255
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.973773431
+         ff 02 96 01 01 00 dc                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.975520311
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.975658272
+         ff 02 96 02 00 03 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.977385363
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.977471678
+         ff 02 96 03 00 02 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.979121138
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.979212246
+         ff 02 96 04 00 05 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.981086248
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.981222933
+         ff 02 96 01 00 00 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.983093686
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.983221881
+         ff 02 96 02 01 03 dc                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.985118247
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.985257581
+         ff 02 96 03 00 02 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.987180140
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.987332353
+         ff 02 96 04 00 05 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.989201090
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.989345414
+         ff 02 96 01 00 00 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.991214250
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.991343106
+         ff 02 96 02 00 03 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.993198749
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.993376145
+         ff 02 96 03 01 02 dc                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.995161980
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.995420491
+         ff 02 96 04 00 05 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.997327262
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.997461552
+         ff 02 96 01 00 00 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618318.999330677
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618318.999462362
+         ff 02 96 02 00 03 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618319.001219823
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618319.001349635
+         ff 02 96 03 00 02 dd                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618319.002983389
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618319.003060700
+         ff 02 96 04 01 05 dc                              |.......|
+Received:SET_USER_GPIO_OUTPUTS         1618319.004690734
+         ff 00 96 00 00 67 bf                              |.....g.|

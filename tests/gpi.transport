@@ -1,0 +1,58 @@
+Sending: VERSION                       1618349.830532032
+         ff 00 03 1d 0c                                    |.....|
+Received:VERSION                       1618349.834088647
+         ff 14 03 00 00 14 12 08  00 30 00 00 02 20 16 12  |.........0... ..|
+         13 01 07 01 02 00 00 00  10 1b 05                 |...........|
+Sending: GET_CURRENT_PROGRAM           1618349.834651661
+         ff 00 0c 1d 03                                    |.....|
+Received:GET_CURRENT_PROGRAM           1618349.836219541
+         ff 01 0c 00 00 52 63 03                           |.....Rc.|
+Sending: GET_POWER_MODE                1618349.836338063
+         ff 00 68 1d 67                                    |..h.g|
+Received:GET_POWER_MODE                1618349.838107299
+         ff 01 68 00 00 00 a4 bf                           |..h.....|
+Sending: GET_READER_OPTIONAL_PARAMS    1618349.838259128
+         ff 02 6a 01 0e 2e 40                              |..j...@|
+Received:GET_READER_OPTIONAL_PARAMS    1618349.840405018
+         ff 03 6a 00 00 01 0e 00  30 44                    |..j.....0D|
+Sending: GET_READER_OPTIONAL_PARAMS    1618349.841446339
+         ff 02 6a 01 12 2e 5c                              |..j...\|
+Received:GET_READER_OPTIONAL_PARAMS    1618349.843738766
+         ff 04 6a 00 00 01 12 00  00 69 af                 |..j......i.|
+Sending: GET_TAG_PROTOCOL              1618349.843921112
+         ff 00 63 1d 6c                                    |..c.l|
+Received:GET_TAG_PROTOCOL              1618349.845804952
+         ff 02 63 00 00 00 05 21  46                       |..c....!F|
+Sending: GET_ANTENNA_PORT              1618349.845969838
+         ff 01 61 05 bd b8                                 |..a...|
+Received:GET_ANTENNA_PORT              1618349.848073650
+         ff 03 61 00 00 05 01 00  61 df                    |..a.....a.|
+Sending: GET_READER_OPTIONAL_PARAMS    1618349.848306062
+         ff 02 6a 01 0c 2e 42                              |..j...B|
+Received:GET_READER_OPTIONAL_PARAMS    1618349.850482317
+         ff 03 6a 00 00 01 0c 01  32 45                    |..j.....2E|
+Sending: GET_READER_OPTIONAL_PARAMS    1618349.850695273
+         ff 02 6a 01 0d 2e 43                              |..j...C|
+Received:GET_READER_OPTIONAL_PARAMS    1618349.853152056
+         ff 06 6a 00 00 01 0d 00  00 00 00 15 43           |..j.........C|
+Sending: SET_USER_GPIO_OUTPUTS         1618349.853335246
+         ff 04 96 01 01 00 00 2d  68                       |.......-h|
+Received:SET_USER_GPIO_OUTPUTS         1618349.855303359
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618349.855484441
+         ff 04 96 01 02 00 00 1d  0b                       |.........|
+Received:SET_USER_GPIO_OUTPUTS         1618349.857372145
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618349.857457353
+         ff 04 96 01 03 00 00 0d  2a                       |........*|
+Received:SET_USER_GPIO_OUTPUTS         1618349.859481273
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: SET_USER_GPIO_OUTPUTS         1618349.859607401
+         ff 04 96 01 04 00 00 7d  cd                       |.......}.|
+Received:SET_USER_GPIO_OUTPUTS         1618349.861699382
+         ff 00 96 00 00 67 bf                              |.....g.|
+Sending: GET_USER_GPIO_INPUTS          1618349.861992903
+         ff 01 66 01 ba bc                                 |..f...|
+Received:GET_USER_GPIO_INPUTS          1618349.864881787
+         ff 0d 66 00 00 01 01 00  00 02 00 00 03 00 00 04  |..f.............|
+         00 01 64 46                                       |..dF|
