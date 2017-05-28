@@ -81,8 +81,10 @@ struct TagFilterEtc {
 
 struct TagOpEtc {
     TMR_TagOp tagop;
-    TMR_TagData epc;
-    uint16_t data16[GLUE_MAX_DATA16];
+    union {
+        TMR_TagData epc;
+        uint16_t data16[GLUE_MAX_DATA16];
+    } u;
 };
 
 #define GLUE_MAX_ANTENNAS TMR_SR_MAX_ANTENNA_PORTS

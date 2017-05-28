@@ -1131,7 +1131,7 @@ sub emitTagOp {
     my $writeTag = $constInfo{'TagOp_GEN2_WriteTag'};
     renameField ($writeTag->{'fields'}, $writeTag->{'info'}, "epcptr", "epc");
     my $epc = $writeTag->{'info'}{"epc"};
-    push @{$epc->{'c'}}, "epc";
+    push @{$epc->{'c'}}, "u.epc";
     $epc->{'marshall'} = ["peekPtr", "pokePtr"];
 
     foreach my $const ("TagOp_GEN2_WriteData", "TagOp_GEN2_ReadData",
@@ -1144,7 +1144,7 @@ sub emitTagOp {
     my $writeData = $constInfo{"TagOp_GEN2_WriteData"};
     my $blockWrite = $constInfo{"TagOp_GEN2_BlockWrite"};
     foreach my $x ($writeData, $blockWrite) {
-        listListField ($x->{'info'}, "data", "data16", "GLUE_MAX_DATA16");
+        listListField ($x->{'info'}, "data", "u.data16", "GLUE_MAX_DATA16");
     }
 
     my $readData       = $constInfo{"TagOp_GEN2_ReadData"};
@@ -1177,7 +1177,7 @@ sub emitTagOp {
     renameField ($blockPermaLock->{'fields'}, $blockPermaLock->{'info'},
                  "mask", "maskList");
     listListField ($blockPermaLock->{"info"}, "maskList",
-                   "data16", "GLUE_MAX_DATA16");
+                   "u.data16", "GLUE_MAX_DATA16");
 
     emit "-- | An operation that can be performed on a tag.  Can be used";
     emit "-- as an argument to 'System.Hardware.MercuryApi.executeTagOp',";

@@ -711,12 +711,12 @@ instance Storable TagOp where
           <*> #{peek TagOpEtc, tagop.u.gen2.u.readData.len} p
       #{const TMR_TAGOP_GEN2_WRITETAG} -> do
         TagOp_GEN2_WriteTag
-          <$> peekPtr (#{ptr TagOpEtc, tagop.u.gen2.u.writeTag.epcptr} p) (#{ptr TagOpEtc, epc} p)
+          <$> peekPtr (#{ptr TagOpEtc, tagop.u.gen2.u.writeTag.epcptr} p) (#{ptr TagOpEtc, u.epc} p)
       #{const TMR_TAGOP_GEN2_WRITEDATA} -> do
         TagOp_GEN2_WriteData
           <$> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.writeData.bank} p)
           <*> #{peek TagOpEtc, tagop.u.gen2.u.writeData.wordAddress} p
-          <*> peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p) (#{ptr TagOpEtc, data16} p)
+          <*> peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p) (#{ptr TagOpEtc, u.data16} p)
       #{const TMR_TAGOP_GEN2_LOCK} -> do
         TagOp_GEN2_Lock
           <$> (unpackLockBits16 <$> #{peek TagOpEtc, tagop.u.gen2.u.lock.mask} p)
@@ -729,7 +729,7 @@ instance Storable TagOp where
         TagOp_GEN2_BlockWrite
           <$> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.blockWrite.bank} p)
           <*> #{peek TagOpEtc, tagop.u.gen2.u.blockWrite.wordPtr} p
-          <*> peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.blockWrite.data} p) (#{ptr TagOpEtc, data16} p)
+          <*> peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.blockWrite.data} p) (#{ptr TagOpEtc, u.data16} p)
       #{const TMR_TAGOP_GEN2_BLOCKERASE} -> do
         TagOp_GEN2_BlockErase
           <$> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.blockErase.bank} p)
@@ -740,7 +740,7 @@ instance Storable TagOp where
           <$> #{peek TagOpEtc, tagop.u.gen2.u.blockPermaLock.readLock} p
           <*> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.blockPermaLock.bank} p)
           <*> #{peek TagOpEtc, tagop.u.gen2.u.blockPermaLock.blockPtr} p
-          <*> peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.blockPermaLock.mask} p) (#{ptr TagOpEtc, data16} p)
+          <*> peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.blockPermaLock.mask} p) (#{ptr TagOpEtc, u.data16} p)
 
   poke p x@(TagOp_GEN2_ReadData {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_READDATA} :: #{type TMR_TagOpType})
@@ -751,13 +751,13 @@ instance Storable TagOp where
 
   poke p x@(TagOp_GEN2_WriteTag {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_WRITETAG} :: #{type TMR_TagOpType})
-    pokePtr (#{ptr TagOpEtc, tagop.u.gen2.u.writeTag.epcptr} p) (#{ptr TagOpEtc, epc} p) (opEpc x)
+    pokePtr (#{ptr TagOpEtc, tagop.u.gen2.u.writeTag.epcptr} p) (#{ptr TagOpEtc, u.epc} p) (opEpc x)
 
   poke p x@(TagOp_GEN2_WriteData {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_WRITEDATA} :: #{type TMR_TagOpType})
     #{poke TagOpEtc, tagop.u.gen2.u.writeData.bank} p (fromBank $ opBank x)
     #{poke TagOpEtc, tagop.u.gen2.u.writeData.wordAddress} p (opWordAddress x)
-    pokeListAsList "data" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p) (#{ptr TagOpEtc, data16} p) (opData x)
+    pokeListAsList "data" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p) (#{ptr TagOpEtc, u.data16} p) (opData x)
 
   poke p x@(TagOp_GEN2_Lock {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_LOCK} :: #{type TMR_TagOpType})
@@ -773,7 +773,7 @@ instance Storable TagOp where
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_BLOCKWRITE} :: #{type TMR_TagOpType})
     #{poke TagOpEtc, tagop.u.gen2.u.blockWrite.bank} p (fromBank $ opBank x)
     #{poke TagOpEtc, tagop.u.gen2.u.blockWrite.wordPtr} p (opWordPtr x)
-    pokeListAsList "data" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.blockWrite.data} p) (#{ptr TagOpEtc, data16} p) (opData x)
+    pokeListAsList "data" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.blockWrite.data} p) (#{ptr TagOpEtc, u.data16} p) (opData x)
 
   poke p x@(TagOp_GEN2_BlockErase {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_BLOCKERASE} :: #{type TMR_TagOpType})
@@ -786,5 +786,5 @@ instance Storable TagOp where
     #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.readLock} p (opReadLock x)
     #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.bank} p (fromBank $ opBank x)
     #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.blockPtr} p (opBlockPtr x)
-    pokeListAsList "maskList" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.blockPermaLock.mask} p) (#{ptr TagOpEtc, data16} p) (opMaskList x)
+    pokeListAsList "maskList" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.blockPermaLock.mask} p) (#{ptr TagOpEtc, u.data16} p) (opMaskList x)
 
