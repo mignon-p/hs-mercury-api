@@ -656,19 +656,19 @@ instance Storable TagReadData where
 -- (However, on the M6e Nano, only 'TagOp_GEN2_ReadData' may be
 -- embedded in a 'System.Hardware.MercuryApi.ReadPlan'.
 data TagOp =
-    TagOp_GEN2_WriteTag
+    TagOp_GEN2_ReadData
+    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to read from
+    , opExtraBanks :: ![GEN2_Bank] -- ^ Additional Gen2 memory banks to read from  (seems buggy, though; I\'ve had strange results with it)
+    , opWordAddress :: !Word32 -- ^ Word address to start reading at
+    , opLen :: !Word8 -- ^ Number of words to read
+    }
+  | TagOp_GEN2_WriteTag
     { opEpc :: !TagData -- ^ Tag EPC
     }
   | TagOp_GEN2_WriteData
     { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to write to
     , opWordAddress :: !Word32 -- ^ Word address to start writing at
     , opData :: ![Word16] -- ^ Data to write
-    }
-  | TagOp_GEN2_ReadData
-    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to read from
-    , opExtraBanks :: ![GEN2_Bank] -- ^ Additional Gen2 memory banks to read from  (seems buggy, though; I\'ve had strange results with it)
-    , opWordAddress :: !Word32 -- ^ Word address to start reading at
-    , opLen :: !Word8 -- ^ Number of words to read
     }
   | TagOp_GEN2_Lock
     { opMask :: ![GEN2_LockBits] -- ^ Bitmask indicating which lock bits to change
@@ -677,6 +677,22 @@ data TagOp =
     }
   | TagOp_GEN2_Kill
     { opPassword :: !GEN2_Password -- ^ Kill password to use to kill the tag
+    }
+  | TagOp_GEN2_BlockWrite
+    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to write to
+    , opWordPtr :: !Word32 -- ^ The word address to start writing to
+    , opData :: ![Word16] -- ^ The data to write
+    }
+  | TagOp_GEN2_BlockErase
+    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to erase
+    , opWordPtr :: !Word32 -- ^ The starting word address for block erase
+    , opWordCount :: !Word8 -- ^ Number of words to erase
+    }
+  | TagOp_GEN2_BlockPermaLock
+    { opReadLock :: !Word8 -- ^ Read lock status or write it?
+    , opBank :: !GEN2_Bank -- ^ Gen2 memory bank to lock
+    , opBlockPtr :: !Word32 -- ^ The starting word address to lock
+    , opMaskList :: ![Word16] -- ^ Mask: Which blocks to lock?
     }
   deriving (Eq, Ord, Show, Read)
 
@@ -687,6 +703,12 @@ instance Storable TagOp where
   peek p = do
     x <- #{peek TagOpEtc, tagop.type} p :: IO #{type TMR_TagOpType}
     case x of
+      #{const TMR_TAGOP_GEN2_READDATA} -> do
+        TagOp_GEN2_ReadData
+          <$> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.readData.bank} p)
+          <*> (unpackExtraBanks <$> #{peek TagOpEtc, tagop.u.gen2.u.readData.bank} p)
+          <*> #{peek TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p
+          <*> #{peek TagOpEtc, tagop.u.gen2.u.readData.len} p
       #{const TMR_TAGOP_GEN2_WRITETAG} -> do
         TagOp_GEN2_WriteTag
           <$> peekPtr (#{ptr TagOpEtc, tagop.u.gen2.u.writeTag.epcptr} p) (#{ptr TagOpEtc, epc} p)
@@ -695,12 +717,6 @@ instance Storable TagOp where
           <$> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.writeData.bank} p)
           <*> #{peek TagOpEtc, tagop.u.gen2.u.writeData.wordAddress} p
           <*> peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p) (#{ptr TagOpEtc, data16} p)
-      #{const TMR_TAGOP_GEN2_READDATA} -> do
-        TagOp_GEN2_ReadData
-          <$> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.readData.bank} p)
-          <*> (unpackExtraBanks <$> #{peek TagOpEtc, tagop.u.gen2.u.readData.bank} p)
-          <*> #{peek TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p
-          <*> #{peek TagOpEtc, tagop.u.gen2.u.readData.len} p
       #{const TMR_TAGOP_GEN2_LOCK} -> do
         TagOp_GEN2_Lock
           <$> (unpackLockBits16 <$> #{peek TagOpEtc, tagop.u.gen2.u.lock.mask} p)
@@ -709,6 +725,29 @@ instance Storable TagOp where
       #{const TMR_TAGOP_GEN2_KILL} -> do
         TagOp_GEN2_Kill
           <$> #{peek TagOpEtc, tagop.u.gen2.u.kill.password} p
+      #{const TMR_TAGOP_GEN2_BLOCKWRITE} -> do
+        TagOp_GEN2_BlockWrite
+          <$> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.blockWrite.bank} p)
+          <*> #{peek TagOpEtc, tagop.u.gen2.u.blockWrite.wordPtr} p
+          <*> peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.blockWrite.data} p) (#{ptr TagOpEtc, data16} p)
+      #{const TMR_TAGOP_GEN2_BLOCKERASE} -> do
+        TagOp_GEN2_BlockErase
+          <$> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.blockErase.bank} p)
+          <*> #{peek TagOpEtc, tagop.u.gen2.u.blockErase.wordPtr} p
+          <*> #{peek TagOpEtc, tagop.u.gen2.u.blockErase.wordCount} p
+      #{const TMR_TAGOP_GEN2_BLOCKPERMALOCK} -> do
+        TagOp_GEN2_BlockPermaLock
+          <$> #{peek TagOpEtc, tagop.u.gen2.u.blockPermaLock.readLock} p
+          <*> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.blockPermaLock.bank} p)
+          <*> #{peek TagOpEtc, tagop.u.gen2.u.blockPermaLock.blockPtr} p
+          <*> peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.blockPermaLock.mask} p) (#{ptr TagOpEtc, data16} p)
+
+  poke p x@(TagOp_GEN2_ReadData {}) = do
+    #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_READDATA} :: #{type TMR_TagOpType})
+    #{poke TagOpEtc, tagop.u.gen2.u.readData.bank} p (fromBank $ opBank x)
+    pokeOr (#{ptr TagOpEtc, tagop.u.gen2.u.readData.bank} p) (packExtraBanks $ opExtraBanks x)
+    #{poke TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p (opWordAddress x)
+    #{poke TagOpEtc, tagop.u.gen2.u.readData.len} p (opLen x)
 
   poke p x@(TagOp_GEN2_WriteTag {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_WRITETAG} :: #{type TMR_TagOpType})
@@ -720,13 +759,6 @@ instance Storable TagOp where
     #{poke TagOpEtc, tagop.u.gen2.u.writeData.wordAddress} p (opWordAddress x)
     pokeListAsList "data" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.writeData.data} p) (#{ptr TagOpEtc, data16} p) (opData x)
 
-  poke p x@(TagOp_GEN2_ReadData {}) = do
-    #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_READDATA} :: #{type TMR_TagOpType})
-    #{poke TagOpEtc, tagop.u.gen2.u.readData.bank} p (fromBank $ opBank x)
-    pokeOr (#{ptr TagOpEtc, tagop.u.gen2.u.readData.bank} p) (packExtraBanks $ opExtraBanks x)
-    #{poke TagOpEtc, tagop.u.gen2.u.readData.wordAddress} p (opWordAddress x)
-    #{poke TagOpEtc, tagop.u.gen2.u.readData.len} p (opLen x)
-
   poke p x@(TagOp_GEN2_Lock {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_LOCK} :: #{type TMR_TagOpType})
     #{poke TagOpEtc, tagop.u.gen2.u.lock.mask} p (packLockBits16 $ opMask x)
@@ -736,4 +768,23 @@ instance Storable TagOp where
   poke p x@(TagOp_GEN2_Kill {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_KILL} :: #{type TMR_TagOpType})
     #{poke TagOpEtc, tagop.u.gen2.u.kill.password} p (opPassword x)
+
+  poke p x@(TagOp_GEN2_BlockWrite {}) = do
+    #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_BLOCKWRITE} :: #{type TMR_TagOpType})
+    #{poke TagOpEtc, tagop.u.gen2.u.blockWrite.bank} p (fromBank $ opBank x)
+    #{poke TagOpEtc, tagop.u.gen2.u.blockWrite.wordPtr} p (opWordPtr x)
+    pokeListAsList "data" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.blockWrite.data} p) (#{ptr TagOpEtc, data16} p) (opData x)
+
+  poke p x@(TagOp_GEN2_BlockErase {}) = do
+    #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_BLOCKERASE} :: #{type TMR_TagOpType})
+    #{poke TagOpEtc, tagop.u.gen2.u.blockErase.bank} p (fromBank $ opBank x)
+    #{poke TagOpEtc, tagop.u.gen2.u.blockErase.wordPtr} p (opWordPtr x)
+    #{poke TagOpEtc, tagop.u.gen2.u.blockErase.wordCount} p (opWordCount x)
+
+  poke p x@(TagOp_GEN2_BlockPermaLock {}) = do
+    #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_BLOCKPERMALOCK} :: #{type TMR_TagOpType})
+    #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.readLock} p (opReadLock x)
+    #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.bank} p (fromBank $ opBank x)
+    #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.blockPtr} p (opBlockPtr x)
+    pokeListAsList "maskList" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.blockPermaLock.mask} p) (#{ptr TagOpEtc, data16} p) (opMaskList x)
 

@@ -1093,7 +1093,8 @@ sub emitTagReadData {
 }
 
 sub emitTagOp {
-    my @ops = (qw(writeTag writeData readData lock kill));
+    my @ops = (qw(readData writeTag writeData lock kill),
+               qw(blockWrite blockErase blockPermaLock));
 
     my $hType = "TagOp";
     my $prefix = "op";
@@ -1133,14 +1134,18 @@ sub emitTagOp {
     push @{$epc->{'c'}}, "epc";
     $epc->{'marshall'} = ["peekPtr", "pokePtr"];
 
-    foreach my $const ("TagOp_GEN2_WriteData", "TagOp_GEN2_ReadData") {
+    foreach my $const ("TagOp_GEN2_WriteData", "TagOp_GEN2_ReadData",
+                       "TagOp_GEN2_BlockWrite", "TagOp_GEN2_BlockErase",
+                       "TagOp_GEN2_BlockPermaLock") {
         wrapField ($constInfo{$const}{"info"}, "bank",
                    "(toBank . (.&. 3))", "fromBank");
     }
 
     my $writeData = $constInfo{"TagOp_GEN2_WriteData"};
-    listListField ($writeData->{'info'}, "data",
-                   "data16", "GLUE_MAX_DATA16");
+    my $blockWrite = $constInfo{"TagOp_GEN2_BlockWrite"};
+    foreach my $x ($writeData, $blockWrite) {
+        listListField ($x->{'info'}, "data", "data16", "GLUE_MAX_DATA16");
+    }
 
     my $readData       = $constInfo{"TagOp_GEN2_ReadData"};
     my $readDataFields = $readData->{'fields'};
@@ -1167,6 +1172,12 @@ sub emitTagOp {
         wrapField ($lockInfo, $field, "unpackLockBits16", "packLockBits16");
         $lockInfo->{$field}{'type'} = "[GEN2_LockBits]";
     }
+
+    my $blockPermaLock = $constInfo{"TagOp_GEN2_BlockPermaLock"};
+    renameField ($blockPermaLock->{'fields'}, $blockPermaLock->{'info'},
+                 "mask", "maskList");
+    listListField ($blockPermaLock->{"info"}, "maskList",
+                   "data16", "GLUE_MAX_DATA16");
 
     emit "-- | An operation that can be performed on a tag.  Can be used";
     emit "-- as an argument to 'System.Hardware.MercuryApi.executeTagOp',";
