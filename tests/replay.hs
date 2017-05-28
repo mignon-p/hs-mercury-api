@@ -205,6 +205,8 @@ testLock rdr ts = do
                  }
   void $ check ts $ TMR.executeTagOp rdr opWrite3 (Just epcFilt)
 
+sequentialBytes = B.pack [0..7]
+
 testBlockWrite :: TestFunc
 testBlockWrite rdr ts = do
   setRegionAndPower rdr
@@ -216,7 +218,7 @@ testBlockWrite rdr ts = do
   check ts $ return trd { TMR.trTimestamp = 0 }
 
   let epcFilt = TMR.TagFilterEPC (TMR.trTag trd)
-      words = TMR.packBytesIntoWords $ B.pack [0..63]
+      words = TMR.packBytesIntoWords sequentialBytes
       opWrite = TMR.TagOp_GEN2_BlockWrite
                 { TMR.opBank = TMR.GEN2_BANK_USER
                 , TMR.opWordPtr = 0
@@ -236,8 +238,8 @@ sequentialUserDataFilter = TMR.TagFilterGen2
   { TMR.tfInvert = False
   , TMR.tfFilterOn = TMR.FilterOnBank TMR.GEN2_BANK_USER
   , TMR.tfBitPointer = 0
-  , TMR.tfMaskBitLength = 8 * 64
-  , TMR.tfMask = B.pack [0..63]
+  , TMR.tfMaskBitLength = fromIntegral $ 8 * B.length sequentialBytes
+  , TMR.tfMask = sequentialBytes
   }
 
 testBlockErase :: TestFunc
