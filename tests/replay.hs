@@ -205,6 +205,66 @@ testLock rdr ts = do
                  }
   void $ check ts $ TMR.executeTagOp rdr opWrite3 (Just epcFilt)
 
+testBlockWrite :: TestFunc
+testBlockWrite rdr ts = do
+  setRegionAndPower rdr
+  TMR.paramSetReadPlanFilter rdr (Just emptyUserDataFilter)
+
+  tags <- TMR.read rdr 1000
+  check ts $ return $ length tags
+  let trd = maximumBy (comparing TMR.trRssi) tags
+  check ts $ return trd { TMR.trTimestamp = 0 }
+
+  let epcFilt = TMR.TagFilterEPC (TMR.trTag trd)
+      words = TMR.packBytesIntoWords $ B.pack [0..63]
+      opWrite = TMR.TagOp_GEN2_BlockWrite
+                { TMR.opBank = TMR.GEN2_BANK_USER
+                , TMR.opWordPtr = 0
+                , TMR.opData = words
+                }
+  check ts $ TMR.executeTagOp rdr opWrite (Just epcFilt)
+
+  TMR.paramSetReadPlanFilter rdr Nothing
+  TMR.paramSetReadPlanTagop rdr (Just readUser)
+  tags2 <- TMR.read rdr 1000
+  check ts $ return $ length tags2
+  forM_ tags2 $ \tag -> do
+    check ts $ return tag { TMR.trTimestamp = 0 }
+
+sequentialUserDataFilter :: TMR.TagFilter
+sequentialUserDataFilter = TMR.TagFilterGen2
+  { TMR.tfInvert = False
+  , TMR.tfFilterOn = TMR.FilterOnBank TMR.GEN2_BANK_USER
+  , TMR.tfBitPointer = 0
+  , TMR.tfMaskBitLength = 8 * 64
+  , TMR.tfMask = B.pack [0..63]
+  }
+
+testBlockErase :: TestFunc
+testBlockErase rdr ts = do
+  setRegionAndPower rdr
+  TMR.paramSetReadPlanFilter rdr (Just sequentialUserDataFilter)
+
+  tags <- TMR.read rdr 1000
+  check ts $ return $ length tags
+  let trd = maximumBy (comparing TMR.trRssi) tags
+  check ts $ return trd { TMR.trTimestamp = 0 }
+
+  let epcFilt = TMR.TagFilterEPC (TMR.trTag trd)
+      opErase = TMR.TagOp_GEN2_BlockErase
+                { TMR.opBank = TMR.GEN2_BANK_USER
+                , TMR.opWordPtr = 0
+                , TMR.opWordCount = 32
+                }
+  check ts $ TMR.executeTagOp rdr opErase (Just epcFilt)
+
+  TMR.paramSetReadPlanFilter rdr Nothing
+  TMR.paramSetReadPlanTagop rdr (Just readUser)
+  tags2 <- TMR.read rdr 1000
+  check ts $ return $ length tags2
+  forM_ tags2 $ \tag -> do
+    check ts $ return tag { TMR.trTimestamp = 0 }
+
 mkPin :: TMR.PinNumber -> TMR.PinNumber -> TMR.GpioPin
 mkPin highPin pin =
   TMR.GpioPin
@@ -235,6 +295,8 @@ tests =
   , ("readUser", testReadUser)
   , ("write", testWrite)
   , ("lock", testLock)
+  , ("blockWrite", testBlockWrite)
+  , ("blockErase", testBlockErase)
   , ("gpo", testGpo)
   , ("gpi", testGpi)
   ]
