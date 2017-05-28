@@ -256,7 +256,7 @@ testBlockErase rdr ts = do
       opErase = TMR.TagOp_GEN2_BlockErase
                 { TMR.opBank = TMR.GEN2_BANK_USER
                 , TMR.opWordPtr = 0
-                , TMR.opWordCount = 32
+                , TMR.opWordCount = 4
                 }
   check ts $ TMR.executeTagOp rdr opErase (Just epcFilt)
 
