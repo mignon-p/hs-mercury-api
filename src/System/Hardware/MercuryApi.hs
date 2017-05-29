@@ -888,7 +888,7 @@ cLocale = U.unsafePerformIO $ throwErrnoIfNull "newlocale" c_new_c_locale
 formatTimestamp :: MillisecondsSinceEpoch -> CBool -> String -> IO T.Text
 formatTimestamp t local z = do
   let (seconds, millis) = t `divMod` 1000
-      fmt = "%FT%H:%M:%S" ++ printf ".%03d" millis ++ z
+      fmt = "%Y-%m-%dT%H:%M:%S" ++ printf ".%03d" millis ++ z
       bufSize = 80
   withCAString fmt $ \cFmt -> allocaBytes bufSize $ \buf -> do
     ret <- c_format_time buf (fromIntegral bufSize) cFmt
