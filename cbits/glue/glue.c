@@ -316,10 +316,17 @@ int c_format_time (char *buf,
     struct tm stm, *stmp;
 
     t = seconds;
+#ifdef _WIN32
+    if (local)
+        stmp = localtime (&t);
+    else
+        stmp = gmtime (&t);
+#else
     if (local)
         stmp = localtime_r (&t, &stm);
     else
         stmp = gmtime_r (&t, &stm);
+#endif
 
     if (! stmp)
         return -1;
