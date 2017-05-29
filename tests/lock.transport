@@ -1,109 +1,109 @@
-Sending: VERSION                       1618208.842782128
+Sending: VERSION                       1790605.584555826
          ff 00 03 1d 0c                                    |.....|
-Received:VERSION                       1618208.846306449
+Received:VERSION                       1790605.588060962
          ff 14 03 00 00 14 12 08  00 30 00 00 02 20 16 12  |.........0... ..|
          13 01 07 01 02 00 00 00  10 1b 05                 |...........|
-Sending: GET_CURRENT_PROGRAM           1618208.846770505
+Sending: GET_CURRENT_PROGRAM           1790605.588579065
          ff 00 0c 1d 03                                    |.....|
-Received:GET_CURRENT_PROGRAM           1618208.848399937
+Received:GET_CURRENT_PROGRAM           1790605.590133584
          ff 01 0c 00 00 52 63 03                           |.....Rc.|
-Sending: GET_POWER_MODE                1618208.848499553
+Sending: GET_POWER_MODE                1790605.590279389
          ff 00 68 1d 67                                    |..h.g|
-Received:GET_POWER_MODE                1618208.850113105
+Received:GET_POWER_MODE                1790605.591896715
          ff 01 68 00 00 00 a4 bf                           |..h.....|
-Sending: GET_READER_OPTIONAL_PARAMS    1618208.850341187
+Sending: GET_READER_OPTIONAL_PARAMS    1790605.591990509
          ff 02 6a 01 0e 2e 40                              |..j...@|
-Received:GET_READER_OPTIONAL_PARAMS    1618208.852517778
+Received:GET_READER_OPTIONAL_PARAMS    1790605.593926208
          ff 03 6a 00 00 01 0e 00  30 44                    |..j.....0D|
-Sending: GET_READER_OPTIONAL_PARAMS    1618208.853516175
+Sending: GET_READER_OPTIONAL_PARAMS    1790605.594787483
          ff 02 6a 01 12 2e 5c                              |..j...\|
-Received:GET_READER_OPTIONAL_PARAMS    1618208.855615818
+Received:GET_READER_OPTIONAL_PARAMS    1790605.597048243
          ff 04 6a 00 00 01 12 00  00 69 af                 |..j......i.|
-Sending: GET_TAG_PROTOCOL              1618208.855747428
+Sending: GET_TAG_PROTOCOL              1790605.597237617
          ff 00 63 1d 6c                                    |..c.l|
-Received:GET_TAG_PROTOCOL              1618208.857581000
+Received:GET_TAG_PROTOCOL              1790605.599164222
          ff 02 63 00 00 00 05 21  46                       |..c....!F|
-Sending: GET_ANTENNA_PORT              1618208.857741470
+Sending: GET_ANTENNA_PORT              1790605.599333871
          ff 01 61 05 bd b8                                 |..a...|
-Received:GET_ANTENNA_PORT              1618208.859861405
+Received:GET_ANTENNA_PORT              1790605.601513969
          ff 03 61 00 00 05 01 00  61 df                    |..a.....a.|
-Sending: GET_READER_OPTIONAL_PARAMS    1618208.860071600
+Sending: GET_READER_OPTIONAL_PARAMS    1790605.601889295
          ff 02 6a 01 0c 2e 42                              |..j...B|
-Received:GET_READER_OPTIONAL_PARAMS    1618208.862226611
+Received:GET_READER_OPTIONAL_PARAMS    1790605.604146998
          ff 03 6a 00 00 01 0c 01  32 45                    |..j.....2E|
-Sending: GET_READER_OPTIONAL_PARAMS    1618208.862384420
+Sending: GET_READER_OPTIONAL_PARAMS    1790605.604339750
          ff 02 6a 01 0d 2e 43                              |..j...C|
-Received:GET_READER_OPTIONAL_PARAMS    1618208.864857010
+Received:GET_READER_OPTIONAL_PARAMS    1790605.606640416
          ff 06 6a 00 00 01 0d 00  00 00 00 15 43           |..j.........C|
-Sending: SET_REGION                    1618208.865107150
+Sending: SET_REGION                    1790605.606780094
          ff 01 97 0d 4b b0                                 |....K.|
-Received:SET_REGION                    1618208.866997748
+Received:SET_REGION                    1790605.608595882
          ff 00 97 00 00 77 9e                              |.....w.|
-Sending: SET_READ_TX_POWER             1618208.867191117
+Sending: SET_READ_TX_POWER             1790605.608799467
          ff 02 92 08 98 49 c1                              |.....I.|
-Received:SET_READ_TX_POWER             1618208.868952510
+Received:SET_READ_TX_POWER             1790605.610710783
          ff 00 92 00 00 27 3b                              |.....';|
-Sending: SET_WRITE_TX_POWER            1618208.869099278
+Sending: SET_WRITE_TX_POWER            1790605.610861534
          ff 02 94 08 98 29 07                              |.....).|
-Received:SET_WRITE_TX_POWER            1618208.870773354
+Received:SET_WRITE_TX_POWER            1790605.612720664
          ff 00 94 00 00 47 fd                              |.....G.|
-Sending: SET_ANTENNA_PORT              1618208.870887339
+Sending: SET_ANTENNA_PORT              1790605.612904299
          ff 02 91 01 01 70 3b                              |.....p;|
-Received:SET_ANTENNA_PORT              1618208.872540989
+Received:SET_ANTENNA_PORT              1790605.614647207
          ff 00 91 00 00 17 58                              |......X|
-Sending: SET_READER_OPTIONAL_PARAMS    1618208.872636451
+Sending: SET_READER_OPTIONAL_PARAMS    1790605.614754132
          ff 03 9a 01 06 01 a9 5c                           |.......\|
-Received:SET_READER_OPTIONAL_PARAMS    1618208.874646026
+Received:SET_READER_OPTIONAL_PARAMS    1790605.616556454
          ff 00 9a 00 00 a6 33                              |......3|
-Sending: GET_READER_STATS              1618208.874803079
+Sending: GET_READER_STATS              1790605.616652209
          ff 03 6c 01 9f 41 89 7b                           |..l..A.{|
-Received:GET_READER_STATS              1618208.877061897
+Received:GET_READER_STATS              1790605.618851953
          ff 03 6c 00 00 01 9f 41  86 9c                    |..l....A..|
-Sending: CLEAR_TAG_ID_BUFFER           1618208.877208264
+Sending: CLEAR_TAG_ID_BUFFER           1790605.619014686
          ff 00 2a 1d 25                                    |..*.%|
-Received:CLEAR_TAG_ID_BUFFER           1618208.878897630
+Received:CLEAR_TAG_ID_BUFFER           1790605.620740423
          ff 00 2a 00 00 01 e8                              |..*....|
-Sending: SET_ANTENNA_PORT              1618208.879045699
+Sending: SET_ANTENNA_PORT              1790605.620890824
          ff 03 91 02 01 01 42 c5                           |......B.|
-Received:SET_ANTENNA_PORT              1618208.881129316
+Received:SET_ANTENNA_PORT              1790605.622843141
          ff 00 91 00 00 17 58                              |......X|
-Sending: READ_TAG_ID_MULTIPLE          1618208.881267041
+Sending: READ_TAG_ID_MULTIPLE          1790605.623000323
          ff 10 22 03 00 13 03 e8  00 00 00 00 00 00 00 00  |..".............|
          10 00 00 86 a3                                    |.....|
-Received:READ_TAG_ID_MULTIPLE          1618209.890101630
+Received:READ_TAG_ID_MULTIPLE          1790606.630500088
          ff 07 22 00 00 03 00 13  00 00 00 01 65 8a        |..".........e.|
-Sending: GET_TAG_ID_BUFFER             1618209.890411283
+Sending: GET_TAG_ID_BUFFER             1790606.630747461
          ff 03 29 01 ff 00 1b 03                           |..).....|
-Received:GET_TAG_ID_BUFFER             1618209.895886853
-         ff 26 29 00 00 01 ff 00  01 1b d0 11 0e 08 30 00  |.&)...........0.|
-         00 01 12 00 ab 05 00 00  00 00 80 30 00 e2 00 51  |...........0...Q|
-         86 01 07 01 87 07 70 c4  c1 ba 1e 27 e4           |......p....'.|
-Sending: WRITE_TAG_DATA                1618209.896545252
+Received:GET_TAG_ID_BUFFER             1790606.636238404
+         ff 26 29 00 00 01 ff 00  01 15 d7 11 0e 13 e8 00  |.&).............|
+         00 03 cd 00 ae 05 00 00  00 00 80 30 00 e2 00 51  |...........0...Q|
+         86 01 07 01 87 07 70 c4  c1 ba 1e db e1           |......p......|
+Sending: WRITE_TAG_DATA                1790606.636934933
          ff 1d 24 03 e8 01 00 00  00 02 00 00 00 00 00 60  |..$............`|
          e2 00 51 86 01 07 01 87  07 70 c4 c1 00 00 30 39  |..Q......p....09|
          a7 0f                                             |..|
-Received:WRITE_TAG_DATA                1618209.937328248
+Received:WRITE_TAG_DATA                1790606.677344468
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: LOCK_TAG                      1618209.937639476
+Sending: LOCK_TAG                      1790606.677604774
          ff 18 25 03 e8 01 00 00  30 39 00 02 00 02 60 e2  |..%.....09....`.|
          00 51 86 01 07 01 87 07  70 c4 c1 eb 70           |.Q......p...p|
-Received:LOCK_TAG                      1618209.996456881
+Received:LOCK_TAG                      1790606.736355478
          ff 00 25 00 00 f0 07                              |..%....|
-Sending: WRITE_TAG_DATA                1618209.996651382
+Sending: WRITE_TAG_DATA                1790606.736556271
          ff 29 24 03 e8 01 00 00  00 00 03 00 00 00 00 60  |.)$............`|
          e2 00 51 86 01 07 01 87  07 70 c4 c1 54 68 69 73  |..Q......p..This|
          20 73 68 6f 75 6c 64 20  66 61 69 6c dd 94        | should fail..|
-Received:WRITE_TAG_DATA                1618211.048616197
+Received:WRITE_TAG_DATA                1790607.750972661
          ff 00 24 04 06 e4 20                              |..$... |
-Sending: LOCK_TAG                      1618211.048854402
+Sending: LOCK_TAG                      1790607.751291468
          ff 18 25 03 e8 01 00 00  30 39 00 02 00 00 60 e2  |..%.....09....`.|
          00 51 86 01 07 01 87 07  70 c4 c1 ed 9a           |.Q......p....|
-Received:LOCK_TAG                      1618211.107533604
+Received:LOCK_TAG                      1790607.821038416
          ff 00 25 00 00 f0 07                              |..%....|
-Sending: WRITE_TAG_DATA                1618211.107816311
+Sending: WRITE_TAG_DATA                1790607.821243325
          ff 2d 24 03 e8 01 00 00  00 00 03 00 00 00 00 60  |.-$............`|
          e2 00 51 86 01 07 01 87  07 70 c4 c1 54 68 69 73  |..Q......p..This|
          20 73 68 6f 75 6c 64 20  73 75 63 63 65 65 64 00  | should succeed.|
          69 0c                                             |i.|
-Received:WRITE_TAG_DATA                1618211.250094910
+Received:WRITE_TAG_DATA                1790607.950912849
          ff 00 24 00 00 e0 26                              |..$...&|

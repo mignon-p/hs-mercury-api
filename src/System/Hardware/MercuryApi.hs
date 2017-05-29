@@ -548,7 +548,7 @@ executeTagOp rdr tagOp tagFilter = alloca $ \pOp -> alloca $ \pFilt -> do
                   Left err -> throwPE rdr err "executeTagOp" "filter"
                   Right _ -> return pFilt
   results <- getList16 $ \pList -> do
-    withReaderEtc rdr "executeTagOp" "" $ \pRdr -> do
+    withReaderEtc rdr "executeTagOp" (tagOpName tagOp) $ \pRdr -> do
       c_TMR_executeTagOp pRdr pOp pFilt' (castPtr pList)
   return $ B.pack results
 

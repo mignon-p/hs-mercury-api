@@ -1186,6 +1186,12 @@ sub emitTagOp {
     emit "-- embedded in a 'System.Hardware.MercuryApi.ReadPlan'.";
     emitUnion ($hType, $prefix, $cType,
                \%discriminator, \@constructors, \%constInfo);
+
+    emit "tagOpName :: TagOp -> Text";
+    foreach my $const (@constructors) {
+        emit "tagOpName $const {} = \"$const\"";
+    }
+    emit "";
 }
 
 sub emitStructs {

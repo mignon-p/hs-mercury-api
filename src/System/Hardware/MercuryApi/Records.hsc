@@ -788,3 +788,13 @@ instance Storable TagOp where
     #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.blockPtr} p (opBlockPtr x)
     pokeListAsList "maskList" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.blockPermaLock.mask} p) (#{ptr TagOpEtc, u.data16} p) (opMaskList x)
 
+tagOpName :: TagOp -> Text
+tagOpName TagOp_GEN2_ReadData {} = "TagOp_GEN2_ReadData"
+tagOpName TagOp_GEN2_WriteTag {} = "TagOp_GEN2_WriteTag"
+tagOpName TagOp_GEN2_WriteData {} = "TagOp_GEN2_WriteData"
+tagOpName TagOp_GEN2_Lock {} = "TagOp_GEN2_Lock"
+tagOpName TagOp_GEN2_Kill {} = "TagOp_GEN2_Kill"
+tagOpName TagOp_GEN2_BlockWrite {} = "TagOp_GEN2_BlockWrite"
+tagOpName TagOp_GEN2_BlockErase {} = "TagOp_GEN2_BlockErase"
+tagOpName TagOp_GEN2_BlockPermaLock {} = "TagOp_GEN2_BlockPermaLock"
+
