@@ -92,13 +92,7 @@ readUser =
   }
 
 emptyUserDataFilter :: TMR.TagFilter
-emptyUserDataFilter = TMR.TagFilterGen2
-  { TMR.tfInvert = False
-  , TMR.tfFilterOn = TMR.FilterOnBank TMR.GEN2_BANK_USER
-  , TMR.tfBitPointer = 0
-  , TMR.tfMaskBitLength = 16
-  , TMR.tfMask = B.pack [0, 0]
-  }
+emptyUserDataFilter = TMR.mkFilterGen2 TMR.GEN2_BANK_USER 0 $ B.pack [0, 0]
 
 testParams :: TestFunc
 testParams rdr ts = do
@@ -234,13 +228,7 @@ testBlockWrite rdr ts = do
     check ts $ return tag { TMR.trTimestamp = 0 }
 
 sequentialUserDataFilter :: TMR.TagFilter
-sequentialUserDataFilter = TMR.TagFilterGen2
-  { TMR.tfInvert = False
-  , TMR.tfFilterOn = TMR.FilterOnBank TMR.GEN2_BANK_USER
-  , TMR.tfBitPointer = 0
-  , TMR.tfMaskBitLength = fromIntegral $ 8 * B.length sequentialBytes
-  , TMR.tfMask = sequentialBytes
-  }
+sequentialUserDataFilter = TMR.mkFilterGen2 TMR.GEN2_BANK_USER 0 sequentialBytes
 
 testBlockErase :: TestFunc
 testBlockErase rdr ts = do

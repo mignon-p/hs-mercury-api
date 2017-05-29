@@ -64,9 +64,10 @@ module System.Hardware.MercuryApi
     -- ** Listeners
   , hexListener
   , opcodeListener
-    -- ** Byte shuffling
+    -- ** Data helpers
   , packBytesIntoWords
   , passwordToWords
+  , mkFilterGen2
     -- ** Parameters
   , paramName
   , paramID
@@ -974,6 +975,22 @@ packBytesIntoWords bs = pbw (B.unpack bs)
 -- into reserved memory.
 passwordToWords :: GEN2_Password -> [Word16]
 passwordToWords pwd = map fromIntegral [pwd `shiftR` 16, pwd .&. 0xffff]
+
+-- | Create a 'TagFilterGen2' with the most common settings
+mkFilterGen2 :: GEN2_Bank    -- ^ The bank to filter on
+             -> Word32       -- ^ The location (in bits) at which to begin
+                             -- comparing the mask
+             -> B.ByteString -- ^ The mask value to compare with the specified
+                             -- region of tag memory
+             -> TagFilter
+mkFilterGen2 bank bitPointer mask =
+  TagFilterGen2
+  { tfInvert = False
+  , tfFilterOn = FilterOnBank bank
+  , tfBitPointer = bitPointer
+  , tfMaskBitLength = fromIntegral $ 8 * B.length mask
+  , tfMask = mask
+  }
 
 -- | Word address of kill password in reserved memory.
 killPasswordAddress :: Word32
