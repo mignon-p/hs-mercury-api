@@ -21,6 +21,7 @@ import qualified Data.Text.IO as T
 import Data.Word
 import Foreign
 import Foreign.C
+import System.Info
 import System.IO
 import qualified System.IO.Unsafe as U
 
@@ -266,9 +267,16 @@ testShutdown p = do
   poke p st { stCookie = nullPtr }
   return successStatus
 
+-- Somehow in Windows, we end up with an absolute path that
+-- starts with "/C:", which doesn't work, so we need to strip
+-- the leading slash.
+hackPath :: String -> String -> String
+hackPath "windows" = dropWhile (== '/')
+hackPath _ = id
+
 testTransportInit :: Ptr SerialTransport -> Ptr () -> CString -> IO RawStatus
 testTransportInit p _ cstr = do
-  fname <- peekCAString cstr
+  fname <- hackPath os <$> peekCAString cstr
   ref <- newIORef []
   ref2 <- newIORef ""
   ref3 <- newIORef 0
