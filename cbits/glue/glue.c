@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#ifndef _WIN32
 #include <xlocale.h>
+#endif
 #include <HsFFI.h>
 
 #include "glue.h"
@@ -294,9 +296,13 @@ void *c_new_c_locale (void)
     /* We need to call tzset once before calling localtime_r, and this seems
      * like a good place to do it. */
     tzset();
+#ifdef _WIN32
+    return NULL;
+#else
     /* Allocate a new locale.  We only do this once, so it's okay
      * that it leaks. */
     return (void *) newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+#endif
 }
 
 int c_format_time (char *buf,
@@ -317,7 +323,12 @@ int c_format_time (char *buf,
 
     if (! stmp)
         return -1;
+#ifdef _WIN32
+    if (0 == strftime (buf, len, fmt, stmp))
+        return -1;
+#else
     if (0 == strftime_l (buf, len, fmt, stmp, (locale_t) locale))
         return -1;
+#endif
     return 0;
 }
