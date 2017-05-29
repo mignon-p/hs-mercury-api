@@ -146,6 +146,36 @@ testWrite rdr ts = do
   forM_ tags2 $ \tag -> do
     check ts $ return tag { TMR.trTimestamp = 0 }
 
+testWriteEpc :: TestFunc
+testWriteEpc rdr ts = do
+  setRegionAndPower rdr
+  TMR.paramSetReadPlanFilter rdr (Just emptyUserDataFilter)
+
+  tags <- TMR.read rdr 1000
+  check ts $ return $ length tags
+  let trd = maximumBy (comparing TMR.trRssi) tags
+  check ts $ return trd { TMR.trTimestamp = 0 }
+
+  let tag = TMR.trTag trd
+      epcFilt = TMR.TagFilterEPC tag
+      Just newEpc = TMR.hexToBytes "0123456789abcdef"
+      newTag = tag { TMR.tdEpc = newEpc }
+      opWrite = TMR.TagOp_GEN2_WriteTag newTag
+
+  check ts $ TMR.executeTagOp rdr opWrite (Just epcFilt)
+
+  TMR.paramSetReadPlanFilter rdr Nothing
+  TMR.paramSetReadPlanTagop rdr (Just readUser)
+  tags2 <- TMR.read rdr 1000
+  check ts $ return $ length tags2
+  forM_ tags2 $ \tag -> do
+    check ts $ return tag { TMR.trTimestamp = 0 }
+
+  let epcFilt2 = TMR.TagFilterEPC newTag
+      opWrite2 = TMR.TagOp_GEN2_WriteTag tag
+
+  void $ check ts $ TMR.executeTagOp rdr opWrite2 (Just epcFilt2)
+
 testLock :: TestFunc
 testLock rdr ts = do
   setRegionAndPower rdr
@@ -284,6 +314,7 @@ tests =
   , ("read", testRead)
   , ("readUser", testReadUser)
   , ("write", testWrite)
+  , ("writeEpc", testWriteEpc)
   , ("lock", testLock)
   , ("blockWrite", testBlockWrite)
   , ("blockErase", testBlockErase)

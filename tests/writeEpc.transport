@@ -1,0 +1,124 @@
+Sending: VERSION                       1783113.335963260
+         ff 00 03 1d 0c                                    |.....|
+Received:VERSION                       1783113.340546799
+         ff 14 03 00 00 14 12 08  00 30 00 00 02 20 16 12  |.........0... ..|
+         13 01 07 01 02 00 00 00  10 1b 05                 |...........|
+Sending: GET_CURRENT_PROGRAM           1783113.341025567
+         ff 00 0c 1d 03                                    |.....|
+Received:GET_CURRENT_PROGRAM           1783113.342675574
+         ff 01 0c 00 00 52 63 03                           |.....Rc.|
+Sending: GET_POWER_MODE                1783113.342832512
+         ff 00 68 1d 67                                    |..h.g|
+Received:GET_POWER_MODE                1783113.344719334
+         ff 01 68 00 00 00 a4 bf                           |..h.....|
+Sending: GET_READER_OPTIONAL_PARAMS    1783113.344877962
+         ff 02 6a 01 0e 2e 40                              |..j...@|
+Received:GET_READER_OPTIONAL_PARAMS    1783113.347044658
+         ff 03 6a 00 00 01 0e 00  30 44                    |..j.....0D|
+Sending: GET_READER_OPTIONAL_PARAMS    1783113.354181389
+         ff 02 6a 01 12 2e 5c                              |..j...\|
+Received:GET_READER_OPTIONAL_PARAMS    1783113.356482817
+         ff 04 6a 00 00 01 12 00  00 69 af                 |..j......i.|
+Sending: GET_TAG_PROTOCOL              1783113.356679203
+         ff 00 63 1d 6c                                    |..c.l|
+Received:GET_TAG_PROTOCOL              1783113.358546212
+         ff 02 63 00 00 00 05 21  46                       |..c....!F|
+Sending: GET_ANTENNA_PORT              1783113.358712824
+         ff 01 61 05 bd b8                                 |..a...|
+Received:GET_ANTENNA_PORT              1783113.360832578
+         ff 03 61 00 00 05 01 00  61 df                    |..a.....a.|
+Sending: GET_READER_OPTIONAL_PARAMS    1783113.361047512
+         ff 02 6a 01 0c 2e 42                              |..j...B|
+Received:GET_READER_OPTIONAL_PARAMS    1783113.363254874
+         ff 03 6a 00 00 01 0c 01  32 45                    |..j.....2E|
+Sending: GET_READER_OPTIONAL_PARAMS    1783113.363464915
+         ff 02 6a 01 0d 2e 43                              |..j...C|
+Received:GET_READER_OPTIONAL_PARAMS    1783113.365915536
+         ff 06 6a 00 00 01 0d 00  00 00 00 15 43           |..j.........C|
+Sending: SET_REGION                    1783113.366099275
+         ff 01 97 0d 4b b0                                 |....K.|
+Received:SET_REGION                    1783113.367851295
+         ff 00 97 00 00 77 9e                              |.....w.|
+Sending: SET_READ_TX_POWER             1783113.368065458
+         ff 02 92 08 98 49 c1                              |.....I.|
+Received:SET_READ_TX_POWER             1783113.369971357
+         ff 00 92 00 00 27 3b                              |.....';|
+Sending: SET_WRITE_TX_POWER            1783113.370116064
+         ff 02 94 08 98 29 07                              |.....).|
+Received:SET_WRITE_TX_POWER            1783113.371990494
+         ff 00 94 00 00 47 fd                              |.....G.|
+Sending: SET_ANTENNA_PORT              1783113.372144979
+         ff 02 91 01 01 70 3b                              |.....p;|
+Received:SET_ANTENNA_PORT              1783113.374086488
+         ff 00 91 00 00 17 58                              |......X|
+Sending: SET_READER_OPTIONAL_PARAMS    1783113.374223675
+         ff 03 9a 01 06 01 a9 5c                           |.......\|
+Received:SET_READER_OPTIONAL_PARAMS    1783113.376213620
+         ff 00 9a 00 00 a6 33                              |......3|
+Sending: GET_READER_STATS              1783113.376365163
+         ff 03 6c 01 9f 41 89 7b                           |..l..A.{|
+Received:GET_READER_STATS              1783113.378504811
+         ff 03 6c 00 00 01 9f 41  86 9c                    |..l....A..|
+Sending: CLEAR_TAG_ID_BUFFER           1783113.378674249
+         ff 00 2a 1d 25                                    |..*.%|
+Received:CLEAR_TAG_ID_BUFFER           1783113.380379708
+         ff 00 2a 00 00 01 e8                              |..*....|
+Sending: SET_ANTENNA_PORT              1783113.380525173
+         ff 03 91 02 01 01 42 c5                           |......B.|
+Received:SET_ANTENNA_PORT              1783113.382539190
+         ff 00 91 00 00 17 58                              |......X|
+Sending: READ_TAG_ID_MULTIPLE          1783113.382687791
+         ff 10 22 03 00 13 03 e8  00 00 00 00 00 00 00 00  |..".............|
+         10 00 00 86 a3                                    |.....|
+Received:READ_TAG_ID_MULTIPLE          1783114.389189850
+         ff 07 22 00 00 03 00 13  00 00 00 01 65 8a        |..".........e.|
+Sending: GET_TAG_ID_BUFFER             1783114.389440192
+         ff 03 29 01 ff 00 1b 03                           |..).....|
+Received:GET_TAG_ID_BUFFER             1783114.394987785
+         ff 26 29 00 00 01 ff 00  01 1f d1 11 0e 13 e8 00  |.&).............|
+         00 03 23 00 ae 05 00 00  00 00 80 30 00 e2 00 51  |..#........0...Q|
+         86 01 07 01 87 07 70 c4  c1 ba 1e f3 0f           |......p......|
+Sending: WRITE_TAG_ID                  1783114.395787548
+         ff 1c 23 03 e8 01 00 00  00 00 60 e2 00 51 86 01  |..#.......`..Q..|
+         07 01 87 07 70 c4 c1 01  23 45 67 89 ab cd ef 5b  |....p...#Eg....[|
+         20                                                | |
+Received:WRITE_TAG_ID                  1783114.473001670
+         ff 00 23 00 00 90 c1                              |..#....|
+Sending: GET_READER_STATS              1783114.473210471
+         ff 03 6c 01 9f 41 89 7b                           |..l..A.{|
+Received:GET_READER_STATS              1783114.475568734
+         ff 03 6c 00 00 01 9f 41  86 9c                    |..l....A..|
+Sending: CLEAR_TAG_ID_BUFFER           1783114.475730903
+         ff 00 2a 1d 25                                    |..*.%|
+Received:CLEAR_TAG_ID_BUFFER           1783114.477455041
+         ff 00 2a 00 00 01 e8                              |..*....|
+Sending: SET_ANTENNA_PORT              1783114.477668332
+         ff 03 91 02 01 01 42 c5                           |......B.|
+Received:SET_ANTENNA_PORT              1783114.479714545
+         ff 00 91 00 00 17 58                              |......X|
+Sending: READ_TAG_ID_MULTIPLE          1783114.479888386
+         ff 11 22 00 00 17 03 e8  01 09 28 07 d0 00 03 00  |..".......(.....|
+         00 00 00 20 49 70                                 |... Ip|
+Received:READ_TAG_ID_MULTIPLE          1783115.497038299
+         ff 4d 22 00 00 00 00 17  00 00 00 01 01 28 00 16  |.M"..........(..|
+         00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+         00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+         00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+         00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+         00 00 e4 bf                                       |....|
+Sending: GET_TAG_ID_BUFFER             1783115.498013194
+         ff 03 29 01 ff 00 1b 03                           |..).....|
+Received:GET_TAG_ID_BUFFER             1783115.508879879
+         ff 62 29 00 00 01 ff 00  01 16 d3 11 0e 03 80 00  |.b).............|
+         00 01 9d 00 ab 05 02 00  00 00 00 00 00 00 00 00  |................|
+         00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+         00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+         00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+         00 00 00 00 00 00 00 00  00 00 60 20 00 01 23 45  |..........` ..#E|
+         67 89 ab cd ef 8e 9e 37  23                       |g......7#|
+Sending: WRITE_TAG_ID                  1783115.510126246
+         ff 1c 23 03 e8 01 00 00  00 00 40 01 23 45 67 89  |..#.......@.#Eg.|
+         ab cd ef e2 00 51 86 01  07 01 87 07 70 c4 c1 72  |.....Q......p..r|
+         c4                                                |.|
+Received:WRITE_TAG_ID                  1783115.619815239
+         ff 00 23 00 00 90 c1                              |..#....|
