@@ -59,11 +59,15 @@ putWithBold txt = do
   when bold $ setSGR [Reset]
 
 displayTag :: TMR.TagReadData -> T.Text
-displayTag trd = strength <> " <" <> epc <> "> " <> user
+displayTag trd = strength <> " <" <> epc <> ">" <> user
   where
     strength = T.pack $ printf "%3d" (TMR.trRssi trd)
     epc = TMR.bytesToHex $ TMR.tdEpc $ TMR.trTag trd
-    user = T.pack $ show $ B.takeWhile (/= 0) (TMR.trData trd)
+    dat = TMR.trData trd
+    user =
+      if B.null dat
+      then "" -- this means it failed to read the user data
+      else T.pack $ ' ' : show (B.takeWhile (/= 0) dat)
 
 main = do
   o <- execParser opts'
