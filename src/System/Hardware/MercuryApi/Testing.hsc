@@ -271,7 +271,7 @@ testShutdown p = do
 -- starts with "/C:", which doesn't work, so we need to strip
 -- the leading slash.
 hackPath :: String -> String -> String
-hackPath "windows" = dropWhile (== '/')
+hackPath "mingw32" = dropWhile (== '/')
 hackPath _ = id
 
 testTransportInit :: Ptr SerialTransport -> Ptr () -> CString -> IO RawStatus
