@@ -285,6 +285,28 @@ testBlockErase rdr ts = do
   forM_ tags2 $ \tag -> do
     check ts $ return tag { TMR.trTimestamp = 0 }
 
+permalockMeFilter :: TMR.TagFilter
+permalockMeFilter = TMR.mkFilterGen2 TMR.GEN2_BANK_USER 0 "permalock me"
+
+testBlockPermalockRead :: TestFunc
+testBlockPermalockRead rdr ts = do
+  setRegionAndPower rdr
+  TMR.paramSetReadPlanFilter rdr (Just permalockMeFilter)
+
+  tags <- TMR.read rdr 1000
+  check ts $ return $ length tags
+  let trd = maximumBy (comparing TMR.trRssi) tags
+  check ts $ return trd { TMR.trTimestamp = 0 }
+
+  let epcFilt = TMR.TagFilterEPC (TMR.trTag trd)
+      opPermalock = TMR.TagOp_GEN2_BlockPermaLock
+                    { TMR.opReadLock = 0
+                    , TMR.opBank = TMR.GEN2_BANK_USER
+                    , TMR.opBlockPtr = 0
+                    , TMR.opMaskList = [0]
+                    }
+  void $ check ts $ TMR.executeTagOp rdr opPermalock (Just epcFilt)
+
 mkPin :: TMR.PinNumber -> TMR.PinNumber -> TMR.GpioPin
 mkPin highPin pin =
   TMR.GpioPin
@@ -318,6 +340,7 @@ tests =
   , ("lock", testLock)
   , ("blockWrite", testBlockWrite)
   , ("blockErase", testBlockErase)
+  , ("blockPermalockRead", testBlockPermalockRead)
   , ("gpo", testGpo)
   , ("gpi", testGpi)
   ]

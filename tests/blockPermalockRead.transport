@@ -1,0 +1,86 @@
+Sending: VERSION                       1788782.640969644
+         ff 00 03 1d 0c                                    |.....|
+Received:VERSION                       1788782.644759827
+         ff 14 03 00 00 14 12 08  00 30 00 00 02 20 16 12  |.........0... ..|
+         13 01 07 01 02 00 00 00  10 1b 05                 |...........|
+Sending: GET_CURRENT_PROGRAM           1788782.645523912
+         ff 00 0c 1d 03                                    |.....|
+Received:GET_CURRENT_PROGRAM           1788782.647207730
+         ff 01 0c 00 00 52 63 03                           |.....Rc.|
+Sending: GET_POWER_MODE                1788782.647393945
+         ff 00 68 1d 67                                    |..h.g|
+Received:GET_POWER_MODE                1788782.649005054
+         ff 01 68 00 00 00 a4 bf                           |..h.....|
+Sending: GET_READER_OPTIONAL_PARAMS    1788782.649132335
+         ff 02 6a 01 0e 2e 40                              |..j...@|
+Received:GET_READER_OPTIONAL_PARAMS    1788782.651098776
+         ff 03 6a 00 00 01 0e 00  30 44                    |..j.....0D|
+Sending: GET_READER_OPTIONAL_PARAMS    1788782.652023108
+         ff 02 6a 01 12 2e 5c                              |..j...\|
+Received:GET_READER_OPTIONAL_PARAMS    1788782.654326231
+         ff 04 6a 00 00 01 12 00  00 69 af                 |..j......i.|
+Sending: GET_TAG_PROTOCOL              1788782.654487070
+         ff 00 63 1d 6c                                    |..c.l|
+Received:GET_TAG_PROTOCOL              1788782.656351621
+         ff 02 63 00 00 00 05 21  46                       |..c....!F|
+Sending: GET_ANTENNA_PORT              1788782.656518848
+         ff 01 61 05 bd b8                                 |..a...|
+Received:GET_ANTENNA_PORT              1788782.658652260
+         ff 03 61 00 00 05 01 00  61 df                    |..a.....a.|
+Sending: GET_READER_OPTIONAL_PARAMS    1788782.658916499
+         ff 02 6a 01 0c 2e 42                              |..j...B|
+Received:GET_READER_OPTIONAL_PARAMS    1788782.661087415
+         ff 03 6a 00 00 01 0c 01  32 45                    |..j.....2E|
+Sending: GET_READER_OPTIONAL_PARAMS    1788782.661273416
+         ff 02 6a 01 0d 2e 43                              |..j...C|
+Received:GET_READER_OPTIONAL_PARAMS    1788782.663720481
+         ff 06 6a 00 00 01 0d 00  00 00 00 15 43           |..j.........C|
+Sending: SET_REGION                    1788782.663951700
+         ff 01 97 0d 4b b0                                 |....K.|
+Received:SET_REGION                    1788782.665729840
+         ff 00 97 00 00 77 9e                              |.....w.|
+Sending: SET_READ_TX_POWER             1788782.665870403
+         ff 02 92 08 98 49 c1                              |.....I.|
+Received:SET_READ_TX_POWER             1788782.667617753
+         ff 00 92 00 00 27 3b                              |.....';|
+Sending: SET_WRITE_TX_POWER            1788782.667715503
+         ff 02 94 08 98 29 07                              |.....).|
+Received:SET_WRITE_TX_POWER            1788782.669567533
+         ff 00 94 00 00 47 fd                              |.....G.|
+Sending: SET_ANTENNA_PORT              1788782.669735366
+         ff 02 91 01 01 70 3b                              |.....p;|
+Received:SET_ANTENNA_PORT              1788782.671616711
+         ff 00 91 00 00 17 58                              |......X|
+Sending: SET_READER_OPTIONAL_PARAMS    1788782.671753994
+         ff 03 9a 01 06 01 a9 5c                           |.......\|
+Received:SET_READER_OPTIONAL_PARAMS    1788782.673702109
+         ff 00 9a 00 00 a6 33                              |......3|
+Sending: GET_READER_STATS              1788782.673865218
+         ff 03 6c 01 9f 41 89 7b                           |..l..A.{|
+Received:GET_READER_STATS              1788782.676076995
+         ff 03 6c 00 00 01 9f 41  86 9c                    |..l....A..|
+Sending: CLEAR_TAG_ID_BUFFER           1788782.676237372
+         ff 00 2a 1d 25                                    |..*.%|
+Received:CLEAR_TAG_ID_BUFFER           1788782.677927643
+         ff 00 2a 00 00 01 e8                              |..*....|
+Sending: SET_ANTENNA_PORT              1788782.678147795
+         ff 03 91 02 01 01 42 c5                           |......B.|
+Received:SET_ANTENNA_PORT              1788782.680173860
+         ff 00 91 00 00 17 58                              |......X|
+Sending: READ_TAG_ID_MULTIPLE          1788782.680323257
+         ff 1a 22 03 00 13 03 e8  00 00 00 00 00 00 00 00  |..".............|
+         60 70 65 72 6d 61 6c 6f  63 6b 20 6d 65 0d 10     |`permalock me..|
+Received:READ_TAG_ID_MULTIPLE          1788783.687738374
+         ff 07 22 00 00 03 00 13  00 00 00 01 65 8a        |..".........e.|
+Sending: GET_TAG_ID_BUFFER             1788783.687953423
+         ff 03 29 01 ff 00 1b 03                           |..).....|
+Received:GET_TAG_ID_BUFFER             1788783.693406134
+         ff 26 29 00 00 01 ff 00  01 19 d6 11 0e 13 e8 00  |.&).............|
+         00 03 48 00 ae 05 00 00  00 00 80 34 00 e2 00 51  |..H........4...Q|
+         86 01 07 01 87 07 70 c4  c1 47 bb b8 14           |......p..G...|
+Sending: ERASE_BLOCK_TAG_SPECIFIC      1788783.694067535
+         ff 1e 2e 03 e8 00 41 01  00 00 00 00 60 e2 00 51  |......A.....`..Q|
+         86 01 07 01 87 07 70 c4  c1 00 00 03 00 00 00 00  |......p.........|
+         01 81 2c                                          |..,|
+Received:ERASE_BLOCK_TAG_SPECIFIC      1788784.705485119
+         ff 00 2e 04 0a 45 66                              |.....Ef|
