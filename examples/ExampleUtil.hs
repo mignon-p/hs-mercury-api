@@ -77,6 +77,7 @@ createConnectAndParams uri listen region power = do
 defUri :: String
 defUri = case os of
            "darwin" -> "tmr:///dev/cu.SLAB_USBtoUART"
+           "ming32" -> "tmr:///COM4"
            _ -> "tmr:///dev/ttyUSB0"
 
 defRegion :: String

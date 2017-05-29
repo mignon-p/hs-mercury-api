@@ -297,7 +297,8 @@ void *c_new_c_locale (void)
      * like a good place to do it. */
     tzset();
 #ifdef _WIN32
-    return NULL;
+    /* Unused on Windows, so value doesn't matter, but can't be NULL. */
+    return (void*) 1;
 #else
     /* Allocate a new locale.  We only do this once, so it's okay
      * that it leaks. */

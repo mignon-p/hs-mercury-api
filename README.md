@@ -11,9 +11,6 @@ their counterparts in the C API, with the `TMR_` prefix dropped.  For
 more in-depth, language-independent documentation of Mercury API, see
 [Mercury API Programmers Guide][2].
 
-Currently, the Haskell binding only supports POSIX systems, but it
-probably wouldn't be too hard to enable Windows support.
-
 The Haskell binding doesn't support background reads.  I recommend
 that you just spawn a new Haskell thread and do foreground reads
 instead.

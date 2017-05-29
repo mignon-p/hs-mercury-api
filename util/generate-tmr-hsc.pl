@@ -1517,7 +1517,6 @@ sub emitParamHeader {
     emit 'Copyright   : © Patrick Pelletier, 2017';
     emit 'License     : MIT';
     emit 'Maintainer  : code@funwithsoftware.org';
-    emit 'Portability : POSIX';
     emit '';
     emit 'Individual functions to get and set parameters.  These are';
     emit "type-checked at compile time, unlike 'paramGet' and 'paramSet',";

@@ -393,6 +393,7 @@ runTests uri dir ts = do
 defUri :: String
 defUri = case os of
            "darwin" -> "tmr:///dev/cu.SLAB_USBtoUART"
+           "ming32" -> "tmr:///COM4"
            _ -> "tmr:///dev/ttyUSB0"
 
 data Opts = Opts
