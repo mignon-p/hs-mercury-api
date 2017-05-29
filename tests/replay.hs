@@ -307,6 +307,40 @@ testBlockPermalockRead rdr ts = do
                     }
   void $ check ts $ TMR.executeTagOp rdr opPermalock (Just epcFilt)
 
+testBlockPermalockWrite :: TestFunc
+testBlockPermalockWrite rdr ts = do
+  setRegionAndPower rdr
+  TMR.paramSetReadPlanFilter rdr (Just permalockMeFilter)
+
+  tags <- TMR.read rdr 1000
+  check ts $ return $ length tags
+  let trd = maximumBy (comparing TMR.trRssi) tags
+  check ts $ return trd { TMR.trTimestamp = 0 }
+
+  let epcFilt = TMR.TagFilterEPC (TMR.trTag trd)
+      opPermalock = TMR.TagOp_GEN2_BlockPermaLock
+                    { TMR.opReadLock = 1
+                    , TMR.opBank = TMR.GEN2_BANK_USER
+                    , TMR.opBlockPtr = 0
+                    , TMR.opMaskList = [0xf00f, 0x00f0]
+                    }
+  check ts $ TMR.executeTagOp rdr opPermalock (Just epcFilt)
+
+  forM_ [0..31] $ \word -> do
+    let opWrite = TMR.TagOp_GEN2_WriteData
+                  { TMR.opBank = TMR.GEN2_BANK_USER
+                  , TMR.opWordAddress = word
+                  , TMR.opData = [fromIntegral word]
+                  }
+    check ts $ TMR.executeTagOp rdr opWrite (Just epcFilt)
+
+  TMR.paramSetReadPlanFilter rdr Nothing
+  TMR.paramSetReadPlanTagop rdr (Just readUser)
+  tags2 <- TMR.read rdr 1000
+  check ts $ return $ length tags2
+  forM_ tags2 $ \tag -> do
+    check ts $ return tag { TMR.trTimestamp = 0 }
+
 mkPin :: TMR.PinNumber -> TMR.PinNumber -> TMR.GpioPin
 mkPin highPin pin =
   TMR.GpioPin
@@ -341,6 +375,7 @@ tests =
   , ("blockWrite", testBlockWrite)
   , ("blockErase", testBlockErase)
   , ("blockPermalockRead", testBlockPermalockRead)
+  , ("blockPermalockWrite", testBlockPermalockWrite)
   , ("gpo", testGpo)
   , ("gpi", testGpi)
   ]
