@@ -14,6 +14,7 @@ import qualified Data.Text.Encoding.Error as T
 import qualified Data.Text.IO as T
 import Data.Word
 import Options.Applicative
+import System.Console.ANSI
 import qualified System.Hardware.MercuryApi as TMR
 import qualified System.Hardware.MercuryApi.Params as TMR
 import System.IO
@@ -45,13 +46,13 @@ opts' = info (helper <*> opts)
     header "tmr-write - write a string to user data of tag" )
 
 emptyUserDataFilter :: TMR.TagFilter
-emptyUserDataFilter = TMR.TagFilterGen2
-  { TMR.tfInvert = False
-  , TMR.tfFilterOn = TMR.FilterOnBank TMR.GEN2_BANK_USER
-  , TMR.tfBitPointer = 0
-  , TMR.tfMaskBitLength = 16
-  , TMR.tfMask = B.pack [0, 0]
-  }
+emptyUserDataFilter = TMR.mkFilterGen2 TMR.GEN2_BANK_USER 0 $ B.pack [0, 0]
+
+printColor :: Color -> T.Text -> IO ()
+printColor c txt = do
+  setSGR [SetColor Foreground Vivid c]
+  T.putStrLn txt
+  setSGR [Reset]
 
 main = do
   o <- execParser opts'
@@ -62,7 +63,10 @@ main = do
 
   tags <- TMR.read rdr 1000
   putStrLn $ "read " ++ show (length tags) ++ " tags"
-  when (not $ null tags) $ do
+  if null tags
+    then do
+    printColor Red "No tag found"
+    else do
     let trd = maximumBy (comparing TMR.trRssi) tags
         td = TMR.trTag trd
         epc = TMR.tdEpc td
@@ -76,6 +80,7 @@ main = do
                   , TMR.opWordAddress = 0
                   , TMR.opData = words
                   }
-    void $ TMR.executeTagOp rdr opWrite (Just epcFilt)
+    TMR.executeTagOp rdr opWrite (Just epcFilt)
+    printColor Green "Success!"
 
   TMR.destroy rdr
