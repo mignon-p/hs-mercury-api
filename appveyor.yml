@@ -1,0 +1,32 @@
+# short paths == fewer problems
+
+clone_folder: "c:\\pkg"
+environment:
+  global:
+    BUILD: "stack"
+    GHC_OPTIONS: "-O0 -Werror"
+    DISABLE_BENCH: "y"
+
+    STACK_ROOT: "c:\\sr"
+    LOCAL_BIN: "%APPDATA%\\local\\bin"
+    PATH: "%PATH%;%APPDATA%\\local\\bin"
+    CABAL_REINIT_CONFIG: "y"
+    PACKAGE_TEST_VER: "f47abfb22fbdfb41668a2d3032353b06c87636f2"
+
+cache:
+  - "%STACK_ROOT%" # stack root
+  - "%LOCALAPPDATA%\\Programs\\stack" # ghc & msys
+  - "%LOCAL_BIN%"
+  - "%APPDATA%\\cabal"
+  - "%APPDATA%\\ghc"
+
+build: off
+
+before_test:
+- if not exist %LOCAL_BIN% mkdir %LOCAL_BIN%
+- where stack.exe || curl -sSkL -ostack.zip http://www.stackage.org/stack/windows-i386 && 7z x stack.zip stack.exe && move stack.exe %LOCAL_BIN%
+- curl -sSkL -opackage-test.sh https://raw.githubusercontent.com/harendra-kumar/package-test/%PACKAGE_TEST_VER%/package-test.sh
+
+test_script:
+- stack setup > nul
+- stack exec bash package-test.sh
