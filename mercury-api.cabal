@@ -40,8 +40,12 @@ author:              Patrick Pelletier
 -- patches.
 maintainer:          code@funwithsoftware.org
 
+homepage:            https://github.com/ppelleti/hs-mercury-api
+
+bug-reports:         https://github.com/ppelleti/hs-mercury-api/issues
+
 -- A copyright notice.
--- copyright:
+copyright:           © Patrick Pelletier, 2017
 
 category:            Hardware
 
@@ -66,6 +70,10 @@ tested-with:
   GHC==7.8.4,
   GHC==7.10.3,
   GHC==8.0.2
+
+source-repository head
+  Type:     git
+  Location: https://github.com/ppelleti/hs-mercury-api.git
 
 
 library

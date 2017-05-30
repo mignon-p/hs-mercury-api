@@ -1,6 +1,13 @@
 (I haven't released this package to Hackage yet, so consider it
 alpha-quality.)
 
+Latest:
+[![Hackage](https://img.shields.io/hackage/v/hs-mercury-api.svg)](https://hackage.haskell.org/package/hs-mercury-api)
+Linux:
+[![Build Status](https://travis-ci.org/ppelleti/hs-mercury-api.svg?branch=master)](https://travis-ci.org/ppelleti/hs-mercury-api)
+Windows:
+[![Build status](https://ci.appveyor.com/api/projects/status/aywuy9y05ow8wja2/branch/master?svg=true)](https://ci.appveyor.com/project/ppelleti/hs-mercury-api/branch/master)
+
 This package is a Haskell binding to the [Mercury API][5] C API for
 [ThingMagic][6] brand RFID readers.  It is especially geared toward
 the [SparkFun Simultaneous RFID Reader][1], which uses ThingMagic's
@@ -10,6 +17,10 @@ compiled in.)  Most of the function and type names are the same as
 their counterparts in the C API, with the `TMR_` prefix dropped.  For
 more in-depth, language-independent documentation of Mercury API, see
 [Mercury API Programmers Guide][2].
+
+This package includes a copy of the Mercury API C library, so no
+external libraries are necessary.  Several small bug fixes have been
+applied to the included version of the library.
 
 The Haskell binding doesn't support background reads.  I recommend
 that you just spawn a new Haskell thread and do foreground reads
