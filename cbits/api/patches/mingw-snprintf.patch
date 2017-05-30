@@ -1,0 +1,21 @@
+commit aee0525e9aba4a36e17f4d8f18409c43b6a4c2bb
+Author: Patrick Pelletier <code@funwithsoftware.org>
+Date:   Mon May 29 16:19:36 2017 -0700
+
+    on mingw, snprintf works but sprintf_s doesn't
+
+diff --git a/serial_transport_win32.c b/serial_transport_win32.c
+index d50e32e..e7a4762 100644
+--- a/serial_transport_win32.c
++++ b/serial_transport_win32.c
+@@ -34,7 +34,9 @@
+ #ifdef WIN32
+ #include <windows.h>
+ #include <stdio.h>
+-#define snprintf sprintf_s 
++#ifndef __GNUC__
++#define snprintf sprintf_s
++#endif
+ #endif /* WIN32 */
+ 
+ #include "tm_reader.h"
