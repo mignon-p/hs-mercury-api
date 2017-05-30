@@ -194,7 +194,8 @@ executable tmr-gpio
   ghc-options:         -threaded
 
 
-executable replay
+test-suite replay
+  type:                exitcode-stdio-1.0
   main-is:             replay.hs
   build-depends:       base >= 4.6 && < 5
                      , bytestring >= 0.10.4 && < 0.11
