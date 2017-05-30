@@ -1,278 +1,284 @@
-Sending: VERSION                       1790826.043898532
+Sending: VERSION                       1829749.010225401
          ff 00 03 1d 0c                                    |.....|
-Received:VERSION                       1790826.047578033
+Received:VERSION                       1829749.013984210
          ff 14 03 00 00 14 12 08  00 30 00 00 02 20 16 12  |.........0... ..|
          13 01 07 01 02 00 00 00  10 1b 05                 |...........|
-Sending: GET_CURRENT_PROGRAM           1790826.048279694
+Sending: GET_CURRENT_PROGRAM           1829749.014793598
          ff 00 0c 1d 03                                    |.....|
-Received:GET_CURRENT_PROGRAM           1790826.049961552
+Received:GET_CURRENT_PROGRAM           1829749.016562806
          ff 01 0c 00 00 52 63 03                           |.....Rc.|
-Sending: GET_POWER_MODE                1790826.050129564
+Sending: GET_POWER_MODE                1829749.016810252
          ff 00 68 1d 67                                    |..h.g|
-Received:GET_POWER_MODE                1790826.051691892
+Received:GET_POWER_MODE                1829749.018482575
          ff 01 68 00 00 00 a4 bf                           |..h.....|
-Sending: GET_READER_OPTIONAL_PARAMS    1790826.051816369
+Sending: GET_READER_OPTIONAL_PARAMS    1829749.018608322
          ff 02 6a 01 0e 2e 40                              |..j...@|
-Received:GET_READER_OPTIONAL_PARAMS    1790826.053927712
+Received:GET_READER_OPTIONAL_PARAMS    1829749.020623429
          ff 03 6a 00 00 01 0e 00  30 44                    |..j.....0D|
-Sending: GET_READER_OPTIONAL_PARAMS    1790826.055011455
+Sending: GET_READER_OPTIONAL_PARAMS    1829749.021754159
          ff 02 6a 01 12 2e 5c                              |..j...\|
-Received:GET_READER_OPTIONAL_PARAMS    1790826.057151787
+Received:GET_READER_OPTIONAL_PARAMS    1829749.023878015
          ff 04 6a 00 00 01 12 00  00 69 af                 |..j......i.|
-Sending: GET_TAG_PROTOCOL              1790826.057266491
+Sending: GET_TAG_PROTOCOL              1829749.024026326
          ff 00 63 1d 6c                                    |..c.l|
-Received:GET_TAG_PROTOCOL              1790826.058926089
+Received:GET_TAG_PROTOCOL              1829749.025740344
          ff 02 63 00 00 00 05 21  46                       |..c....!F|
-Sending: GET_ANTENNA_PORT              1790826.059025143
+Sending: GET_ANTENNA_PORT              1829749.025881277
          ff 01 61 05 bd b8                                 |..a...|
-Received:GET_ANTENNA_PORT              1790826.061002031
+Received:GET_ANTENNA_PORT              1829749.027831871
          ff 03 61 00 00 05 01 00  61 df                    |..a.....a.|
-Sending: GET_READER_OPTIONAL_PARAMS    1790826.061151771
+Sending: GET_READER_OPTIONAL_PARAMS    1829749.027988101
          ff 02 6a 01 0c 2e 42                              |..j...B|
-Received:GET_READER_OPTIONAL_PARAMS    1790826.063079335
+Received:GET_READER_OPTIONAL_PARAMS    1829749.029953161
          ff 03 6a 00 00 01 0c 01  32 45                    |..j.....2E|
-Sending: GET_READER_OPTIONAL_PARAMS    1790826.063185785
+Sending: GET_READER_OPTIONAL_PARAMS    1829749.030069038
          ff 02 6a 01 0d 2e 43                              |..j...C|
-Received:GET_READER_OPTIONAL_PARAMS    1790826.065379546
+Received:GET_READER_OPTIONAL_PARAMS    1829749.032468987
          ff 06 6a 00 00 01 0d 00  00 00 00 15 43           |..j.........C|
-Sending: SET_REGION                    1790826.065511213
+Sending: SET_REGION                    1829749.032668048
          ff 01 97 0d 4b b0                                 |....K.|
-Received:SET_REGION                    1790826.067161128
+Received:SET_REGION                    1829749.034531357
          ff 00 97 00 00 77 9e                              |.....w.|
-Sending: SET_READ_TX_POWER             1790826.067285021
+Sending: SET_READ_TX_POWER             1829749.034720522
          ff 02 92 08 98 49 c1                              |.....I.|
-Received:SET_READ_TX_POWER             1790826.069152876
+Received:SET_READ_TX_POWER             1829749.036607567
          ff 00 92 00 00 27 3b                              |.....';|
-Sending: SET_WRITE_TX_POWER            1790826.069286104
+Sending: SET_WRITE_TX_POWER            1829749.036735988
          ff 02 94 08 98 29 07                              |.....).|
-Received:SET_WRITE_TX_POWER            1790826.071156222
+Received:SET_WRITE_TX_POWER            1829749.038506907
          ff 00 94 00 00 47 fd                              |.....G.|
-Sending: SET_ANTENNA_PORT              1790826.071338296
+Sending: SET_ANTENNA_PORT              1829749.038650766
          ff 02 91 01 01 70 3b                              |.....p;|
-Received:SET_ANTENNA_PORT              1790826.073154455
+Received:SET_ANTENNA_PORT              1829749.040334163
          ff 00 91 00 00 17 58                              |......X|
-Sending: SET_READER_OPTIONAL_PARAMS    1790826.073375964
+Sending: SET_READER_OPTIONAL_PARAMS    1829749.040436892
          ff 03 9a 01 06 01 a9 5c                           |.......\|
-Received:SET_READER_OPTIONAL_PARAMS    1790826.075203235
+Received:SET_READER_OPTIONAL_PARAMS    1829749.042469035
          ff 00 9a 00 00 a6 33                              |......3|
-Sending: GET_READER_STATS              1790826.075316082
+Sending: GET_READER_STATS              1829749.042628435
          ff 03 6c 01 9f 41 89 7b                           |..l..A.{|
-Received:GET_READER_STATS              1790826.077536787
+Received:GET_READER_STATS              1829749.044924815
          ff 03 6c 00 00 01 9f 41  86 9c                    |..l....A..|
-Sending: CLEAR_TAG_ID_BUFFER           1790826.077696721
+Sending: CLEAR_TAG_ID_BUFFER           1829749.045087626
          ff 00 2a 1d 25                                    |..*.%|
-Received:CLEAR_TAG_ID_BUFFER           1790826.079271728
+Received:CLEAR_TAG_ID_BUFFER           1829749.046781026
          ff 00 2a 00 00 01 e8                              |..*....|
-Sending: SET_ANTENNA_PORT              1790826.079420873
+Sending: SET_ANTENNA_PORT              1829749.046931097
          ff 03 91 02 01 01 42 c5                           |......B.|
-Received:SET_ANTENNA_PORT              1790826.081469266
+Received:SET_ANTENNA_PORT              1829749.048977941
          ff 00 91 00 00 17 58                              |......X|
-Sending: READ_TAG_ID_MULTIPLE          1790826.081617463
+Sending: READ_TAG_ID_MULTIPLE          1829749.049135083
          ff 1a 22 03 00 13 03 e8  00 00 00 00 00 00 00 00  |..".............|
          60 70 65 72 6d 61 6c 6f  63 6b 20 6d 65 0d 10     |`permalock me..|
-Received:READ_TAG_ID_MULTIPLE          1790827.088957190
+Received:READ_TAG_ID_MULTIPLE          1829750.056628187
          ff 07 22 00 00 03 00 13  00 00 00 01 65 8a        |..".........e.|
-Sending: GET_TAG_ID_BUFFER             1790827.089131479
+Sending: GET_TAG_ID_BUFFER             1829750.056804295
          ff 03 29 01 ff 00 1b 03                           |..).....|
-Received:GET_TAG_ID_BUFFER             1790827.094350471
-         ff 26 29 00 00 01 ff 00  01 19 d6 11 0e 13 e8 00  |.&).............|
-         00 03 2f 00 ae 05 00 00  00 00 80 34 00 e2 00 51  |../........4...Q|
-         86 01 07 01 87 07 70 c4  c1 47 bb 32 30           |......p..G.20|
-Sending: ERASE_BLOCK_TAG_SPECIFIC      1790827.094780339
-         ff 22 2e 03 e8 00 41 01  00 00 00 00 60 e2 00 51  |."....A.....`..Q|
-         86 01 07 01 87 07 70 c4  c1 00 01 03 00 00 00 00  |......p.........|
-         02 f0 0f 00 f0 0c 77                              |......w|
-Received:ERASE_BLOCK_TAG_SPECIFIC      1790828.153262944
-         ff 00 2e 04 06 45 6a                              |.....Ej|
-Sending: WRITE_TAG_DATA                1790828.153584838
+Received:GET_TAG_ID_BUFFER             1829750.062018018
+         ff 26 29 00 00 01 ff 00  01 1d dc 11 0e 13 e8 00  |.&).............|
+         00 03 0b 00 ae 05 00 00  00 00 80 34 00 e2 00 00  |...........4....|
+         15 86 0e 01 86 10 50 b2  05 43 05 9e 57           |......P..C..W|
+Sending: ERASE_BLOCK_TAG_SPECIFIC      1829750.065369420
+         ff 20 2e 03 e8 00 41 01  00 00 00 00 60 e2 00 00  |. ....A.....`...|
+         15 86 0e 01 86 10 50 b2  05 00 01 03 00 00 00 00  |......P.........|
+         01 aa 00 60 1e                                    |...`.|
+Received:ERASE_BLOCK_TAG_SPECIFIC      1829750.112401542
+         ff 00 2e 00 00 41 6c                              |.....Al|
+Sending: WRITE_TAG_DATA                1829750.112821077
          ff 1b 24 03 e8 01 00 00  00 00 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 00 16 49  |..Q......p.....I|
-Received:WRITE_TAG_DATA                1790828.182924970
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.183228270
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 00 12 f7  |.........P......|
+Received:WRITE_TAG_DATA                1829751.142148716
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829751.142397556
          ff 1b 24 03 e8 01 00 00  00 01 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 01 c8 57  |..Q......p.....W|
-Received:WRITE_TAG_DATA                1790828.214325250
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.214597618
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 01 cc e9  |.........P......|
+Received:WRITE_TAG_DATA                1829752.152142164
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829752.152418941
          ff 1b 24 03 e8 01 00 00  00 02 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 02 ba 54  |..Q......p.....T|
-Received:WRITE_TAG_DATA                1790828.243889761
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.244127508
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 02 be ea  |.........P......|
+Received:WRITE_TAG_DATA                1829753.171222351
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829753.171502860
          ff 1b 24 03 e8 01 00 00  00 03 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 03 64 4a  |..Q......p....dJ|
-Received:WRITE_TAG_DATA                1790828.274738902
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.275018215
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 03 60 f4  |.........P....`.|
+Received:WRITE_TAG_DATA                1829754.193508531
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829754.193796103
          ff 1b 24 03 e8 01 00 00  00 04 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 04 5e 52  |..Q......p....^R|
-Received:WRITE_TAG_DATA                1790828.305502697
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 04 5a ec  |.........P....Z.|
+Received:WRITE_TAG_DATA                1829754.222549247
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.305682630
+Sending: WRITE_TAG_DATA                1829754.222738514
          ff 1b 24 03 e8 01 00 00  00 05 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 05 80 4c  |..Q......p.....L|
-Received:WRITE_TAG_DATA                1790828.336278198
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 05 84 f2  |.........P......|
+Received:WRITE_TAG_DATA                1829754.251609957
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.336520955
+Sending: WRITE_TAG_DATA                1829754.251872514
          ff 1b 24 03 e8 01 00 00  00 06 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 06 f2 4f  |..Q......p.....O|
-Received:WRITE_TAG_DATA                1790828.380656960
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 06 f6 f1  |.........P......|
+Received:WRITE_TAG_DATA                1829754.280762468
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.380842853
+Sending: WRITE_TAG_DATA                1829754.281006941
          ff 1b 24 03 e8 01 00 00  00 07 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 07 2c 51  |..Q......p....,Q|
-Received:WRITE_TAG_DATA                1790828.412046673
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 07 28 ef  |.........P....(.|
+Received:WRITE_TAG_DATA                1829754.309970159
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.412225794
+Sending: WRITE_TAG_DATA                1829754.310172608
          ff 1b 24 03 e8 01 00 00  00 08 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 08 86 7f  |..Q......p......|
-Received:WRITE_TAG_DATA                1790828.441504613
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.441834791
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 08 82 c1  |.........P......|
+Received:WRITE_TAG_DATA                1829755.346791842
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829755.347092306
          ff 1b 24 03 e8 01 00 00  00 09 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 09 58 61  |..Q......p....Xa|
-Received:WRITE_TAG_DATA                1790828.485175206
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.485378658
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 09 5c df  |.........P....\.|
+Received:WRITE_TAG_DATA                1829756.380042974
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829756.380287524
          ff 1b 24 03 e8 01 00 00  00 0a 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 0a 2a 62  |..Q......p....*b|
-Received:WRITE_TAG_DATA                1790828.515090224
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.515357455
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 0a 2e dc  |.........P......|
+Received:WRITE_TAG_DATA                1829757.407129848
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829757.407368360
          ff 1b 24 03 e8 01 00 00  00 0b 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 0b f4 7c  |..Q......p.....||
-Received:WRITE_TAG_DATA                1790828.546174823
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.546369706
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 0b f0 c2  |.........P......|
+Received:WRITE_TAG_DATA                1829758.440289154
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829758.440490255
          ff 1b 24 03 e8 01 00 00  00 0c 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 0c ce 64  |..Q......p.....d|
-Received:WRITE_TAG_DATA                1790828.577028713
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 0c ca da  |.........P......|
+Received:WRITE_TAG_DATA                1829758.469259190
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.577289787
+Sending: WRITE_TAG_DATA                1829758.469522032
          ff 1b 24 03 e8 01 00 00  00 0d 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 0d 10 7a  |..Q......p.....z|
-Received:WRITE_TAG_DATA                1790828.607822498
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 0d 14 c4  |.........P......|
+Received:WRITE_TAG_DATA                1829758.498531273
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.608008924
+Sending: WRITE_TAG_DATA                1829758.498805425
          ff 1b 24 03 e8 01 00 00  00 0e 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 0e 62 79  |..Q......p....by|
-Received:WRITE_TAG_DATA                1790828.649777705
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 0e 66 c7  |.........P....f.|
+Received:WRITE_TAG_DATA                1829758.527733252
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.650058506
+Sending: WRITE_TAG_DATA                1829758.527982849
          ff 1b 24 03 e8 01 00 00  00 0f 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 0f bc 67  |..Q......p.....g|
-Received:WRITE_TAG_DATA                1790828.681126753
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 0f b8 d9  |.........P......|
+Received:WRITE_TAG_DATA                1829758.556692351
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.681387263
+Sending: WRITE_TAG_DATA                1829758.556900495
          ff 1b 24 03 e8 01 00 00  00 10 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 10 26 04  |..Q......p....&.|
-Received:WRITE_TAG_DATA                1790828.710628859
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.710894153
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 10 22 ba  |.........P....".|
+Received:WRITE_TAG_DATA                1829759.593563381
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829759.593731843
          ff 1b 24 03 e8 01 00 00  00 11 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 11 f8 1a  |..Q......p......|
-Received:WRITE_TAG_DATA                1790828.741624519
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.741910519
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 11 fc a4  |.........P......|
+Received:WRITE_TAG_DATA                1829760.623955751
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829760.624235451
          ff 1b 24 03 e8 01 00 00  00 12 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 12 8a 19  |..Q......p......|
-Received:WRITE_TAG_DATA                1790828.771280541
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.771548470
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 12 8e a7  |.........P......|
+Received:WRITE_TAG_DATA                1829761.652961247
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829761.653243691
          ff 1b 24 03 e8 01 00 00  00 13 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 13 54 07  |..Q......p....T.|
-Received:WRITE_TAG_DATA                1790828.813840360
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.814128496
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 13 50 b9  |.........P....P.|
+Received:WRITE_TAG_DATA                1829762.665276942
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829762.665494236
          ff 1b 24 03 e8 01 00 00  00 14 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 14 6e 1f  |..Q......p....n.|
-Received:WRITE_TAG_DATA                1790828.845102998
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 14 6a a1  |.........P....j.|
+Received:WRITE_TAG_DATA                1829762.694120598
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.845362636
+Sending: WRITE_TAG_DATA                1829762.694383889
          ff 1b 24 03 e8 01 00 00  00 15 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 15 b0 01  |..Q......p......|
-Received:WRITE_TAG_DATA                1790828.876078008
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 15 b4 bf  |.........P......|
+Received:WRITE_TAG_DATA                1829762.751451949
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.876366922
+Sending: WRITE_TAG_DATA                1829762.751713427
          ff 1b 24 03 e8 01 00 00  00 16 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 16 c2 02  |..Q......p......|
-Received:WRITE_TAG_DATA                1790828.907025558
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 16 c6 bc  |.........P......|
+Received:WRITE_TAG_DATA                1829762.780199308
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.907256013
+Sending: WRITE_TAG_DATA                1829762.780457877
          ff 1b 24 03 e8 01 00 00  00 17 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 17 1c 1c  |..Q......p......|
-Received:WRITE_TAG_DATA                1790828.951885902
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 17 18 a2  |.........P......|
+Received:WRITE_TAG_DATA                1829762.809239881
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.952145527
+Sending: WRITE_TAG_DATA                1829762.809503379
          ff 1b 24 03 e8 01 00 00  00 18 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 18 b6 32  |..Q......p.....2|
-Received:WRITE_TAG_DATA                1790828.981549398
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790828.981841009
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 18 b2 8c  |.........P......|
+Received:WRITE_TAG_DATA                1829763.842151363
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829763.842308880
          ff 1b 24 03 e8 01 00 00  00 19 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 19 68 2c  |..Q......p....h,|
-Received:WRITE_TAG_DATA                1790829.012335006
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790829.012463775
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 19 6c 92  |.........P....l.|
+Received:WRITE_TAG_DATA                1829764.873162970
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829764.873443541
          ff 1b 24 03 e8 01 00 00  00 1a 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 1a 1a 2f  |..Q......p...../|
-Received:WRITE_TAG_DATA                1790829.042861527
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790829.043028814
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 1a 1e 91  |.........P......|
+Received:WRITE_TAG_DATA                1829765.879579000
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829765.879851392
          ff 1b 24 03 e8 01 00 00  00 1b 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 1b c4 31  |..Q......p.....1|
-Received:WRITE_TAG_DATA                1790829.073457938
-         ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790829.073590663
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 1b c0 8f  |.........P......|
+Received:WRITE_TAG_DATA                1829766.888892450
+         ff 00 24 04 06 e4 20                              |..$... |
+Sending: WRITE_TAG_DATA                1829766.889180097
          ff 1b 24 03 e8 01 00 00  00 1c 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 1c fe 29  |..Q......p.....)|
-Received:WRITE_TAG_DATA                1790829.104099683
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 1c fa 97  |.........P......|
+Received:WRITE_TAG_DATA                1829766.918023959
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790829.104303077
+Sending: WRITE_TAG_DATA                1829766.918292458
          ff 1b 24 03 e8 01 00 00  00 1d 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 1d 20 37  |..Q......p.... 7|
-Received:WRITE_TAG_DATA                1790829.135087197
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 1d 24 89  |.........P....$.|
+Received:WRITE_TAG_DATA                1829766.946906138
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790829.135272730
+Sending: WRITE_TAG_DATA                1829766.947094131
          ff 1b 24 03 e8 01 00 00  00 1e 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 1e 52 34  |..Q......p....R4|
-Received:WRITE_TAG_DATA                1790829.186951951
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 1e 56 8a  |.........P....V.|
+Received:WRITE_TAG_DATA                1829766.975771316
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: WRITE_TAG_DATA                1790829.187134983
+Sending: WRITE_TAG_DATA                1829766.976106491
          ff 1b 24 03 e8 01 00 00  00 1f 03 00 00 00 00 60  |..$............`|
-         e2 00 51 86 01 07 01 87  07 70 c4 c1 00 1f 8c 2a  |..Q......p.....*|
-Received:WRITE_TAG_DATA                1790829.217847488
+         e2 00 00 15 86 0e 01 86  10 50 b2 05 00 1f 88 94  |.........P......|
+Received:WRITE_TAG_DATA                1829767.004705226
          ff 00 24 00 00 e0 26                              |..$...&|
-Sending: GET_READER_STATS              1790829.218124076
+Sending: GET_READER_STATS              1829767.004898988
          ff 03 6c 01 9f 41 89 7b                           |..l..A.{|
-Received:GET_READER_STATS              1790829.220457900
+Received:GET_READER_STATS              1829767.007163224
          ff 03 6c 00 00 01 9f 41  86 9c                    |..l....A..|
-Sending: CLEAR_TAG_ID_BUFFER           1790829.220691329
+Sending: CLEAR_TAG_ID_BUFFER           1829767.007420284
          ff 00 2a 1d 25                                    |..*.%|
-Received:CLEAR_TAG_ID_BUFFER           1790829.222473771
+Received:CLEAR_TAG_ID_BUFFER           1829767.009235148
          ff 00 2a 00 00 01 e8                              |..*....|
-Sending: SET_ANTENNA_PORT              1790829.222656066
+Sending: SET_ANTENNA_PORT              1829767.009451929
          ff 03 91 02 01 01 42 c5                           |......B.|
-Received:SET_ANTENNA_PORT              1790829.224606415
+Received:SET_ANTENNA_PORT              1829767.011452983
          ff 00 91 00 00 17 58                              |......X|
-Sending: READ_TAG_ID_MULTIPLE          1790829.224785641
+Sending: READ_TAG_ID_MULTIPLE          1829767.011619788
          ff 11 22 00 00 17 03 e8  01 09 28 07 d0 00 03 00  |..".......(.....|
          00 00 00 20 49 70                                 |... Ip|
-Received:READ_TAG_ID_MULTIPLE          1790830.237856968
-         ff 4d 22 00 00 00 00 17  00 00 00 01 01 28 00 09  |.M"..........(..|
-         00 03 00 00 00 01 00 02  00 03 00 04 00 05 00 06  |................|
-         00 07 00 08 00 09 00 0a  00 0b 00 0c 00 0d 00 0e  |................|
-         00 0f 00 10 00 11 00 12  00 13 00 14 00 15 00 16  |................|
-         00 17 00 18 00 19 00 1a  00 1b 00 1c 00 1d 00 1e  |................|
-         00 1f f2 c7                                       |....|
-Sending: GET_TAG_ID_BUFFER             1790830.238808290
+Received:READ_TAG_ID_MULTIPLE          1829768.032941727
+         ff 4d 22 00 00 00 00 17  00 00 00 01 01 28 00 16  |.M"..........(..|
+         00 00 70 65 72 6d 61 6c  6f 63 00 04 00 05 00 06  |..permaloc......|
+         00 07 20 20 20 20 20 20  20 20 00 0c 00 0d 00 0e  |..        ......|
+         00 0f 20 20 20 20 20 20  20 20 00 14 00 15 00 16  |..        ......|
+         00 17 20 20 20 20 20 20  20 20 00 1c 00 1d 00 1e  |..        ......|
+         00 1f c4 38                                       |...8|
+Sending: GET_TAG_ID_BUFFER             1829768.033538854
          ff 03 29 01 ff 00 1b 03                           |..).....|
-Received:GET_TAG_ID_BUFFER             1790830.250087196
-         ff 66 29 00 00 01 ff 00  01 0c d7 11 0e 10 c8 00  |.f).............|
-         00 01 96 00 ae 05 02 00  00 00 00 01 00 02 00 03  |................|
-         00 04 00 05 00 06 00 07  00 08 00 09 00 0a 00 0b  |................|
-         00 0c 00 0d 00 0e 00 0f  00 10 00 11 00 12 00 13  |................|
-         00 14 00 15 00 16 00 17  00 18 00 19 00 1a 00 1b  |................|
-         00 1c 00 1d 00 1e 00 1f  00 00 80 30 00 e2 00 51  |...........0...Q|
-         86 01 07 01 87 07 70 c4  c1 ba 1e ae 80           |......p......|
+Received:GET_TAG_ID_BUFFER             1829768.044502944
+         ff 66 29 00 00 01 ff 00  01 16 de 11 0e 10 00 00  |.f).............|
+         00 00 16 00 ae 05 02 00  70 65 72 6d 61 6c 6f 63  |........permaloc|
+         00 04 00 05 00 06 00 07  20 20 20 20 20 20 20 20  |........        |
+         00 0c 00 0d 00 0e 00 0f  20 20 20 20 20 20 20 20  |........        |
+         00 14 00 15 00 16 00 17  20 20 20 20 20 20 20 20  |........        |
+         00 1c 00 1d 00 1e 00 1f  00 00 80 34 00 e2 00 00  |...........4....|
+         15 86 0e 01 86 10 50 b2  05 43 05 90 67           |......P..C..g|
+Sending: ERASE_BLOCK_TAG_SPECIFIC      1829768.045283520
+         ff 1e 2e 03 e8 00 41 01  00 00 00 00 60 e2 00 00  |......A.....`...|
+         15 86 0e 01 86 10 50 b2  05 00 00 03 00 00 00 00  |......P.........|
+         01 66 1b                                          |.f.|
+Received:ERASE_BLOCK_TAG_SPECIFIC      1829768.068511562
+         ff 04 2e 00 00 41 01 aa  00 74 5f                 |.....A...t_|

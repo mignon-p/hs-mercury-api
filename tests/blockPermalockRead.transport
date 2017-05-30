@@ -1,86 +1,86 @@
-Sending: VERSION                       1790764.319904289
+Sending: VERSION                       1829051.749487169
          ff 00 03 1d 0c                                    |.....|
-Received:VERSION                       1790764.323642004
+Received:VERSION                       1829051.754158098
          ff 14 03 00 00 14 12 08  00 30 00 00 02 20 16 12  |.........0... ..|
          13 01 07 01 02 00 00 00  10 1b 05                 |...........|
-Sending: GET_CURRENT_PROGRAM           1790764.324413877
+Sending: GET_CURRENT_PROGRAM           1829051.754732547
          ff 00 0c 1d 03                                    |.....|
-Received:GET_CURRENT_PROGRAM           1790764.326023588
+Received:GET_CURRENT_PROGRAM           1829051.756325310
          ff 01 0c 00 00 52 63 03                           |.....Rc.|
-Sending: GET_POWER_MODE                1790764.326185140
+Sending: GET_POWER_MODE                1829051.756433837
          ff 00 68 1d 67                                    |..h.g|
-Received:GET_POWER_MODE                1790764.327795318
+Received:GET_POWER_MODE                1829051.758001346
          ff 01 68 00 00 00 a4 bf                           |..h.....|
-Sending: GET_READER_OPTIONAL_PARAMS    1790764.327899650
+Sending: GET_READER_OPTIONAL_PARAMS    1829051.758097441
          ff 02 6a 01 0e 2e 40                              |..j...@|
-Received:GET_READER_OPTIONAL_PARAMS    1790764.329831612
+Received:GET_READER_OPTIONAL_PARAMS    1829051.760214239
          ff 03 6a 00 00 01 0e 00  30 44                    |..j.....0D|
-Sending: GET_READER_OPTIONAL_PARAMS    1790764.330740721
+Sending: GET_READER_OPTIONAL_PARAMS    1829051.768183546
          ff 02 6a 01 12 2e 5c                              |..j...\|
-Received:GET_READER_OPTIONAL_PARAMS    1790764.332826825
+Received:GET_READER_OPTIONAL_PARAMS    1829051.770281602
          ff 04 6a 00 00 01 12 00  00 69 af                 |..j......i.|
-Sending: GET_TAG_PROTOCOL              1790764.332934630
+Sending: GET_TAG_PROTOCOL              1829051.770397735
          ff 00 63 1d 6c                                    |..c.l|
-Received:GET_TAG_PROTOCOL              1790764.334617181
+Received:GET_TAG_PROTOCOL              1829051.772015315
          ff 02 63 00 00 00 05 21  46                       |..c....!F|
-Sending: GET_ANTENNA_PORT              1790764.334717268
+Sending: GET_ANTENNA_PORT              1829051.772120484
          ff 01 61 05 bd b8                                 |..a...|
-Received:GET_ANTENNA_PORT              1790764.336633605
+Received:GET_ANTENNA_PORT              1829051.774081569
          ff 03 61 00 00 05 01 00  61 df                    |..a.....a.|
-Sending: GET_READER_OPTIONAL_PARAMS    1790764.336775192
+Sending: GET_READER_OPTIONAL_PARAMS    1829051.774218216
          ff 02 6a 01 0c 2e 42                              |..j...B|
-Received:GET_READER_OPTIONAL_PARAMS    1790764.338867980
+Received:GET_READER_OPTIONAL_PARAMS    1829051.776219065
          ff 03 6a 00 00 01 0c 01  32 45                    |..j.....2E|
-Sending: GET_READER_OPTIONAL_PARAMS    1790764.339025580
+Sending: GET_READER_OPTIONAL_PARAMS    1829051.776383680
          ff 02 6a 01 0d 2e 43                              |..j...C|
-Received:GET_READER_OPTIONAL_PARAMS    1790764.341485051
+Received:GET_READER_OPTIONAL_PARAMS    1829051.778820450
          ff 06 6a 00 00 01 0d 00  00 00 00 15 43           |..j.........C|
-Sending: SET_REGION                    1790764.341756272
+Sending: SET_REGION                    1829051.779002895
          ff 01 97 0d 4b b0                                 |....K.|
-Received:SET_REGION                    1790764.343622178
+Received:SET_REGION                    1829051.780904919
          ff 00 97 00 00 77 9e                              |.....w.|
-Sending: SET_READ_TX_POWER             1790764.343816448
+Sending: SET_READ_TX_POWER             1829051.781086964
          ff 02 92 08 98 49 c1                              |.....I.|
-Received:SET_READ_TX_POWER             1790764.345550386
+Received:SET_READ_TX_POWER             1829051.782951692
          ff 00 92 00 00 27 3b                              |.....';|
-Sending: SET_WRITE_TX_POWER            1790764.345649725
+Sending: SET_WRITE_TX_POWER            1829051.783084670
          ff 02 94 08 98 29 07                              |.....).|
-Received:SET_WRITE_TX_POWER            1790764.347350934
+Received:SET_WRITE_TX_POWER            1829051.784973813
          ff 00 94 00 00 47 fd                              |.....G.|
-Sending: SET_ANTENNA_PORT              1790764.347445144
+Sending: SET_ANTENNA_PORT              1829051.785227705
          ff 02 91 01 01 70 3b                              |.....p;|
-Received:SET_ANTENNA_PORT              1790764.349340208
+Received:SET_ANTENNA_PORT              1829051.787167999
          ff 00 91 00 00 17 58                              |......X|
-Sending: SET_READER_OPTIONAL_PARAMS    1790764.349471223
+Sending: SET_READER_OPTIONAL_PARAMS    1829051.787303537
          ff 03 9a 01 06 01 a9 5c                           |.......\|
-Received:SET_READER_OPTIONAL_PARAMS    1790764.351492218
+Received:SET_READER_OPTIONAL_PARAMS    1829051.789354238
          ff 00 9a 00 00 a6 33                              |......3|
-Sending: GET_READER_STATS              1790764.351641277
+Sending: GET_READER_STATS              1829051.789507837
          ff 03 6c 01 9f 41 89 7b                           |..l..A.{|
-Received:GET_READER_STATS              1790764.353882252
+Received:GET_READER_STATS              1829051.791778681
          ff 03 6c 00 00 01 9f 41  86 9c                    |..l....A..|
-Sending: CLEAR_TAG_ID_BUFFER           1790764.354041849
+Sending: CLEAR_TAG_ID_BUFFER           1829051.791937775
          ff 00 2a 1d 25                                    |..*.%|
-Received:CLEAR_TAG_ID_BUFFER           1790764.355774686
+Received:CLEAR_TAG_ID_BUFFER           1829051.793646752
          ff 00 2a 00 00 01 e8                              |..*....|
-Sending: SET_ANTENNA_PORT              1790764.355917415
+Sending: SET_ANTENNA_PORT              1829051.793796892
          ff 03 91 02 01 01 42 c5                           |......B.|
-Received:SET_ANTENNA_PORT              1790764.357906261
+Received:SET_ANTENNA_PORT              1829051.795843593
          ff 00 91 00 00 17 58                              |......X|
-Sending: READ_TAG_ID_MULTIPLE          1790764.358046578
+Sending: READ_TAG_ID_MULTIPLE          1829051.795998706
          ff 1a 22 03 00 13 03 e8  00 00 00 00 00 00 00 00  |..".............|
          60 70 65 72 6d 61 6c 6f  63 6b 20 6d 65 0d 10     |`permalock me..|
-Received:READ_TAG_ID_MULTIPLE          1790765.365735983
+Received:READ_TAG_ID_MULTIPLE          1829052.807263318
          ff 07 22 00 00 03 00 13  00 00 00 01 65 8a        |..".........e.|
-Sending: GET_TAG_ID_BUFFER             1790765.366045232
+Sending: GET_TAG_ID_BUFFER             1829052.807500776
          ff 03 29 01 ff 00 1b 03                           |..).....|
-Received:GET_TAG_ID_BUFFER             1790765.371536670
-         ff 26 29 00 00 01 ff 00  01 16 d6 11 0e 13 e8 00  |.&).............|
-         00 03 2e 00 ae 05 00 00  00 00 80 34 00 e2 00 51  |...........4...Q|
-         86 01 07 01 87 07 70 c4  c1 47 bb 23 ba           |......p..G.#.|
-Sending: ERASE_BLOCK_TAG_SPECIFIC      1790765.372204829
-         ff 1e 2e 03 e8 00 41 01  00 00 00 00 60 e2 00 51  |......A.....`..Q|
-         86 01 07 01 87 07 70 c4  c1 00 00 03 00 00 00 00  |......p.........|
-         01 81 2c                                          |..,|
-Received:ERASE_BLOCK_TAG_SPECIFIC      1790766.394605179
-         ff 00 2e 04 0a 45 66                              |.....Ef|
+Received:GET_TAG_ID_BUFFER             1829052.813042126
+         ff 26 29 00 00 01 ff 00  01 1d dc 11 0e 13 e8 00  |.&).............|
+         00 03 66 00 ae 05 00 00  00 00 80 34 00 e2 00 00  |..f........4....|
+         15 86 0e 01 86 10 50 b2  05 43 05 c6 5e           |......P..C..^|
+Sending: ERASE_BLOCK_TAG_SPECIFIC      1829052.816943258
+         ff 1e 2e 03 e8 00 41 01  00 00 00 00 60 e2 00 00  |......A.....`...|
+         15 86 0e 01 86 10 50 b2  05 00 00 03 00 00 00 00  |......P.........|
+         01 66 1b                                          |.f.|
+Received:ERASE_BLOCK_TAG_SPECIFIC      1829052.840513132
+         ff 04 2e 00 00 41 01 00  00 de 5f                 |.....A...._|
