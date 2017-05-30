@@ -300,7 +300,7 @@ testBlockPermalockRead rdr ts = do
 
   let epcFilt = TMR.TagFilterEPC (TMR.trTag trd)
       opPermalock = TMR.TagOp_GEN2_BlockPermaLock
-                    { TMR.opReadLock = 0
+                    { TMR.opReadLock = TMR.Read
                     , TMR.opBank = TMR.GEN2_BANK_USER
                     , TMR.opBlockPtr = 0
                     , TMR.opMaskList = [0]
@@ -319,7 +319,7 @@ testBlockPermalockWrite rdr ts = do
 
   let epcFilt = TMR.TagFilterEPC (TMR.trTag trd)
       opPermalock = TMR.TagOp_GEN2_BlockPermaLock
-                    { TMR.opReadLock = 1
+                    { TMR.opReadLock = TMR.Write
                     , TMR.opBank = TMR.GEN2_BANK_USER
                     , TMR.opBlockPtr = 0
                     , TMR.opMaskList = [0xf00f, 0x00f0]

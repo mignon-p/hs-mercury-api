@@ -74,6 +74,20 @@ textToBS = T.encodeUtf8
 textFromCString :: CString -> IO Text
 textFromCString cs = textFromBS <$> B.packCString cs
 
+-- | Indicates whether to read or write in 'TagOp_GEN2_BlockPermaLock'.
+data ReadWrite = Read | Write deriving (Eq, Ord, Show, Read, Bounded, Enum)
+
+type RawReadWrite = Word8
+
+fromReadWrite :: ReadWrite -> RawReadWrite
+fromReadWrite Read = 0
+fromReadWrite Write = 1
+
+toReadWrite :: RawReadWrite -> ReadWrite
+toReadWrite 0 = Read
+toReadWrite 1 = Write
+toReadWrite x = error $ "didn't expect ReadWrite to be " ++ show x
+
 -- This exception is never seen by the user.  It is caught
 -- internally and turned into a MercuryException (with some added fields).
 data ParamException = ParamException StatusType Status Text

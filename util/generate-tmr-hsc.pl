@@ -1179,6 +1179,10 @@ sub emitTagOp {
     listListField ($blockPermaLock->{"info"}, "maskList",
                    "u.data16", "GLUE_MAX_DATA16");
 
+    $blockPermaLock->{'info'}{'readLock'}{'type'} = "ReadWrite";
+    wrapField ($blockPermaLock->{'info'},
+               "readLock", "toReadWrite", "fromReadWrite");
+
     emit "-- | An operation that can be performed on a tag.  Can be used";
     emit "-- as an argument to 'System.Hardware.MercuryApi.executeTagOp',";
     emit "-- or can be embedded into a 'System.Hardware.MercuryApi.ReadPlan'.";

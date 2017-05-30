@@ -74,6 +74,20 @@ textToBS = T.encodeUtf8
 textFromCString :: CString -> IO Text
 textFromCString cs = textFromBS <$> B.packCString cs
 
+-- | Indicates whether to read or write in 'TagOp_GEN2_BlockPermaLock'.
+data ReadWrite = Read | Write deriving (Eq, Ord, Show, Read, Bounded, Enum)
+
+type RawReadWrite = Word8
+
+fromReadWrite :: ReadWrite -> RawReadWrite
+fromReadWrite Read = 0
+fromReadWrite Write = 1
+
+toReadWrite :: RawReadWrite -> ReadWrite
+toReadWrite 0 = Read
+toReadWrite 1 = Write
+toReadWrite x = error $ "didn't expect ReadWrite to be " ++ show x
+
 -- This exception is never seen by the user.  It is caught
 -- internally and turned into a MercuryException (with some added fields).
 data ParamException = ParamException StatusType Status Text
@@ -689,7 +703,7 @@ data TagOp =
     , opWordCount :: !Word8 -- ^ Number of words to erase
     }
   | TagOp_GEN2_BlockPermaLock
-    { opReadLock :: !Word8 -- ^ Read lock status or write it?
+    { opReadLock :: !ReadWrite -- ^ Read lock status or write it?
     , opBank :: !GEN2_Bank -- ^ Gen2 memory bank to lock
     , opBlockPtr :: !Word32 -- ^ The starting word address to lock
     , opMaskList :: ![Word16] -- ^ Mask: Which blocks to lock?
@@ -737,7 +751,7 @@ instance Storable TagOp where
           <*> #{peek TagOpEtc, tagop.u.gen2.u.blockErase.wordCount} p
       #{const TMR_TAGOP_GEN2_BLOCKPERMALOCK} -> do
         TagOp_GEN2_BlockPermaLock
-          <$> #{peek TagOpEtc, tagop.u.gen2.u.blockPermaLock.readLock} p
+          <$> (toReadWrite <$> #{peek TagOpEtc, tagop.u.gen2.u.blockPermaLock.readLock} p)
           <*> ((toBank . (.&. 3)) <$> #{peek TagOpEtc, tagop.u.gen2.u.blockPermaLock.bank} p)
           <*> #{peek TagOpEtc, tagop.u.gen2.u.blockPermaLock.blockPtr} p
           <*> peekListAsList (#{ptr TagOpEtc, tagop.u.gen2.u.blockPermaLock.mask} p) (#{ptr TagOpEtc, u.data16} p)
@@ -783,7 +797,7 @@ instance Storable TagOp where
 
   poke p x@(TagOp_GEN2_BlockPermaLock {}) = do
     #{poke TagOpEtc, tagop.type} p (#{const TMR_TAGOP_GEN2_BLOCKPERMALOCK} :: #{type TMR_TagOpType})
-    #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.readLock} p (opReadLock x)
+    #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.readLock} p (fromReadWrite $ opReadLock x)
     #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.bank} p (fromBank $ opBank x)
     #{poke TagOpEtc, tagop.u.gen2.u.blockPermaLock.blockPtr} p (opBlockPtr x)
     pokeListAsList "maskList" #{const GLUE_MAX_DATA16} (#{ptr TagOpEtc, tagop.u.gen2.u.blockPermaLock.mask} p) (#{ptr TagOpEtc, u.data16} p) (opMaskList x)
