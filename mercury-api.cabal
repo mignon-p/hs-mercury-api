@@ -52,6 +52,11 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
                    , README.md
                    , examples/LICENSE-FOR-EXAMPLES
+                   , tests/*.result
+                   , tests/*.transport
+                   , cbits/api/*.h
+                   , cbits/api/patches/*.patch
+                   , cbits/glue/glue.h
 
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.10
