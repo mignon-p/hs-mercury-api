@@ -349,6 +349,41 @@ testBlockPermalockWrite rdr ts = do
                      }
   void $ check ts $ TMR.executeTagOp rdr opPermalock2 (Just epcFilt)
 
+killMeFilter :: TMR.TagFilter
+killMeFilter =
+  TMR.mkFilterGen2 TMR.GEN2_BANK_USER 0 $ "permaloc" <> B.pack [0,4,0,5,0,6,0,7]
+
+testKill :: TestFunc
+testKill rdr ts = do
+  setRegionAndPower rdr
+  TMR.paramSetReadPlanFilter rdr (Just killMeFilter)
+
+  -- find a tag
+  tags <- TMR.read rdr 1000
+  check ts $ return $ length tags
+  let trd = maximumBy (comparing TMR.trRssi) tags
+  check ts $ return trd { TMR.trTimestamp = 0 }
+
+  -- write access password
+  let password = 0xbeadead1
+      epcFilt = TMR.TagFilterEPC (TMR.trTag trd)
+      opWrite = TMR.TagOp_GEN2_WriteData
+                { TMR.opBank = TMR.GEN2_BANK_RESERVED
+                , TMR.opWordAddress = TMR.killPasswordAddress
+                , TMR.opData = TMR.passwordToWords password
+                }
+  check ts $ TMR.executeTagOp rdr opWrite (Just epcFilt)
+
+  -- kill
+  let opKill = TMR.TagOp_GEN2_Kill password
+  check ts $ TMR.executeTagOp rdr opKill (Just epcFilt)
+
+  -- still alive?
+  TMR.paramSetReadPlanFilter rdr (Just epcFilt)
+  TMR.paramSetReadPlanTagop rdr (Just readUser)
+  tags2 <- TMR.read rdr 1000
+  void $ check ts $ return $ length tags2
+
 mkPin :: TMR.PinNumber -> TMR.PinNumber -> TMR.GpioPin
 mkPin highPin pin =
   TMR.GpioPin
@@ -384,6 +419,7 @@ tests =
   , ("blockErase", testBlockErase)
   , ("blockPermalockRead", testBlockPermalockRead)
   , ("blockPermalockWrite", testBlockPermalockWrite)
+  , ("kill", testKill)
   , ("gpo", testGpo)
   , ("gpi", testGpi)
   ]
