@@ -894,7 +894,7 @@ formatTimestamp t local z = do
     ret <- c_format_time buf (fromIntegral bufSize) cFmt
            (CTime $ fromIntegral seconds) local cLocale
     if ret < 0
-      then fail "error formatting time"
+      then return $ T.pack $ printf "%d.%03d" seconds millis
       else textFromCString buf
 
 -- | Convert a timestamp into
