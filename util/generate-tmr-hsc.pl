@@ -44,6 +44,8 @@ my %lockBits = ();
 
 my @opcodes = ();
 
+my @powerModes = ();
+
 my %tagDataStructs = ();
 my %gen2Structs = ();
 my %gpioStructs = ();
@@ -75,6 +77,8 @@ my %toHaskellType = (
     "TMR_TagProtocol" => "TagProtocol",
     "TMR_ReadPlan"    => "ReadPlan",
     "TMR_GEN2_Password" => "Word32",
+    "TMR_GEN2_WriteMode" => "GEN2_WriteMode",
+    "TMR_SR_PowerMode" => "PowerMode",
     "TMR_TRD_MetadataFlag" => "[MetadataFlag]",
     "TMR_String" => "Text",
     "TMR_uint8List"  => "[Word8]",
@@ -381,6 +385,20 @@ sub readSerialReaderImp {
     while (<F>) {
         if (/^\s+TMR_SR_OPCODE_(\w+)/) {
             push @opcodes, $1;
+        }
+    }
+    close F;
+}
+
+sub readSerialReaderH {
+    open F, "$apiDir/tmr_serial_reader.h" or die;
+    while (<F>) {
+        if (/^\s+TMR_SR_(POWER_MODE_\w+)/) {
+            my $mode = $1;
+            push @powerModes, $mode
+                if ($mode ne "POWER_MODE_MIN" and
+                    $mode ne "POWER_MODE_MAX" and
+                    $mode ne "POWER_MODE_INVALID");
         }
     }
     close F;
@@ -1310,6 +1328,12 @@ sub emitParamValues {
         } elsif ($paramType eq "TagProtocol") {
             emit '  pGet f = alloca $ \p -> f (castPtr p) >> toTagProtocol <$> peek p';
             emit '  pSet x f = alloca $ \p -> poke p (fromTagProtocol x) >> f (castPtr p)';
+        } elsif ($paramType eq "GEN2_WriteMode") {
+            emit '  pGet f = alloca $ \p -> f (castPtr p) >> toWriteMode <$> peek p';
+            emit '  pSet x f = alloca $ \p -> poke p (fromWriteMode x) >> f (castPtr p)';
+        } elsif ($paramType eq "PowerMode") {
+            emit '  pGet f = alloca $ \p -> f (castPtr p) >> toPowerMode <$> peek p';
+            emit '  pSet x f = alloca $ \p -> poke p (fromPowerMode x) >> f (castPtr p)';
         } elsif ($paramType eq "ReadPlan") {
             emit '  pGet f = alloca $ \p -> f (castPtr p) >> peek p';
             emit '  -- Unlike all the other cases, in this case we transfer ownership';
@@ -1472,6 +1496,52 @@ sub emitOpcodes {
         emit "opcodeName #{const TMR_SR_OPCODE_$opcode} = \"$opcode\"";
     }
     emit 'opcodeName x = "Unknown opcode " <> T.pack (printf "0x%02X" x)';
+    emit '';
+}
+
+sub emitWriteMode {
+    my @modes = ("GEN2_WORD_ONLY", "GEN2_BLOCK_ONLY", "GEN2_BLOCK_FALLBACK");
+
+    emit "type RawWriteMode = #{type TMR_GEN2_WriteMode}";
+    emit "";
+
+    emit "-- | Whether to use word write or block write for";
+    emit "-- 'System.Hardware.MercuryApi.TagOp_GEN2_WriteData'.";
+    emit "data GEN2_WriteMode =";
+    emitEnum (\@modes, {});
+    emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
+    emit "";
+
+    emit "fromWriteMode :: GEN2_WriteMode -> RawWriteMode";
+    emitFrom ("fromWriteMode", "TMR_", \@modes);
+    emit "";
+
+    emit "toWriteMode :: RawWriteMode -> GEN2_WriteMode";
+    emitTo ("toWriteMode", "TMR_", \@modes);
+    emit "toWriteMode x = error \$ \"didn't expect WriteMode to be \" ++ show x";
+    emit "";
+}
+
+sub emitPowerMode {
+    emit "type RawPowerMode = #{type TMR_SR_PowerMode}";
+    emit "";
+
+    emit "-- Value for parameter 'PARAM_POWERMODE'.  On the M6e Nano,";
+    emit "-- 'POWER_MODE_MINSAVE', 'POWER_MODE_MEDSAVE', and";
+    emit "-- 'POWER_MODE_MAXSAVE' are all the same.";
+    emit "data PowerMode =";
+    emitEnum (\@powerModes, {});
+    emit "  deriving (Eq, Ord, Show, Read, Bounded, Enum)";
+    emit "";
+
+    emit "fromPowerMode :: PowerMode -> RawPowerMode";
+    emitFrom ("fromPowerMode", "TMR_SR_", \@powerModes);
+    emit "";
+
+    emit "toPowerMode :: RawPowerMode -> PowerMode";
+    emitTo ("toPowerMode", "TMR_SR_", \@powerModes);
+    emit "toPowerMode x = error \$ \"didn't expect PowerMode to be \" ++ show x";
+    emit "";
 }
 
 sub paramBase {
@@ -1639,6 +1709,7 @@ readGen2();
 readGpio();
 readTagop();
 readSerialReaderImp();
+readSerialReaderH();
 
 emitEnumHeader();
 emitStatus();
@@ -1648,6 +1719,8 @@ emitMetadataFlags();
 emitBanks();
 emitLockBits();
 emitOpcodes();
+emitWriteMode();
+emitPowerMode();
 emitParams();
 emitParamTypes();
 

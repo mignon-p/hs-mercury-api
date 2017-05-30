@@ -511,6 +511,56 @@ opcodeName #{const TMR_SR_OPCODE_SET_PROTOCOL_LICENSEKEY} = "SET_PROTOCOL_LICENS
 opcodeName #{const TMR_SR_OPCODE_SET_OPERATING_FREQ} = "SET_OPERATING_FREQ"
 opcodeName #{const TMR_SR_OPCODE_TX_CW_SIGNAL} = "TX_CW_SIGNAL"
 opcodeName x = "Unknown opcode " <> T.pack (printf "0x%02X" x)
+
+type RawWriteMode = #{type TMR_GEN2_WriteMode}
+
+-- | Whether to use word write or block write for
+-- 'System.Hardware.MercuryApi.TagOp_GEN2_WriteData'.
+data GEN2_WriteMode =
+    GEN2_WORD_ONLY
+  | GEN2_BLOCK_ONLY
+  | GEN2_BLOCK_FALLBACK
+  deriving (Eq, Ord, Show, Read, Bounded, Enum)
+
+fromWriteMode :: GEN2_WriteMode -> RawWriteMode
+fromWriteMode GEN2_WORD_ONLY = #{const TMR_GEN2_WORD_ONLY}
+fromWriteMode GEN2_BLOCK_ONLY = #{const TMR_GEN2_BLOCK_ONLY}
+fromWriteMode GEN2_BLOCK_FALLBACK = #{const TMR_GEN2_BLOCK_FALLBACK}
+
+toWriteMode :: RawWriteMode -> GEN2_WriteMode
+toWriteMode #{const TMR_GEN2_WORD_ONLY} = GEN2_WORD_ONLY
+toWriteMode #{const TMR_GEN2_BLOCK_ONLY} = GEN2_BLOCK_ONLY
+toWriteMode #{const TMR_GEN2_BLOCK_FALLBACK} = GEN2_BLOCK_FALLBACK
+toWriteMode x = error $ "didn't expect WriteMode to be " ++ show x
+
+type RawPowerMode = #{type TMR_SR_PowerMode}
+
+-- Value for parameter 'PARAM_POWERMODE'.  On the M6e Nano,
+-- 'POWER_MODE_MINSAVE', 'POWER_MODE_MEDSAVE', and
+-- 'POWER_MODE_MAXSAVE' are all the same.
+data PowerMode =
+    POWER_MODE_FULL
+  | POWER_MODE_MINSAVE
+  | POWER_MODE_MEDSAVE
+  | POWER_MODE_MAXSAVE
+  | POWER_MODE_SLEEP
+  deriving (Eq, Ord, Show, Read, Bounded, Enum)
+
+fromPowerMode :: PowerMode -> RawPowerMode
+fromPowerMode POWER_MODE_FULL = #{const TMR_SR_POWER_MODE_FULL}
+fromPowerMode POWER_MODE_MINSAVE = #{const TMR_SR_POWER_MODE_MINSAVE}
+fromPowerMode POWER_MODE_MEDSAVE = #{const TMR_SR_POWER_MODE_MEDSAVE}
+fromPowerMode POWER_MODE_MAXSAVE = #{const TMR_SR_POWER_MODE_MAXSAVE}
+fromPowerMode POWER_MODE_SLEEP = #{const TMR_SR_POWER_MODE_SLEEP}
+
+toPowerMode :: RawPowerMode -> PowerMode
+toPowerMode #{const TMR_SR_POWER_MODE_FULL} = POWER_MODE_FULL
+toPowerMode #{const TMR_SR_POWER_MODE_MINSAVE} = POWER_MODE_MINSAVE
+toPowerMode #{const TMR_SR_POWER_MODE_MEDSAVE} = POWER_MODE_MEDSAVE
+toPowerMode #{const TMR_SR_POWER_MODE_MAXSAVE} = POWER_MODE_MAXSAVE
+toPowerMode #{const TMR_SR_POWER_MODE_SLEEP} = POWER_MODE_SLEEP
+toPowerMode x = error $ "didn't expect PowerMode to be " ++ show x
+
 type RawParam = #{type TMR_Param}
 
 -- | Reader parameters which you can get and set.  The names
@@ -534,7 +584,7 @@ data Param =
   | PARAM_LICENSE_KEY -- ^ @\/reader\/licenseKey@ ['Word8']
   | PARAM_LICENSED_FEATURES -- ^ @\/reader\/licensedFeatures@ ['Word8']
   | PARAM_METADATAFLAG -- ^ @\/reader\/metadataflags@ ['MetadataFlag']
-  | PARAM_POWERMODE -- ^ @\/reader\/powerMode@ (Not yet implemented)
+  | PARAM_POWERMODE -- ^ @\/reader\/powerMode@ 'PowerMode'
   | PARAM_PROBEBAUDRATES -- ^ @\/reader\/probeBaudRates@ ['Word32']
   | PARAM_READER_STATISTICS -- ^ @\/reader\/statistics@ (Not yet implemented)
   | PARAM_READER_STATS -- ^ @\/reader\/stats@ (Not yet implemented)
@@ -559,7 +609,7 @@ data Param =
   | PARAM_GEN2_TARGET -- ^ @\/reader\/gen2\/target@ (Not yet implemented)
   | PARAM_GEN2_TARI -- ^ @\/reader\/gen2\/tari@ (Not yet implemented)
   | PARAM_READER_WRITE_EARLY_EXIT -- ^ @\/reader\/gen2\/writeEarlyExit@ 'Bool'
-  | PARAM_GEN2_WRITEMODE -- ^ @\/reader\/gen2\/writeMode@ (Not yet implemented)
+  | PARAM_GEN2_WRITEMODE -- ^ @\/reader\/gen2\/writeMode@ 'GEN2_WriteMode'
   | PARAM_READER_WRITE_REPLY_TIMEOUT -- ^ @\/reader\/gen2\/writeReplyTimeout@ 'Word16' (microseconds)
   | PARAM_GPIO_INPUTLIST -- ^ @\/reader\/gpio\/inputList@ ['Word8'], or typedef ['PinNumber']
   | PARAM_GPIO_OUTPUTLIST -- ^ @\/reader\/gpio\/outputList@ ['Word8'], or typedef ['PinNumber']
@@ -813,10 +863,12 @@ paramUnits _ = Nothing
 -- | The Haskell data type expected for a particular parameter.
 data ParamType =
     ParamTypeBool
+  | ParamTypeGEN2_WriteMode
   | ParamTypeInt16
   | ParamTypeInt32
   | ParamTypeInt8
   | ParamTypeMetadataFlagList
+  | ParamTypePowerMode
   | ParamTypeReadPlan
   | ParamTypeRegion
   | ParamTypeRegionList
@@ -837,6 +889,7 @@ paramType PARAM_BAUDRATE = ParamTypeWord32
 paramType PARAM_PROBEBAUDRATES = ParamTypeWord32List
 paramType PARAM_COMMANDTIMEOUT = ParamTypeWord32
 paramType PARAM_TRANSPORTTIMEOUT = ParamTypeWord32
+paramType PARAM_POWERMODE = ParamTypePowerMode
 paramType PARAM_ANTENNA_CHECKPORT = ParamTypeBool
 paramType PARAM_ANTENNA_PORTLIST = ParamTypeWord8List
 paramType PARAM_ANTENNA_CONNECTEDPORTLIST = ParamTypeWord8List
@@ -844,6 +897,7 @@ paramType PARAM_ANTENNA_PORTSWITCHGPOS = ParamTypeWord8List
 paramType PARAM_GPIO_INPUTLIST = ParamTypeWord8List
 paramType PARAM_GPIO_OUTPUTLIST = ParamTypeWord8List
 paramType PARAM_GEN2_ACCESSPASSWORD = ParamTypeWord32
+paramType PARAM_GEN2_WRITEMODE = ParamTypeGEN2_WriteMode
 paramType PARAM_READ_ASYNCOFFTIME = ParamTypeWord32
 paramType PARAM_READ_ASYNCONTIME = ParamTypeWord32
 paramType PARAM_READ_PLAN = ParamTypeReadPlan
@@ -897,9 +951,11 @@ paramType _ = ParamTypeUnimplemented
 -- to a particular 'ParamType'.
 displayParamType :: ParamType -> Text
 displayParamType ParamTypeBool = "Bool"
+displayParamType ParamTypeGEN2_WriteMode = "GEN2_WriteMode"
 displayParamType ParamTypeInt16 = "Int16"
 displayParamType ParamTypeInt32 = "Int32"
 displayParamType ParamTypeInt8 = "Int8"
+displayParamType ParamTypePowerMode = "PowerMode"
 displayParamType ParamTypeReadPlan = "ReadPlan"
 displayParamType ParamTypeRegion = "Region"
 displayParamType ParamTypeTagProtocol = "TagProtocol"

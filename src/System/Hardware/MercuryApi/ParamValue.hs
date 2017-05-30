@@ -32,6 +32,11 @@ instance ParamValue Bool where
   pGet f = alloca $ \p -> f (castPtr (p :: Ptr CBool)) >> toBool <$> peek p
   pSet x f = alloca $ \p -> poke p (fromBool x :: CBool) >> f (castPtr p)
 
+instance ParamValue GEN2_WriteMode where
+  pType _ = ParamTypeGEN2_WriteMode
+  pGet f = alloca $ \p -> f (castPtr p) >> toWriteMode <$> peek p
+  pSet x f = alloca $ \p -> poke p (fromWriteMode x) >> f (castPtr p)
+
 instance ParamValue Int16 where
   pType _ = ParamTypeInt16
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
@@ -46,6 +51,11 @@ instance ParamValue Int8 where
   pType _ = ParamTypeInt8
   pGet f = alloca $ \p -> f (castPtr p) >> peek p
   pSet x f = alloca $ \p -> poke p x >> f (castPtr p)
+
+instance ParamValue PowerMode where
+  pType _ = ParamTypePowerMode
+  pGet f = alloca $ \p -> f (castPtr p) >> toPowerMode <$> peek p
+  pSet x f = alloca $ \p -> poke p (fromPowerMode x) >> f (castPtr p)
 
 instance ParamValue ReadPlan where
   pType _ = ParamTypeReadPlan

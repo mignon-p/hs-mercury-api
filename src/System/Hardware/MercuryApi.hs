@@ -126,6 +126,8 @@ module System.Hardware.MercuryApi
   , MetadataFlag (..)
   , GEN2_Bank (..)
   , GEN2_LockBits (..)
+  , GEN2_WriteMode (..)
+  , PowerMode (..)
   , ReadWrite (..)
   , TransportDirection (..)
   ) where

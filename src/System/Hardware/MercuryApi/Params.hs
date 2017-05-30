@@ -29,6 +29,8 @@ module System.Hardware.MercuryApi.Params
   , paramSetLicensedFeatures
   , paramGetMetadataflags
   , paramSetMetadataflags
+  , paramGetPowerMode
+  , paramSetPowerMode
   , paramGetProbeBaudRates
   , paramSetProbeBaudRates
   , paramGetTransportTimeout
@@ -46,6 +48,8 @@ module System.Hardware.MercuryApi.Params
   , paramSetGen2AccessPassword
   , paramGetGen2WriteEarlyExit
   , paramSetGen2WriteEarlyExit
+  , paramGetGen2WriteMode
+  , paramSetGen2WriteMode
   , paramGetGen2WriteReplyTimeout
   , paramSetGen2WriteReplyTimeout
     -- ** \/reader\/gpio
@@ -171,6 +175,14 @@ paramSetTransportTimeout rdr = paramSet rdr PARAM_TRANSPORTTIMEOUT
 paramGetTransportTimeout :: Reader -> IO Word32
 paramGetTransportTimeout rdr = paramGet rdr PARAM_TRANSPORTTIMEOUT
 
+-- | Set parameter 'PARAM_POWERMODE' (@\/reader\/powerMode@)
+paramSetPowerMode :: Reader -> PowerMode -> IO ()
+paramSetPowerMode rdr = paramSet rdr PARAM_POWERMODE
+
+-- | Get parameter 'PARAM_POWERMODE' (@\/reader\/powerMode@)
+paramGetPowerMode :: Reader -> IO PowerMode
+paramGetPowerMode rdr = paramGet rdr PARAM_POWERMODE
+
 -- | Set parameter 'PARAM_ANTENNA_CHECKPORT' (@\/reader\/antenna\/checkPort@)
 paramSetAntennaCheckPort :: Reader -> Bool -> IO ()
 paramSetAntennaCheckPort rdr = paramSet rdr PARAM_ANTENNA_CHECKPORT
@@ -218,6 +230,14 @@ paramSetGen2AccessPassword rdr = paramSet rdr PARAM_GEN2_ACCESSPASSWORD
 -- | Get parameter 'PARAM_GEN2_ACCESSPASSWORD' (@\/reader\/gen2\/accessPassword@)
 paramGetGen2AccessPassword :: Reader -> IO GEN2_Password
 paramGetGen2AccessPassword rdr = paramGet rdr PARAM_GEN2_ACCESSPASSWORD
+
+-- | Set parameter 'PARAM_GEN2_WRITEMODE' (@\/reader\/gen2\/writeMode@)
+paramSetGen2WriteMode :: Reader -> GEN2_WriteMode -> IO ()
+paramSetGen2WriteMode rdr = paramSet rdr PARAM_GEN2_WRITEMODE
+
+-- | Get parameter 'PARAM_GEN2_WRITEMODE' (@\/reader\/gen2\/writeMode@)
+paramGetGen2WriteMode :: Reader -> IO GEN2_WriteMode
+paramGetGen2WriteMode rdr = paramGet rdr PARAM_GEN2_WRITEMODE
 
 -- | Set parameter 'PARAM_READ_ASYNCOFFTIME' (@\/reader\/read\/asyncOffTime@) (milliseconds)
 paramSetReadAsyncOffTime :: Reader -> Word32 -> IO ()
@@ -546,9 +566,11 @@ paramSetString rdr param txt = do
   let str = T.unpack txt
   case paramType param of
     ParamTypeBool -> paramSet rdr param (read str :: Bool)
+    ParamTypeGEN2_WriteMode -> paramSet rdr param (read str :: GEN2_WriteMode)
     ParamTypeInt16 -> paramSet rdr param (read str :: Int16)
     ParamTypeInt32 -> paramSet rdr param (read str :: Int32)
     ParamTypeInt8 -> paramSet rdr param (read str :: Int8)
+    ParamTypePowerMode -> paramSet rdr param (read str :: PowerMode)
     ParamTypeReadPlan -> paramSet rdr param (read str :: ReadPlan)
     ParamTypeRegion -> paramSet rdr param (read str :: Region)
     ParamTypeTagProtocol -> paramSet rdr param (read str :: TagProtocol)
@@ -570,9 +592,11 @@ paramGetString rdr param =
   T.pack <$>
   case paramType param of
     ParamTypeBool -> show <$> (paramGet rdr param :: IO Bool)
+    ParamTypeGEN2_WriteMode -> show <$> (paramGet rdr param :: IO GEN2_WriteMode)
     ParamTypeInt16 -> show <$> (paramGet rdr param :: IO Int16)
     ParamTypeInt32 -> show <$> (paramGet rdr param :: IO Int32)
     ParamTypeInt8 -> show <$> (paramGet rdr param :: IO Int8)
+    ParamTypePowerMode -> show <$> (paramGet rdr param :: IO PowerMode)
     ParamTypeReadPlan -> show <$> (paramGet rdr param :: IO ReadPlan)
     ParamTypeRegion -> show <$> (paramGet rdr param :: IO Region)
     ParamTypeTagProtocol -> show <$> (paramGet rdr param :: IO TagProtocol)
