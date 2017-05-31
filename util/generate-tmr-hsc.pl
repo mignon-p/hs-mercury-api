@@ -140,6 +140,12 @@ my %typedefs = (
     "PARAM_TRIGGER_READ_GPI" => "[PinNumber]",
     );
 
+# types which are not in scope in Enums.hs, so need to be linked
+# will the full module name
+my %needFullLink = map { $_ => 1 } (
+    qw(AntennaPort PinNumber GEN2_Password ReadPlan)
+    );
+
 sub readStatus {
     open F, "$apiDir/tmr_status.h" or die;
     my $comment = "";
@@ -178,6 +184,16 @@ sub readStrerror {
     close F;
 }
 
+sub linkifyType {
+    my ($type) = @_;
+
+    if (exists $needFullLink{$type}) {
+        return "'System.Hardware.MercuryApi.$type'";
+    } else {
+        return "'$type'";
+    }
+}
+
 sub parseParamComment {
     my ($c, $param) = @_;
     if ($c =~ /^\"([^\"]+)\",\s+(\w+)/) {
@@ -190,12 +206,12 @@ sub parseParamComment {
         }
         my $equoted = escapeHaddock($quoted);
         my $linkedType = $haskellType;
-        $linkedType =~ s/(\w+)/'$1'/ if ($linkedType ne $nyi);
+        $linkedType =~ s/(\w+)/linkifyType($1)/e if ($linkedType ne $nyi);
         my $xtra = "";
         if ($linkedType ne $nyi) {
             if (exists $typedefs{$param}) {
                 my $typedef = $typedefs{$param};
-                $typedef =~ s/(\w+)/'$1'/;
+                $typedef =~ s/(\w+)/linkifyType($1)/e;
                 $linkedType .= ", or typedef $typedef";
             }
             if (exists $extra{$quoted}) {

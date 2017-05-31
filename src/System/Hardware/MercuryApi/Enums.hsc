@@ -593,14 +593,14 @@ data Param =
   | PARAM_USER_CONFIG -- ^ @\/reader\/userConfig@ (Not yet implemented)
   | PARAM_USERMODE -- ^ @\/reader\/userMode@ (Not yet implemented)
   | PARAM_ANTENNA_CHECKPORT -- ^ @\/reader\/antenna\/checkPort@ 'Bool'
-  | PARAM_ANTENNA_CONNECTEDPORTLIST -- ^ @\/reader\/antenna\/connectedPortList@ ['Word8'], or typedef ['AntennaPort'] (read-only)
-  | PARAM_ANTENNA_PORTLIST -- ^ @\/reader\/antenna\/portList@ ['Word8'], or typedef ['AntennaPort'] (read-only)
-  | PARAM_ANTENNA_PORTSWITCHGPOS -- ^ @\/reader\/antenna\/portSwitchGpos@ ['Word8'], or typedef ['PinNumber']
+  | PARAM_ANTENNA_CONNECTEDPORTLIST -- ^ @\/reader\/antenna\/connectedPortList@ ['Word8'], or typedef ['System.Hardware.MercuryApi.AntennaPort'] (read-only)
+  | PARAM_ANTENNA_PORTLIST -- ^ @\/reader\/antenna\/portList@ ['Word8'], or typedef ['System.Hardware.MercuryApi.AntennaPort'] (read-only)
+  | PARAM_ANTENNA_PORTSWITCHGPOS -- ^ @\/reader\/antenna\/portSwitchGpos@ ['Word8'], or typedef ['System.Hardware.MercuryApi.PinNumber']
   | PARAM_ANTENNA_RETURNLOSS -- ^ @\/reader\/antenna\/returnLoss@ (Not yet implemented)
   | PARAM_ANTENNA_SETTLINGTIMELIST -- ^ @\/reader\/antenna\/settlingTimeList@ (Not yet implemented)
   | PARAM_ANTENNA_TXRXMAP -- ^ @\/reader\/antenna\/txRxMap@ (Not yet implemented)
   | PARAM_GEN2_BLF -- ^ @\/reader\/gen2\/BLF@ (Not yet implemented)
-  | PARAM_GEN2_ACCESSPASSWORD -- ^ @\/reader\/gen2\/accessPassword@ 'Word32', or typedef 'GEN2_Password'
+  | PARAM_GEN2_ACCESSPASSWORD -- ^ @\/reader\/gen2\/accessPassword@ 'Word32', or typedef 'System.Hardware.MercuryApi.GEN2_Password'
   | PARAM_GEN2_BAP -- ^ @\/reader\/gen2\/bap@ (Not yet implemented)
   | PARAM_GEN2_PROTOCOLEXTENSION -- ^ @\/reader\/gen2\/protocolExtension@ (Not yet implemented)
   | PARAM_GEN2_Q -- ^ @\/reader\/gen2\/q@ (Not yet implemented)
@@ -611,8 +611,8 @@ data Param =
   | PARAM_READER_WRITE_EARLY_EXIT -- ^ @\/reader\/gen2\/writeEarlyExit@ 'Bool'
   | PARAM_GEN2_WRITEMODE -- ^ @\/reader\/gen2\/writeMode@ 'GEN2_WriteMode'
   | PARAM_READER_WRITE_REPLY_TIMEOUT -- ^ @\/reader\/gen2\/writeReplyTimeout@ 'Word16' (microseconds)
-  | PARAM_GPIO_INPUTLIST -- ^ @\/reader\/gpio\/inputList@ ['Word8'], or typedef ['PinNumber']
-  | PARAM_GPIO_OUTPUTLIST -- ^ @\/reader\/gpio\/outputList@ ['Word8'], or typedef ['PinNumber']
+  | PARAM_GPIO_INPUTLIST -- ^ @\/reader\/gpio\/inputList@ ['Word8'], or typedef ['System.Hardware.MercuryApi.PinNumber']
+  | PARAM_GPIO_OUTPUTLIST -- ^ @\/reader\/gpio\/outputList@ ['Word8'], or typedef ['System.Hardware.MercuryApi.PinNumber']
   | PARAM_ISO180006B_BLF -- ^ @\/reader\/iso180006b\/BLF@ (Not yet implemented)
   | PARAM_ISO180006B_DELIMITER -- ^ @\/reader\/iso180006b\/delimiter@ (Not yet implemented)
   | PARAM_ISO180006B_MODULATION_DEPTH -- ^ @\/reader\/iso180006b\/modulationDepth@ (Not yet implemented)
@@ -627,7 +627,7 @@ data Param =
   | PARAM_RADIO_WRITEPOWER -- ^ @\/reader\/radio\/writePower@ 'Int32' (centi-dBm)
   | PARAM_READ_ASYNCOFFTIME -- ^ @\/reader\/read\/asyncOffTime@ 'Word32' (milliseconds)
   | PARAM_READ_ASYNCONTIME -- ^ @\/reader\/read\/asyncOnTime@ 'Word32' (milliseconds)
-  | PARAM_READ_PLAN -- ^ @\/reader\/read\/plan@ 'ReadPlan'
+  | PARAM_READ_PLAN -- ^ @\/reader\/read\/plan@ 'System.Hardware.MercuryApi.ReadPlan'
   | PARAM_REGION_HOPTABLE -- ^ @\/reader\/region\/hopTable@ ['Word32'] (kHz)
   | PARAM_REGION_HOPTIME -- ^ @\/reader\/region\/hopTime@ 'Word32' (milliseconds)
   | PARAM_REGION_ID -- ^ @\/reader\/region\/id@ 'Region'
@@ -646,9 +646,9 @@ data Param =
   | PARAM_TAGREADDATA_UNIQUEBYANTENNA -- ^ @\/reader\/tagReadData\/uniqueByAntenna@ 'Bool'
   | PARAM_TAGREADDATA_UNIQUEBYDATA -- ^ @\/reader\/tagReadData\/uniqueByData@ 'Bool'
   | PARAM_TAGREADDATA_UNIQUEBYPROTOCOL -- ^ @\/reader\/tagReadData\/uniqueByProtocol@ 'Bool'
-  | PARAM_TAGOP_ANTENNA -- ^ @\/reader\/tagop\/antenna@ 'Word8', or typedef 'AntennaPort'
+  | PARAM_TAGOP_ANTENNA -- ^ @\/reader\/tagop\/antenna@ 'Word8', or typedef 'System.Hardware.MercuryApi.AntennaPort'
   | PARAM_TAGOP_PROTOCOL -- ^ @\/reader\/tagop\/protocol@ 'TagProtocol'
-  | PARAM_TRIGGER_READ_GPI -- ^ @\/reader\/trigger\/read\/Gpi@ ['Word8'], or typedef ['PinNumber']
+  | PARAM_TRIGGER_READ_GPI -- ^ @\/reader\/trigger\/read\/Gpi@ ['Word8'], or typedef ['System.Hardware.MercuryApi.PinNumber']
   | PARAM_VERSION_HARDWARE -- ^ @\/reader\/version\/hardware@ 'Text' (read-only)
   | PARAM_VERSION_MODEL -- ^ @\/reader\/version\/model@ 'Text' (read-only)
   | PARAM_PRODUCT_GROUP -- ^ @\/reader\/version\/productGroup@ 'Text' (read-only)
