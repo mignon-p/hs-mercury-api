@@ -1205,7 +1205,7 @@ sub emitTagOp {
     emit "-- as an argument to 'System.Hardware.MercuryApi.executeTagOp',";
     emit "-- or can be embedded into a 'System.Hardware.MercuryApi.ReadPlan'.";
     emit "-- (However, on the M6e Nano, only 'TagOp_GEN2_ReadData' may be";
-    emit "-- embedded in a 'System.Hardware.MercuryApi.ReadPlan'.";
+    emit "-- embedded in a 'System.Hardware.MercuryApi.ReadPlan'.)";
     emitUnion ($hType, $prefix, $cType,
                \%discriminator, \@constructors, \%constInfo);
 
@@ -1526,7 +1526,7 @@ sub emitPowerMode {
     emit "type RawPowerMode = #{type TMR_SR_PowerMode}";
     emit "";
 
-    emit "-- Value for parameter 'PARAM_POWERMODE'.  On the M6e Nano,";
+    emit "-- | Value for parameter 'PARAM_POWERMODE'.  On the M6e Nano,";
     emit "-- 'POWER_MODE_MINSAVE', 'POWER_MODE_MEDSAVE', and";
     emit "-- 'POWER_MODE_MAXSAVE' are all the same.";
     emit "data PowerMode =";

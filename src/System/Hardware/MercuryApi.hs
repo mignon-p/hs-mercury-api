@@ -40,7 +40,8 @@ module System.Hardware.MercuryApi
     -- ** Listeners
     -- | Transport listeners can be used to monitor the raw serial data
     -- going to and from the reader, for debugging purposes.  A listener
-    -- that prints the data to a 'Handle' is available from 'hexListener'.
+    -- that prints the data to a 'Handle' is available from 'hexListener'
+    -- or 'opcodeListener'.
   , addTransportListener
   , removeTransportListener
     -- ** GPIO
@@ -163,6 +164,9 @@ import System.Hardware.MercuryApi.Records
 import System.Hardware.MercuryApi.ParamValue
 
 -- | An opaque type which represents a connection to an RFID reader.
+-- Note that @Reader@ is not threadsafe, so if you want to use a
+-- @Reader@ from more than one thread, you will need to implement
+-- your own locking.
 newtype Reader = Reader (ForeignPtr ReaderEtc)
 
 type RawStatus = Word32
@@ -434,8 +438,9 @@ paramID name = H.lookupDefault PARAM_NONE name paramMapReverse
 -- not contacted at this point.  On Mac OS X, be sure to use the
 -- serial device that starts with @cu.@, not the one that starts with
 -- @tty.@.
-create :: T.Text -- ^ a reader URI, such as @tmr:\/\/\/dev\/ttyUSB0@ on Linux
-                 -- or @tmr:\/\/\/dev\/cu.SLAB_USBtoUART@ on Mac OS X
+create :: T.Text -- ^ a reader URI, such as @tmr:\/\/\/dev\/ttyUSB0@ on Linux,
+                 -- @tmr:\/\/\/dev\/cu.SLAB_USBtoUART@ on Mac OS X, or
+                 -- @tmr:\/\/\/COM4@ on Windows.
        -> IO Reader
 create deviceUri = do
   B.useAsCStringLen (textToBS deviceUri) $ \(cs, len) -> do
@@ -474,7 +479,8 @@ destroy rdr = withReaderEtc rdr "destroy" "" c_TMR_destroy
 -- | Create a new 'Reader' with the specified URI, pass it to the given
 -- computation, and destroy it when the computation exits.
 withReader :: T.Text -- ^ a reader URI, such as @tmr:\/\/\/dev\/ttyUSB0@ on
-                     -- Linux or @tmr:\/\/\/dev\/cu.SLAB_USBtoUART@ on Mac OS X
+                     -- Linux, @tmr:\/\/\/dev\/cu.SLAB_USBtoUART@ on Mac OS X,
+                     -- or @tmr:\/\/\/COM4@ on Windows.
            -> (Reader -> IO a) -- ^ computation to run with Reader
            -> IO a
 withReader uri = bracket (create uri) destroy
@@ -818,9 +824,10 @@ opcodeAndTime bs = do
       tm = printf "%d.%09d" (sec now) (nsec now)
   return [pad 30 opcode <> T.pack tm]
 
--- | Convert a hexadecimal string into a 'B.ByteString'.  The hex string may
--- optionally include a "0x" prefix, which will be ignored.  If the input
--- cannot be parsed as a hex string, returns 'Nothing'.
+-- | Convert a hexadecimal string (without spaces) into a
+-- 'B.ByteString'.  The hex string may optionally include a "0x"
+-- prefix, which will be ignored.  If the input cannot be parsed as a
+-- hex string, returns 'Nothing'.
 hexToBytes :: T.Text -> Maybe B.ByteString
 hexToBytes hex = U.unsafePerformIO $ do
   let hexBs = textToBS hex

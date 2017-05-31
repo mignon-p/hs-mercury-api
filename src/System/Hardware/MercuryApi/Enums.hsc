@@ -535,7 +535,7 @@ toWriteMode x = error $ "didn't expect WriteMode to be " ++ show x
 
 type RawPowerMode = #{type TMR_SR_PowerMode}
 
--- Value for parameter 'PARAM_POWERMODE'.  On the M6e Nano,
+-- | Value for parameter 'PARAM_POWERMODE'.  On the M6e Nano,
 -- 'POWER_MODE_MINSAVE', 'POWER_MODE_MEDSAVE', and
 -- 'POWER_MODE_MAXSAVE' are all the same.
 data PowerMode =

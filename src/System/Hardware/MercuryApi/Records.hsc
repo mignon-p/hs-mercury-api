@@ -668,7 +668,7 @@ instance Storable TagReadData where
 -- as an argument to 'System.Hardware.MercuryApi.executeTagOp',
 -- or can be embedded into a 'System.Hardware.MercuryApi.ReadPlan'.
 -- (However, on the M6e Nano, only 'TagOp_GEN2_ReadData' may be
--- embedded in a 'System.Hardware.MercuryApi.ReadPlan'.
+-- embedded in a 'System.Hardware.MercuryApi.ReadPlan'.)
 data TagOp =
     TagOp_GEN2_ReadData
     { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to read from
