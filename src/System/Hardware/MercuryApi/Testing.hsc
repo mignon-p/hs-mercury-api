@@ -1,4 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_HADDOCK hide #-}
+{-|
+Module      : System.Hardware.MercuryApi.Testing
+Description : A serial transport for MercuryApi which replays data from a file
+Copyright   : © Patrick Pelletier, 2017
+License     : MIT
+Maintainer  : code@funwithsoftware.org
+
+This module is not meant to be used by the end user.  It exists for the
+automated tests.  It provides a handler for URIs of the form
+test:///path/to/file, where the file is in the format produced by
+'opcodeListener'.  When Mercury API reads from the transport, the data
+from a "Received:" line is returned.  When Mercury API writes to the
+transport, the data is compared to the data in the "Sending:" line.
+If the data does not match, an error message is printed, and
+TMR_ERROR_TIMEOUT is returned.  (Timeout was chosen because it's the only
+error that seems to be consistently propagated from the transport by
+Mercury API.)
+-}
 
 module System.Hardware.MercuryApi.Testing
   ( registerTransportInit
@@ -36,7 +55,6 @@ successStatus :: RawStatus
 successStatus = #{const TMR_SUCCESS}
 
 failureStatus :: RawStatus
--- failureStatus = #{const ERROR_TEST_FAILURE}
 failureStatus = #{const TMR_ERROR_TIMEOUT}
 
 data SerialState =

@@ -141,7 +141,7 @@ my %typedefs = (
     );
 
 # types which are not in scope in Enums.hs, so need to be linked
-# will the full module name
+# with the full module name
 my %needFullLink = map { $_ => 1 } (
     qw(AntennaPort PinNumber GEN2_Password ReadPlan)
     );
