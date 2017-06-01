@@ -1,13 +1,33 @@
-commit 77d711420137c83976d4ea141003916aa738befb
+commit c9d480e6fc5ed731355d2d73603f48ab1d3543b5
 Author: Patrick Pelletier <code@funwithsoftware.org>
-Date:   Tue Apr 11 14:55:51 2017 -0700
+Date:   Wed May 31 16:56:05 2017 -0700
 
-    avoid linker error by using "extern"
+    declare isSecureAccessEnabled extern, and define it in one place
+    
+    This avoids a problem with duplicate symbols I was running into.
+    The problem was only showing up when compiling with cabal, for reasons
+    I don't understand, but I think doing it this way is better style,
+    in any case.
 
-diff --git a/cbits/api/serial_reader_imp.h b/cbits/api/serial_reader_imp.h
-index a96405f..d784c24 100644
---- a/cbits/api/serial_reader_imp.h
-+++ b/cbits/api/serial_reader_imp.h
+diff --git a/serial_reader.c b/serial_reader.c
+index 1fdf25b..654cb29 100644
+--- a/serial_reader.c
++++ b/serial_reader.c
+@@ -41,6 +41,10 @@
+ 
+ #ifdef TMR_ENABLE_SERIAL_READER
+ 
++#ifndef BARE_METAL
++bool isSecureAccessEnabled;
++#endif
++
+ static TMR_Status
+ initTxRxMapFromPorts(TMR_Reader *reader)
+ {
+diff --git a/serial_reader_imp.h b/serial_reader_imp.h
+index 9f5fd54..16e30b1 100644
+--- a/serial_reader_imp.h
++++ b/serial_reader_imp.h
 @@ -40,7 +40,7 @@ extern "C" {
  /* This is used to enable the Gen2 secure readdata option */
  
