@@ -13,8 +13,6 @@
 #include "glue.h"
 #include "serial_reader_imp.h"
 
-bool isSecureAccessEnabled;
-
 static TMR_Status free_transport_listener (TMR_Reader *reader,
                                            TransportListenerEtc *listener,
                                            TransportListenerEtc **prev)
