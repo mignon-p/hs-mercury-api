@@ -1,0 +1,23 @@
+commit 092146c3eb431d9358135e5a2919f5a9a6f4c0db
+Author: Patrick Pelletier <code@funwithsoftware.org>
+Date:   Thu May 25 15:55:39 2017 -0700
+
+    increase the maximum length of a reader URI
+    
+    This is necessary because in the case of test:// URIs, we are passing
+    an arbitrary filename.  Even 256 is fairly arbitrary, but it seems
+    like enough for most cases, while 64 seemed tight.
+
+diff --git a/tm_config.h b/tm_config.h
+index a749b26..ea5892e 100644
+--- a/tm_config.h
++++ b/tm_config.h
+@@ -56,7 +56,7 @@ extern "C" {
+ /**
+  * The longest possible name for a reader.
+  */
+-#define TMR_MAX_READER_NAME_LENGTH 64
++#define TMR_MAX_READER_NAME_LENGTH 256
+ 
+ /**
+  * The maximum number of protocols supported in a multiprotocol search command
