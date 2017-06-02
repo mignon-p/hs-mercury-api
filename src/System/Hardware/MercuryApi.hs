@@ -117,6 +117,7 @@ module System.Hardware.MercuryApi
   , GpioPin (..)
   , TagData (..)
   , GEN2_TagData (..)
+  , ReadWrite (..)
     -- ** Enums
   , StatusType (..)
   , Status (..)
@@ -129,7 +130,6 @@ module System.Hardware.MercuryApi
   , GEN2_LockBits (..)
   , GEN2_WriteMode (..)
   , PowerMode (..)
-  , ReadWrite (..)
   , TransportDirection (..)
   ) where
 
