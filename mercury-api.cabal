@@ -55,10 +55,12 @@ build-type:          Simple
 -- README.
 extra-source-files:  ChangeLog.md
                    , README.md
+                   , UPGRADING.md
                    , examples/LICENSE-FOR-EXAMPLES
                    , tests/*.result
                    , tests/*.transport
                    , cbits/api/*.h
+                   , cbits/api/patches/README.md
                    , cbits/api/patches/*.patch
                    , cbits/glue/glue.h
 

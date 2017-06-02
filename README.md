@@ -20,7 +20,10 @@ more in-depth, language-independent documentation of Mercury API, see
 
 This package includes a copy of the Mercury API C library, so no
 external libraries are necessary.  Several small bug fixes have been
-applied to the included version of the library.
+applied to the included version of the library.  (I have submitted
+these patches upstream, but I don't know if or when they will be
+included in the official version.)  If you need to upgrade to a newer
+version of Mercury API than the included one, see [UPGRADING.md][9].
 
 The Haskell binding doesn't support background reads.  I recommend
 that you just spawn a new Haskell thread and do foreground reads
@@ -52,3 +55,4 @@ Additional resources:
 [6]: http://www.thingmagic.com/
 [7]: http://www.thingmagic.com/index.php/embedded-rfid-readers/thingmagic-nano-module
 [8]: https://learn.sparkfun.com/tutorials/rfid-basics
+[9]: UPGRADING.html
