@@ -668,17 +668,17 @@ instance Storable TagReadData where
 -- embedded in a 'System.Hardware.MercuryApi.ReadPlan'.)
 data TagOp =
     TagOp_GEN2_ReadData
-    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to read from
+    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to operate on
     , opExtraBanks :: ![GEN2_Bank] -- ^ Additional Gen2 memory banks to read from  (seems buggy, though; I\'ve had strange results with it)
-    , opWordAddress :: !Word32 -- ^ Word address to start reading at
+    , opWordAddress :: !Word32 -- ^ Word address to start at
     , opLen :: !Word8 -- ^ Number of words to read
     }
   | TagOp_GEN2_WriteTag
     { opEpc :: !TagData -- ^ Tag EPC
     }
   | TagOp_GEN2_WriteData
-    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to write to
-    , opWordAddress :: !Word32 -- ^ Word address to start writing at
+    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to operate on
+    , opWordAddress :: !Word32 -- ^ Word address to start at
     , opData :: ![Word16] -- ^ Data to write
     }
   | TagOp_GEN2_Lock
@@ -690,18 +690,18 @@ data TagOp =
     { opPassword :: !GEN2_Password -- ^ Kill password to use to kill the tag
     }
   | TagOp_GEN2_BlockWrite
-    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to write to
-    , opWordPtr :: !Word32 -- ^ The word address to start writing to
+    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to operate on
+    , opWordPtr :: !Word32 -- ^ The word address to start at
     , opData :: ![Word16] -- ^ The data to write
     }
   | TagOp_GEN2_BlockErase
-    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to erase
-    , opWordPtr :: !Word32 -- ^ The starting word address for block erase
+    { opBank :: !GEN2_Bank -- ^ Gen2 memory bank to operate on
+    , opWordPtr :: !Word32 -- ^ The word address to start at
     , opWordCount :: !Word8 -- ^ Number of words to erase
     }
   | TagOp_GEN2_BlockPermaLock
     { opReadLock :: !ReadWrite -- ^ Read lock status or write it?
-    , opBank :: !GEN2_Bank -- ^ Gen2 memory bank to lock
+    , opBank :: !GEN2_Bank -- ^ Gen2 memory bank to operate on
     , opBlockPtr :: !Word32 -- ^ The starting word address to lock
     , opMaskList :: ![Word16] -- ^ Mask: Which blocks to lock?
     }
