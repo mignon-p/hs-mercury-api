@@ -5,6 +5,7 @@ Description : Control ThingMagic RFID readers
 Copyright   : © Patrick Pelletier, 2017
 License     : MIT
 Maintainer  : code@funwithsoftware.org
+Portability : POSIX, Windows
 
 This module is a Haskell binding to the \"Mercury API\" C API for
 ThingMagic brand RFID readers.  It is especially geared toward the

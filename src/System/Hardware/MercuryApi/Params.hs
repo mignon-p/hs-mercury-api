@@ -5,6 +5,7 @@ Description : Type-safe parameter access
 Copyright   : © Patrick Pelletier, 2017
 License     : MIT
 Maintainer  : code@funwithsoftware.org
+Portability : POSIX, Windows
 
 Individual functions to get and set parameters.  These are
 type-checked at compile time, unlike 'paramGet' and 'paramSet',
