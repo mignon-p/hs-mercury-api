@@ -55,4 +55,4 @@ Additional resources:
 [6]: http://www.thingmagic.com/
 [7]: http://www.thingmagic.com/index.php/embedded-rfid-readers/thingmagic-nano-module
 [8]: https://learn.sparkfun.com/tutorials/rfid-basics
-[9]: UPGRADING.html
+[9]: https://github.com/ppelleti/hs-mercury-api/blob/master/UPGRADING.md
