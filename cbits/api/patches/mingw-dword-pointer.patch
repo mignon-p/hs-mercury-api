@@ -1,0 +1,32 @@
+commit edd36ea2a7dd785c69c570f00e007f6600d15905
+Author: Patrick Pelletier <code@funwithsoftware.org>
+Date:   Fri Jun 2 15:51:58 2017 -0700
+
+    avoid compiler error about incompatible pointer type
+    
+    cbits\api\serial_transport_win32.c: In function 's_receiveBytes':
+    C:\pkg\cbits\api\serial_transport_win32.c:141:54: error:
+         warning: passing argument 4 of 'ReadFile' from incompatible pointer type [-Wincompatible-pointer-types]
+            readStatus = ReadFile(c->handle, message, length, &readLength, NULL);
+                                                              ^
+    In file included from C:/Users/appveyor/AppData/Local/Programs/stack/i386-windows/ghc-8.0.2/mingw/i686-w64-mingw32/include/winbase.h:18:0,
+                     from C:/Users/appveyor/AppData/Local/Programs/stack/i386-windows/ghc-8.0.2/mingw/i686-w64-mingw32/include/windows.h:70,
+                     C:\pkg\from cbits\api\serial_transport_win32.c:35:0: error:
+    
+    C:/Users/appveyor/AppData/Local/Programs/stack/i386-windows/ghc-8.0.2/mingw/i686-w64-mingw32/include/fileapi.h:166:29: note: expected 'LPDWORD {aka long unsigned int *}' but argument is of type 'uint32_t * {aka unsigned int *}'
+       WINBASEAPI WINBOOL WINAPI ReadFile (HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped);
+                                 ^
+
+diff --git a/serial_transport_win32.c b/serial_transport_win32.c
+index d50e32e..ac640e1 100644
+--- a/serial_transport_win32.c
++++ b/serial_transport_win32.c
+@@ -118,7 +118,7 @@ s_receiveBytes(TMR_SR_SerialTransport *this, uint32_t length,
+               uint32_t* messageLength, uint8_t* message, const uint32_t
+ timeoutMs)
+ {
+- uint32_t readLength;
++ DWORD readLength;
+  DWORD errorFlags;
+  COMSTAT comStat;
+  TMR_SR_SerialPortNativeContext *c;

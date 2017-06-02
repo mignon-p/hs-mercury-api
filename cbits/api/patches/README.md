@@ -14,6 +14,8 @@ possible inclusion in a future release.
 
 `metadataflag-size.patch` - `paramSet()` treated `TMR_PARAM_METADATAFLAG` as `TMR_TRD_MetadataFlag`, while `paramGet()` treated `TMR_PARAM_METADATAFLAG` as `uint16_t`.  Since `sizeof(TMR_TRD_MetadataFlag)` is 4 but `sizeof(uint16_t)` is 2, the sizes didn't match.  This patch fixes `paramGet()` to also treat it as `TMR_TRD_MetadataFlag`.
 
+`mingw-dword-pointer.patch` - Fixes a compiler warning about `warning: passing argument 4 of 'ReadFile' from incompatible pointer type [-Wincompatible-pointer-types]`.  Somehow the warning was getting treated as an error on Appveyor.
+
 `mingw-snprintf.patch` - Fixes a problem I ran into on MinGW, where `sprintf_s()` doesn't seem to work properly, but `snprintf()` does work properly.
 
 `typos.patch` - This just fixes a bunch of small typos I found.
