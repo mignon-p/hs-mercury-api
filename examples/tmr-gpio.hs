@@ -1,20 +1,25 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Control.Concurrent
-import Control.Exception
-import Control.Monad
-import qualified Data.ByteString as B
-import Data.Int
-import Data.List
-import Data.Monoid
-import Data.Ord
-import qualified Data.Text as T
-import qualified Data.Text.IO as T
-import Data.Word
+import Control.Concurrent ( threadDelay )
+import Control.Exception ( finally )
+import Control.Monad ( when )
+import Data.Monoid ( (<>) )
+import qualified Data.Text.IO as T ( putStrLn )
 import Options.Applicative
+    ( Alternative(many),
+      Applicative((<*>)),
+      Parser,
+      helper,
+      execParser,
+      metavar,
+      info,
+      header,
+      fullDesc,
+      auto,
+      argument,
+      (<$>) )
 import qualified System.Hardware.MercuryApi as TMR
 import qualified System.Hardware.MercuryApi.Params as TMR
-import System.IO
 
 import ExampleUtil
 
