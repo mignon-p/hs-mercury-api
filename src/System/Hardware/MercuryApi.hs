@@ -8,7 +8,7 @@ Maintainer  : code@funwithsoftware.org
 Portability : POSIX, Windows
 
 This module is a Haskell binding to the \"Mercury API\" C API for
-ThingMagic brand RFID readers.  It is especially geared toward the
+ThingMagic RFID readers.  It is especially geared toward the
 <https://www.sparkfun.com/products/14066 SparkFun Simultaneous RFID Reader>,
 which uses ThingMagic's M6e Nano module, but it should work with other
 ThingMagic readers.  (Though currently, only support for serial readers

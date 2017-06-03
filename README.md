@@ -9,7 +9,7 @@ Windows:
 [![Build status](https://ci.appveyor.com/api/projects/status/aywuy9y05ow8wja2/branch/master?svg=true)](https://ci.appveyor.com/project/ppelleti/hs-mercury-api/branch/master)
 
 This package is a Haskell binding to the [Mercury API][5] C API for
-[ThingMagic][6] brand RFID readers.  It is especially geared toward
+[ThingMagic][6] RFID readers.  It is especially geared toward
 the [SparkFun Simultaneous RFID Reader][1], which uses ThingMagic's
 [M6e Nano][7] module, but it should work with other ThingMagic
 readers.  (Though currently, only support for serial readers is
