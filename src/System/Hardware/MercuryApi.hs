@@ -16,6 +16,10 @@ is compiled in.)  Most of the function and type names are the same as
 their counterparts in the C API, with the @TMR_@ prefix dropped.  For more
 in-depth, language-independent documentation of Mercury API, see
 <http://www.thingmagic.com/images/Downloads/Docs/MercuryAPI_ProgrammerGuide_for_v1.27.3.pdf Mercury API Programmers Guide>.
+
+This module is intended to be imported @qualified@, e. g.
+
+> import qualified System.Hardware.MercuryApi as TMR
 -}
 
 module System.Hardware.MercuryApi
