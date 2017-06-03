@@ -135,12 +135,11 @@ module System.Hardware.MercuryApi.Params
   , paramSetString
   ) where
 
-import Control.Applicative
-import Data.ByteString (ByteString)
-import Data.Int
+import Control.Applicative ( (<$>) )
+import Data.Int ( Int8, Int16, Int32 )
 import Data.Text (Text)
-import qualified Data.Text as T
-import Data.Word
+import qualified Data.Text as T ( unpack, pack )
+import Data.Word ( Word8, Word16, Word32 )
 
 import System.Hardware.MercuryApi hiding (read)
 

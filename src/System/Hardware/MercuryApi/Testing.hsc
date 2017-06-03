@@ -23,26 +23,35 @@ module System.Hardware.MercuryApi.Testing
   ( registerTransportInit
   ) where
 
-import Control.Applicative
-import Control.Concurrent
-import Control.Exception
-import Control.Monad
+import Control.Applicative ( Applicative((<*>)), (<$>) )
+import Control.Concurrent ( threadDelay )
+import Control.Exception ( IOException, try )
+import Control.Monad ( when )
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as B8
-import Data.Char
-import Data.IORef
-import Data.List
-import Data.Monoid
+import qualified Data.ByteString.Char8 as B8 ( unpack )
+import Data.Char ( isDigit )
+import Data.IORef ( IORef, writeIORef, readIORef, newIORef )
+import Data.Monoid ( (<>) )
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
-import qualified Data.Text.Encoding.Error as T
-import qualified Data.Text.IO as T
-import Data.Word
+import qualified Data.Text.Encoding as T ( encodeUtf8 )
+import qualified Data.Text.IO as T ( readFile, putStrLn )
+import Data.Word ( Word8, Word32 )
 import Foreign
-import Foreign.C
-import System.Info
-import System.IO
-import qualified System.IO.Unsafe as U
+    ( newStablePtr,
+      Ptr,
+      FunPtr,
+      nullPtr,
+      Storable(alignment, peek, peekByteOff, poke, pokeByteOff, sizeOf),
+      freeStablePtr,
+      deRefStablePtr,
+      castStablePtrToPtr,
+      castPtrToStablePtr,
+      nullFunPtr,
+      castPtr,
+      copyArray )
+import Foreign.C ( CString, withCAString, peekCAString )
+import System.Info ( os )
+import qualified System.IO.Unsafe as U ( unsafePerformIO )
 
 import System.Hardware.MercuryApi hiding (read)
 

@@ -1,21 +1,25 @@
 {-# LANGUAGE OverloadedStrings, FlexibleInstances, DeriveDataTypeable #-}
 module System.Hardware.MercuryApi.ParamValue where
 
-import Control.Applicative
-import Control.Exception
-import Data.Hashable
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as B
-import Data.Maybe
-import Data.Monoid
+import Control.Applicative ( (<$>) )
+import Control.Exception ( bracketOnError )
+import qualified Data.ByteString as B ( useAsCString, length )
 import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
-import qualified Data.Text.Encoding.Error as T
-import Data.Typeable
-import Data.Word
+import Data.Word ( Word8, Word16, Word32 )
 import Foreign
-import Foreign.C
+    ( Int8,
+      Int16,
+      Int32,
+      Ptr,
+      Storable(peek, poke),
+      castPtr,
+      with,
+      toBool,
+      new,
+      fromBool,
+      free,
+      allocaBytes,
+      alloca )
 
 import System.Hardware.MercuryApi.Enums
 import System.Hardware.MercuryApi.Records

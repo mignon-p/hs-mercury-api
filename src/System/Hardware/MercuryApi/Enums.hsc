@@ -2,22 +2,12 @@
 {-# LANGUAGE OverloadedStrings, FlexibleInstances, DeriveDataTypeable #-}
 module System.Hardware.MercuryApi.Enums where
 
-import Control.Applicative
-import Control.Exception
-import Data.Hashable
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as B
-import Data.Maybe
-import Data.Monoid
+import Data.Hashable ( Hashable(..) )
+import Data.Monoid ( (<>) )
 import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
-import qualified Data.Text.Encoding.Error as T
-import Data.Typeable
-import Data.Word
-import Foreign
-import Foreign.C
-import Text.Printf
+import qualified Data.Text as T ( pack )
+import Data.Word ( Word8, Word32 )
+import Text.Printf ( printf )
 
 #include <tm_reader.h>
 #include <serial_reader_imp.h>

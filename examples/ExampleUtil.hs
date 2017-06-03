@@ -9,19 +9,28 @@ module ExampleUtil
   , optListen
   ) where
 
-import Control.Exception
-import Control.Monad
-import Data.Int
-import Data.Monoid
-import qualified Data.Text as T
-import qualified Data.Text.IO as T
-import Data.Word
+import Control.Exception ( throw, try )
+import Control.Monad ( when, void, forM_ )
+import Data.Int ( Int32 )
+import Data.Monoid ( (<>) )
+import qualified Data.Text as T ( replicate, pack, length )
+import qualified Data.Text.IO as T ( putStrLn )
 import Options.Applicative
+    ( Parser,
+      value,
+      switch,
+      strOption,
+      short,
+      option,
+      metavar,
+      long,
+      help,
+      auto )
 import qualified System.Hardware.MercuryApi as TMR
 import qualified System.Hardware.MercuryApi.Params as TMR
-import System.Exit
-import System.Info
-import System.IO
+import System.Exit ( exitFailure )
+import System.Info ( os )
+import System.IO ( stdout )
 
 printRegionsAndFail :: TMR.Reader -> IO a
 printRegionsAndFail rdr = do

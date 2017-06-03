@@ -1,21 +1,36 @@
 {-# LANGUAGE OverloadedStrings, FlexibleInstances, DeriveDataTypeable #-}
 module System.Hardware.MercuryApi.Records where
 
-import Control.Applicative
-import Control.Exception
-import Data.Hashable
+import Control.Applicative ( Applicative((<*>)), (<$>) )
+import Control.Exception ( Exception, throwIO )
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
-import Data.Maybe
-import Data.Monoid
+import Data.Maybe ( mapMaybe, fromMaybe )
+import Data.Monoid ( (<>) )
 import Data.Text (Text)
-import qualified Data.Text as T
+import qualified Data.Text as T ( pack )
 import qualified Data.Text.Encoding as T
-import qualified Data.Text.Encoding.Error as T
-import Data.Typeable
-import Data.Word
+    ( encodeUtf8, decodeUtf8With )
+import qualified Data.Text.Encoding.Error as T ( lenientDecode )
+import Data.Typeable ( Typeable )
+import Data.Word ( Word8, Word16, Word32, Word64 )
 import Foreign
-import Foreign.C
+    ( Int32,
+      Ptr,
+      nullPtr,
+      plusPtr,
+      Storable(alignment, peek, peekByteOff, poke, pokeByteOff, sizeOf),
+      Bits((.&.), (.|.), shiftL),
+      castPtr,
+      with,
+      toBool,
+      fromBool,
+      withArrayLen,
+      pokeArray,
+      peekArray,
+      copyArray,
+      allocaArray )
+import Foreign.C ( CString )
 
 import System.Hardware.MercuryApi.Enums
 

@@ -136,28 +136,60 @@ module System.Hardware.MercuryApi
 
 import Prelude hiding (read)
 
-import Control.Applicative
-import Control.Concurrent
-import Control.Exception
-import Control.Monad
+import Control.Applicative ( (<$>) )
+import Control.Exception ( Exception, throwIO, try, bracket )
+import Control.Monad ( when )
 import qualified Data.ByteString as B
 import qualified Data.HashMap.Strict as H
-import Data.IORef
-import Data.List
-import Data.Monoid
+import Data.IORef ( IORef, newIORef, atomicModifyIORef' )
+import Data.List ( intercalate )
+import Data.Monoid ( (<>) )
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
-import qualified Data.Text.Encoding.Error as T
-import qualified Data.Text.IO as T
-import Data.Typeable
-import Data.Word
+import qualified Data.Text.IO as T ( hPutStrLn )
+import Data.Typeable ( Typeable )
+import Data.Word ( Word8, Word16, Word32 )
 import Foreign
+    ( Int32,
+      Ptr,
+      FunPtr,
+      ForeignPtr,
+      nullPtr,
+      withForeignPtr,
+      Storable(peek, poke),
+      Bits((.&.), (.|.), bit, shiftL, shiftR, testBit),
+      castPtr,
+      mallocForeignPtrBytes,
+      addForeignPtrFinalizer,
+      with,
+      toBool,
+      withArrayLen,
+      peekArray,
+      allocaArray,
+      allocaBytes,
+      alloca )
 import Foreign.C
-import Text.Printf
+    ( CStringLen,
+      CString,
+      CInt(..),
+      CTime(..),
+      CSize(..),
+      Errno(..),
+      withCAString,
+      newCAString,
+      throwErrnoIfNull,
+      errnoToIOError )
+import Text.Printf ( printf )
 import System.Clock
+    ( TimeSpec(nsec, sec), Clock(Monotonic), getTime )
 import System.Console.ANSI
-import System.IO
-import qualified System.IO.Unsafe as U
+    ( SGR(Reset, SetColor),
+      ConsoleLayer(Foreground),
+      ColorIntensity(Vivid),
+      Color(Cyan, Magenta),
+      hSupportsANSI,
+      hSetSGR )
+import System.IO ( Handle, hFlush )
+import qualified System.IO.Unsafe as U ( unsafePerformIO )
 import Text.Read (readMaybe)
 
 import System.Hardware.MercuryApi.Enums
