@@ -1,23 +1,32 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Control.Concurrent
-import Control.Exception
-import Control.Monad
-import qualified Data.ByteString as B
-import Data.Int
-import Data.List
-import Data.Monoid
-import Data.Ord
-import qualified Data.Text as T
-import qualified Data.Text.IO as T
-import Data.Word
+import Control.Monad ( when, forM_ )
+import qualified Data.ByteString as B ( takeWhile, null )
+import Data.Int ( Int32 )
+import Data.List ( sortBy )
+import Data.Monoid ( (<>) )
+import Data.Ord ( comparing )
+import qualified Data.Text as T ( Text, takeWhile, pack, null )
+import qualified Data.Text.IO as T ( putStrLn )
 import Options.Applicative
+    ( Applicative((<*>)),
+      Parser,
+      helper,
+      execParser,
+      switch,
+      short,
+      long,
+      info,
+      help,
+      header,
+      fullDesc,
+      (<$>) )
 import System.Console.ANSI
+    ( SGR(Reset, SetConsoleIntensity),
+      ConsoleIntensity(BoldIntensity),
+      setSGR )
 import qualified System.Hardware.MercuryApi as TMR
-import qualified System.Hardware.MercuryApi.Params as TMR
-import System.Exit
-import System.IO
-import Text.Printf
+import Text.Printf ( printf )
 
 import ExampleUtil
 

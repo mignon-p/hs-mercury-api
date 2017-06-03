@@ -1,23 +1,37 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Control.Concurrent
-import Control.Exception
-import Control.Monad
-import qualified Data.ByteString as B
-import Data.Int
-import Data.List
-import Data.Monoid
-import Data.Ord
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
-import qualified Data.Text.Encoding.Error as T
-import qualified Data.Text.IO as T
-import Data.Word
+import Control.Monad ( when )
+import qualified Data.ByteString as B ( snoc, pack )
+import Data.Int ( Int32 )
+import Data.List ( maximumBy )
+import Data.Monoid ( (<>) )
+import Data.Ord ( comparing )
+import qualified Data.Text as T ( Text, pack )
+import qualified Data.Text.Encoding as T ( encodeUtf8 )
+import qualified Data.Text.IO as T ( putStrLn )
 import Options.Applicative
+    ( Applicative((<*>)),
+      Parser,
+      helper,
+      execParser,
+      switch,
+      str,
+      short,
+      metavar,
+      long,
+      info,
+      help,
+      header,
+      fullDesc,
+      argument,
+      (<$>) )
 import System.Console.ANSI
+    ( SGR(Reset, SetColor),
+      Color(Green, Red),
+      ColorIntensity(Vivid),
+      ConsoleLayer(Foreground),
+      setSGR )
 import qualified System.Hardware.MercuryApi as TMR
-import qualified System.Hardware.MercuryApi.Params as TMR
-import System.IO
 
 import ExampleUtil
 
