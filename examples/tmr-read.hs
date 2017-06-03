@@ -22,8 +22,11 @@ import Options.Applicative
       fullDesc,
       (<$>) )
 import System.Console.ANSI
-    ( SGR(Reset, SetConsoleIntensity),
+    ( SGR(Reset, SetColor, SetConsoleIntensity),
+      Color(Blue),
+      ColorIntensity(Vivid),
       ConsoleIntensity(BoldIntensity),
+      ConsoleLayer(Foreground),
       setSGR )
 import qualified System.Hardware.MercuryApi as TMR
 import Text.Printf ( printf )
@@ -86,7 +89,9 @@ main = do
 
   tags <- TMR.read rdr 1000
   let tags' = reverse $ sortBy (comparing TMR.trRssi) tags
+  setSGR [SetColor Foreground Vivid Blue]
   putStrLn $ "read " ++ show (length tags') ++ " tags"
+  setSGR [Reset]
   if oLong o
     then mapM_ putWithBold (concatMap TMR.displayTagReadData tags')
     else forM_ tags' (T.putStrLn . displayTag)
