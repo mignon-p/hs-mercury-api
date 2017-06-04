@@ -869,7 +869,7 @@ hexToBytes :: T.Text -> Maybe B.ByteString
 hexToBytes hex = U.unsafePerformIO $ do
   let hexBs = textToBS hex
       hexLen = B.length hexBs
-      bufLen = hexLen `div` 2
+      bufLen = 1 + (hexLen `div` 2)
   alloca $ \pLen -> allocaBytes bufLen $ \buf -> B.useAsCString hexBs $ \cs -> do
     status <- c_TMR_hexToBytes cs buf (fromIntegral bufLen) pLen
     outLen <- peek pLen
