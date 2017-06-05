@@ -1,6 +1,3 @@
-(I haven't released this package to Hackage yet, so consider it
-alpha-quality.)
-
 Latest:
 [![Hackage](https://img.shields.io/hackage/v/hs-mercury-api.svg)](https://hackage.haskell.org/package/hs-mercury-api)
 Linux:
