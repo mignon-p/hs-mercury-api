@@ -1,5 +1,5 @@
 Latest:
-[![Hackage](https://img.shields.io/hackage/v/hs-mercury-api.svg)](https://hackage.haskell.org/package/hs-mercury-api)
+[![Hackage](https://img.shields.io/hackage/v/mercury-api.svg)](https://hackage.haskell.org/package/mercury-api)
 Linux:
 [![Build Status](https://travis-ci.org/ppelleti/hs-mercury-api.svg?branch=master)](https://travis-ci.org/ppelleti/hs-mercury-api)
 Windows:
