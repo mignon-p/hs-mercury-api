@@ -17,7 +17,10 @@ Mercury API, follow these instructions:
   added in the new release.  Note that not all C files are needed; in
   particular, `serial_transport_tcp_posix.c` and
   `tmr_loadsave_configuration.c` are not needed.  Also, note that the
-  files are supposed to be listed in [dependency order][1].
+  files are supposed to be listed in [dependency order][1].  (And
+  sadly, to get them in the right order, we have to list all the files
+  for both Windows and POSIX, because the files end up in the wrong
+  order if some are conditional and some are unconditional.  Yuck!)
 
 * Run `util/generate-tmr-hsc.pl` (no arguments needed), which will
   update the generated files `Enums.hsc` and `Params.hs` based on the
