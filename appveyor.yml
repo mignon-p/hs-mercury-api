@@ -13,6 +13,8 @@ environment:
     CABAL_REINIT_CONFIG: "y"
     PACKAGE_TEST_VER: "f47abfb22fbdfb41668a2d3032353b06c87636f2"
 
+platform: x64
+
 build: off
 
 before_test:
