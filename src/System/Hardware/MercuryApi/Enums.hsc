@@ -133,6 +133,7 @@ data Status =
   | ERROR_LLRP_UNDEFINED_VALUE -- ^ Undefined Value
   | ERROR_LLRP_READER_ERROR -- ^ LLRP reader unknown error
   | ERROR_LLRP_READER_CONNECTION_LOST -- ^ LLRP reader connection lost
+  | ERROR_LLRP_CLIENT_CONNECTION_EXISTS -- ^ LLRP Reader Connection attempt is failed, A Client initiated connection already exists
   | ERROR_ALREADY_DESTROYED -- ^ Attempt to use reader after it was destroyed.
   | ERROR_INVALID_PARAM_TYPE -- ^ The parameter value was not of the type expected.
   | ERROR_UNIMPLEMENTED_PARAM -- ^ The given parameter is not yet implemented in the Haskell binding.
@@ -238,6 +239,7 @@ toStatus #{const TMR_ERROR_LLRP_INVALID_RFMODE} = ERROR_LLRP_INVALID_RFMODE
 toStatus #{const TMR_ERROR_LLRP_UNDEFINED_VALUE} = ERROR_LLRP_UNDEFINED_VALUE
 toStatus #{const TMR_ERROR_LLRP_READER_ERROR} = ERROR_LLRP_READER_ERROR
 toStatus #{const TMR_ERROR_LLRP_READER_CONNECTION_LOST} = ERROR_LLRP_READER_CONNECTION_LOST
+toStatus #{const TMR_ERROR_LLRP_CLIENT_CONNECTION_EXISTS} = ERROR_LLRP_CLIENT_CONNECTION_EXISTS
 toStatus #{const ERROR_ALREADY_DESTROYED} = ERROR_ALREADY_DESTROYED
 toStatus x = ERROR_UNKNOWN x
 
@@ -647,6 +649,7 @@ data Param =
   | PARAM_VERSION_SERIAL -- ^ @\/reader\/version\/serial@ 'Text'
   | PARAM_VERSION_SOFTWARE -- ^ @\/reader\/version\/software@ 'Text' (read-only)
   | PARAM_VERSION_SUPPORTEDPROTOCOLS -- ^ @\/reader\/version\/supportedProtocols@ ['TagProtocol'] (read-only)
+  | PARAM_SELECTED_PROTOCOLS
   deriving (Eq, Ord, Show, Read, Bounded, Enum)
 
 instance Hashable Param where
@@ -737,6 +740,7 @@ toParam #{const TMR_PARAM_READER_STATS_ENABLE} = PARAM_READER_STATS_ENABLE
 toParam #{const TMR_PARAM_TRIGGER_READ_GPI} = PARAM_TRIGGER_READ_GPI
 toParam #{const TMR_PARAM_METADATAFLAG} = PARAM_METADATAFLAG
 toParam #{const TMR_PARAM_LICENSED_FEATURES} = PARAM_LICENSED_FEATURES
+toParam #{const TMR_PARAM_SELECTED_PROTOCOLS} = PARAM_SELECTED_PROTOCOLS
 toParam _ = PARAM_NONE
 
 fromParam :: Param -> RawParam
@@ -823,6 +827,7 @@ fromParam PARAM_READER_STATS_ENABLE = #{const TMR_PARAM_READER_STATS_ENABLE}
 fromParam PARAM_TRIGGER_READ_GPI = #{const TMR_PARAM_TRIGGER_READ_GPI}
 fromParam PARAM_METADATAFLAG = #{const TMR_PARAM_METADATAFLAG}
 fromParam PARAM_LICENSED_FEATURES = #{const TMR_PARAM_LICENSED_FEATURES}
+fromParam PARAM_SELECTED_PROTOCOLS = #{const TMR_PARAM_SELECTED_PROTOCOLS}
 
 paramMax :: RawParam
 paramMax = #{const TMR_PARAM_MAX}
