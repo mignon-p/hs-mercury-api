@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import qualified Data.ByteString as B
+import qualified Data.ByteString as B ( ByteString )
 import Data.Monoid ((<>))
-import qualified Data.Text as T
-import Test.HUnit
+import qualified Data.Text as T ( Text )
+import Test.HUnit ( Assertion, Test(..), runTestTT, assertEqual )
 
 import qualified System.Hardware.MercuryApi as TMR
 
