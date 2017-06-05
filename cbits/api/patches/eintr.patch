@@ -1,9 +1,3 @@
-commit 0f796e4226f2f699d0174db462f6a881b850ef3a
-Author: Patrick Pelletier <code@funwithsoftware.org>
-Date:   Wed Apr 19 03:02:13 2017 +0000
-
-    handle EINTR
-
 diff --git a/serial_transport_posix.c b/serial_transport_posix.c
 index 9146589..4127ee3 100644
 --- a/serial_transport_posix.c

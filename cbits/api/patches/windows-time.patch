@@ -1,28 +1,30 @@
-commit 28676612b855f4e196832270b670f81a856e0112
-Author: Patrick Pelletier <code@funwithsoftware.org>
-Date:   Mon May 29 17:47:14 2017 -0700
-
-    on Windows, correctly return time in milliseconds since 1/1/1970
-
 diff --git a/osdep_win32.c b/osdep_win32.c
-index 8b99ac3..1f170ce 100644
+index ba65bfa..4ea7603 100644
 --- a/osdep_win32.c
 +++ b/osdep_win32.c
-@@ -29,6 +29,9 @@
+@@ -31,8 +31,8 @@
  #include <time.h>
  #include "osdep.h"
  
+-/* FILETIME of Jan 1 1970 00:00:00. */
+-static const unsigned __int64 epoch = ((unsigned __int64) 116444736000000000ULL);
 +// https://stackoverflow.com/questions/6161776/convert-windows-filetime-to-second-in-unix-linux
 +#define SEC_TO_UNIX_EPOCH 11644473600LL
-+
+ 
  uint64_t
  tmr_gettime()
- {
-@@ -40,28 +43,21 @@ tmr_gettime()
+@@ -41,35 +41,25 @@ tmr_gettime()
+   SYSTEMTIME st;
+   FILETIME ft;
+   LARGE_INTEGER li;    
+-  struct timeval tv;
+   GetSystemTime(&st);
    SystemTimeToFileTime(&st, &ft);
    li.LowPart = ft.dwLowDateTime;
    li.HighPart = ft.dwHighDateTime;
--  totalms=(((uint64_t)li.LowPart)>>32 || ((uint64_t)(li.HighPart)))/10000;
+-  tv.tv_sec = (long) ((li.QuadPart - epoch) / 10000000L);
+-  tv.tv_usec =(long) (st.wMilliseconds * 1000);
+-  totalms = (((uint64_t)tv.tv_sec) * 1000) + ((uint64_t) tv.tv_usec) / 1000;
 +  totalms=(((uint64_t)li.LowPart) | ((uint64_t)li.HighPart)<<32)/10000;
 +  totalms -= SEC_TO_UNIX_EPOCH * 1000;
    return totalms;

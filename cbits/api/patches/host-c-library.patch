@@ -1,18 +1,8 @@
-commit 3960a8ef94f0772de9a740f39a32793347a2ce4e
-Author: Patrick Pelletier <code@funwithsoftware.org>
-Date:   Mon May 22 14:51:37 2017 -0700
-
-    fix build failure when TMR_USE_HOST_C_LIBRARY is defined
-    
-    There was a warning because string.h wasn't included in
-    tm_reader_async.c, and there was a fatal error because tm_memcpy was
-    an undefined symbol.
-
 diff --git a/tm_reader_async.c b/tm_reader_async.c
-index 76045b9..d8fcc28 100644
+index 4bcec6f..a464c5f 100644
 --- a/tm_reader_async.c
 +++ b/tm_reader_async.c
-@@ -37,6 +37,7 @@
+@@ -40,6 +40,7 @@ TMR_Status restart_reading(struct TMR_Reader *reader);
  #include <semaphore.h>
  #include <time.h>
  #include <stdio.h>
