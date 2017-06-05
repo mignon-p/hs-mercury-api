@@ -374,10 +374,13 @@ sub emitEnumHeader {
     emit 'module System.Hardware.MercuryApi.Enums where';
     emit '';
     emit 'import Data.Hashable ( Hashable(..) )';
+    # Data.Int is needed for linking from the Haddock documentation
+    emit 'import Data.Int ( Int8, Int16, Int32 )';
     emit 'import Data.Monoid ( (<>) )';
     emit 'import Data.Text (Text)';
     emit 'import qualified Data.Text as T ( pack )';
-    emit 'import Data.Word ( Word8, Word32 )';
+    # Word16 is needed for linking from the Haddock documentation
+    emit 'import Data.Word ( Word8, Word16, Word32 )';
     emit 'import Text.Printf ( printf )';
     emit '';
     emit '#include <tm_reader.h>';

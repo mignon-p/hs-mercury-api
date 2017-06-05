@@ -88,7 +88,8 @@ textToBS = T.encodeUtf8
 textFromCString :: CString -> IO Text
 textFromCString cs = textFromBS <$> B.packCString cs
 
--- | Indicates whether to read or write in 'TagOp_GEN2_BlockPermaLock'.
+-- | Indicates whether to read or write the lock bits in
+-- 'TagOp_GEN2_BlockPermaLock'.
 data ReadWrite = Read !Int       -- ^ number of words of lock bits to read
                | Write ![Word16] -- ^ lock bits to write
                deriving (Eq, Ord, Show, Read)

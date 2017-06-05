@@ -3,10 +3,11 @@
 module System.Hardware.MercuryApi.Enums where
 
 import Data.Hashable ( Hashable(..) )
+import Data.Int ( Int8, Int16, Int32 )
 import Data.Monoid ( (<>) )
 import Data.Text (Text)
 import qualified Data.Text as T ( pack )
-import Data.Word ( Word8, Word32 )
+import Data.Word ( Word8, Word16, Word32 )
 import Text.Printf ( printf )
 
 #include <tm_reader.h>

@@ -141,7 +141,8 @@ module System.Hardware.MercuryApi
 import Prelude hiding (read)
 
 import Control.Applicative ( (<$>) )
-import Control.Exception ( Exception, throwIO, try, bracket )
+-- IOException is needed here so that Haddock can link to it
+import Control.Exception ( Exception, IOException, throwIO, try, bracket )
 import Control.Monad ( when )
 import qualified Data.ByteString as B
 import qualified Data.HashMap.Strict as H
