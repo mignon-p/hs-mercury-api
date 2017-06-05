@@ -92,22 +92,25 @@ library
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
 
-  c-sources:           cbits/api/tmr_strerror.c
-                     , cbits/api/tmr_param.c
-                     , cbits/api/hex_bytes.c
-                     , cbits/api/tm_reader.c
-                     , cbits/api/tm_reader_async.c
-                     , cbits/api/serial_reader.c
-                     , cbits/api/serial_reader_l3.c
-                     , cbits/api/tmr_utils.c
-                     , cbits/glue/glue.c
-
+  -- Apparently these are supposed to be listed in dependency order,
+  -- although the Cabal documentation doesn't breathe a word about it:
+  -- https://ghc.haskell.org/trac/ghc/ticket/13786#comment:3
   if os(windows)
     c-sources:         cbits/api/serial_transport_win32.c
                      , cbits/api/osdep_win32.c
   else
     c-sources:         cbits/api/serial_transport_posix.c
                      , cbits/api/osdep_posix.c
+
+  c-sources:           cbits/api/tmr_strerror.c
+                     , cbits/api/tmr_utils.c
+                     , cbits/api/tmr_param.c
+                     , cbits/api/hex_bytes.c
+                     , cbits/api/serial_reader_l3.c
+                     , cbits/api/serial_reader.c
+                     , cbits/api/tm_reader_async.c
+                     , cbits/api/tm_reader.c
+                     , cbits/glue/glue.c
 
   include-dirs:        cbits/api
                      , cbits/glue
