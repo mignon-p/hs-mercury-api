@@ -32,7 +32,9 @@ import System.IO
       IOMode(ReadMode, WriteMode),
       withFile,
       hPutStrLn,
-      hGetLine )
+      hGetLine,
+      hFlush,
+      stderr )
 import System.Info ( os )
 
 import qualified System.Hardware.MercuryApi as TMR
@@ -53,6 +55,8 @@ suppressUri :: Either TMR.MercuryException a -> Either TMR.MercuryException a
 suppressUri (Left exc) = Left exc { TMR.meUri = T.empty }
 suppressUri x = x
 
+putStrLnE = hPutStrLn stderr
+
 check :: (Read a, Show a, Eq a) => TestState -> IO a -> IO a
 check ts f = do
   eth' <- try f
@@ -63,10 +67,11 @@ check ts f = do
       ln <- hGetLine (tsHandle ts)
       let expected = read ln :: (Read a => Either TMR.MercuryException a)
       when (expected /= eth) $ do
-        putStrLn "expected:"
-        putStrLn ln
-        putStrLn "but got:"
-        print eth
+        putStrLnE "expected:"
+        putStrLnE ln
+        putStrLnE "but got:"
+        putStrLnE $ show eth
+        hFlush stderr
         fail "test failed"
   return $ case eth of
              Left exc -> throw exc -- only thrown if caller looks at result
@@ -74,7 +79,8 @@ check ts f = do
 
 runTest :: String -> TestDirection -> String -> TestFunc -> IO ()
 runTest uri dir name func = do
-  putStrLn $ "running test: " ++ name
+  putStrLnE $ "running test: " ++ name
+  hFlush stderr
   let fname = "tests/" ++ name
       transportFile = fname ++ ".transport"
       resultFile = fname ++ ".result"
