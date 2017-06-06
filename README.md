@@ -38,11 +38,42 @@ Haskell binding.  (There are a lot of them, and I only implemented the
 ones I needed.)  If you need support for additional parameters or
 tagops, please file an issue in GitHub and I will add them.
 
+I have tested this package on Linux, Mac OS X, and Windows, using the
+SparkFun board.
+
+Here is a minimal example which reads tags at maximum power for 1
+second, and then prints the results:
+
+```haskell
+{-# LANGUAGE OverloadedStrings #-}
+
+import qualified Data.Text.IO as T
+import qualified System.Hardware.MercuryApi as TMR
+import qualified System.Hardware.MercuryApi.Params as TMR
+
+main = do
+  rdr <- TMR.create "tmr:///dev/ttyUSB0"
+  TMR.paramSetTransportTimeout rdr 10000
+  TMR.connect rdr
+  TMR.paramSetBasics rdr TMR.REGION_NA2 2700 TMR.sparkFunAntennas
+  tags <- TMR.read rdr 1000
+  putStrLn $ "read " ++ show (length tags) ++ " tags"
+  mapM_ T.putStrLn $ concatMap TMR.displayTagReadData tags
+  TMR.destroy rdr
+```
+
+Additional examples are available in the `examples` directory.
+
 Additional resources:
 
 * [RFID Basics][8]
 * [SparkFun Simultaneous RFID Reader hookup guide][3]
 * [ThingMagic manuals and firmware][4]
+
+Mercury API in other languages:
+
+* C, Java, and C# - officially supported by [Mercury API][5]
+* [Python binding][10] by Petr Gotthard
 
 [1]: https://www.sparkfun.com/products/14066
 [2]: http://www.thingmagic.com/images/Downloads/Docs/MercuryAPI_ProgrammerGuide_for_v1.27.3.pdf
@@ -53,3 +84,4 @@ Additional resources:
 [7]: http://www.thingmagic.com/index.php/embedded-rfid-readers/thingmagic-nano-module
 [8]: https://learn.sparkfun.com/tutorials/rfid-basics
 [9]: https://github.com/ppelleti/hs-mercury-api/blob/master/UPGRADING.md
+[10]: https://github.com/gotthardp/python-mercuryapi
