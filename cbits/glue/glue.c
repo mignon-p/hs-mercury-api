@@ -9,6 +9,7 @@
 #include <xlocale.h>
 #endif
 #include <HsFFI.h>
+#include <stdio.h>
 
 #include "glue.h"
 #include "serial_reader_imp.h"
@@ -157,6 +158,10 @@ TMR_Status c_TMR_paramSet(ReaderEtc *reader,
     else {
         TMR_Status status;
 
+        if (key == TMR_PARAM_READ_PLAN) {
+            fprintf (stderr, "(calling TMR_paramSet on readplan)\n");
+            fflush (stderr);
+        }
         status = TMR_paramSet (&reader->reader, key, value);
         if (key == TMR_PARAM_READ_PLAN) {
             if (status == TMR_SUCCESS) {
@@ -169,6 +174,8 @@ TMR_Status c_TMR_paramSet(ReaderEtc *reader,
                  * When the read plan is set, we need to free the old
                  * ReadPlanEtc, and keep a pointer to the new one.
                  */
+                fprintf (stderr, "(freeing old readplan)\n");
+                fflush (stderr);
                 free (reader->readPlan);
                 reader->readPlan = (ReadPlanEtc *) value;
             }

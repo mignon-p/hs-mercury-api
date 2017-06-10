@@ -148,7 +148,7 @@ testReadUser rdr ts = do
 testWrite :: TestFunc
 testWrite rdr ts = do
   setRegionAndPower rdr
-  putStrLnE "(modifying read plan)"
+  putStrLnE "(modifying read plan filter)"
   TMR.paramSetReadPlanFilter rdr (Just emptyUserDataFilter)
 
   putStrLnE "(TMR.read)"
@@ -167,8 +167,9 @@ testWrite rdr ts = do
   putStrLnE "(TMR.executeTagOp)"
   check ts $ TMR.executeTagOp rdr opWrite (Just epcFilt)
 
-  putStrLnE "(modifying read plan)"
+  putStrLnE "(modifying read plan filter)"
   TMR.paramSetReadPlanFilter rdr Nothing
+  putStrLnE "(modifying read plan tagop)"
   TMR.paramSetReadPlanTagop rdr (Just readUser)
   putStrLnE "(TMR.read)"
   tags2 <- TMR.read rdr 1000
