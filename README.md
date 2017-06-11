@@ -33,6 +33,9 @@ any way to test LLRP, however, as the M6e Nano doesn't support it.)
 On Mac OS X, be sure to use the serial device that starts with
 `/dev/cu.`, not the serial device that starts with `/dev/tty.`.
 
+On Windows, you can type `wmic path Win32_SerialPort` to list the
+available COM ports.
+
 Only some parameters and some tagops are currently supported in the
 Haskell binding.  (There are a lot of them, and I only implemented the
 ones I needed.)  If you need support for additional parameters or
