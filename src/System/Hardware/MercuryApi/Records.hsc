@@ -202,33 +202,27 @@ instance Storable ReadPlan where
     putStrLnE "(finished poking readplan)"
 
   peek p = do
-    putStrLnE "(started peeking readplan)"
     weight <- #{peek ReadPlanEtc, plan.weight} p
     enableAutonomousRead <- #{peek ReadPlanEtc, plan.enableAutonomousRead} p
     antennas <- peekList16 (antennasInfo p)
     protocol <- #{peek ReadPlanEtc, plan.u.simple.protocol} p
-    putStrLnE "(peeking readplan: #1)"
     fPtr <- #{peek ReadPlanEtc, plan.u.simple.filter} p
     filt <- if fPtr == nullPtr
             then return Nothing
             else Just <$> peek fPtr
-    putStrLnE "(peeking readplan: #2)"
     opPtr <- #{peek ReadPlanEtc, plan.u.simple.tagop} p
     op <- if opPtr == nullPtr
           then return Nothing
           else Just <$> peek opPtr
-    putStrLnE "(peeking readplan: #3)"
     useFastSearch <- #{peek ReadPlanEtc, plan.u.simple.useFastSearch} p
     stop <- #{peek ReadPlanEtc, plan.u.simple.stopOnCount.stopNTriggerStatus} p
     stopOnCount <- if toBool' stop
                    then Just <$> #{peek ReadPlanEtc, plan.u.simple.stopOnCount.noOfTags} p
                    else return Nothing
-    putStrLnE "(peeking readplan: #4)"
     enable <- #{peek ReadPlanEtc, plan.u.simple.triggerRead.enable} p
     triggerRead <- if toBool' enable
                    then Just <$> peekList16 (gpiListInfo p)
                    else return Nothing
-    putStrLnE "(finished peeking readplan)"
     return $ SimpleReadPlan
       { rpWeight = weight
       , rpEnableAutonomousRead = toBool' enableAutonomousRead
