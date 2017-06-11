@@ -209,6 +209,7 @@ instance Storable ReadPlan where
     protocol <- #{peek ReadPlanEtc, plan.u.simple.protocol} p
     putStrLnE "(peeking readplan: #1)"
     fPtr <- #{peek ReadPlanEtc, plan.u.simple.filter} p
+    putStrLnE $ "fPtr = " ++ show fPtr
     filt <- if fPtr == nullPtr
             then return Nothing
             else Just <$> peek fPtr
@@ -283,6 +284,12 @@ data TagFilter = TagFilterEPC TagData
                }
                deriving (Eq, Ord, Show, Read)
 
+traceShowId :: Show a => IO a -> IO a
+traceShowId f = do
+  x <- f
+  putStrLnE (show x)
+  return x
+
 instance Storable TagFilter where
   sizeOf _ = #{size TagFilterEtc}
   alignment _ = 8
@@ -315,17 +322,20 @@ instance Storable TagFilter where
     putStrLnE "(finished poke of TagFilterGen2)"
 
   peek p = do
+    putStrLnE "(starting peek of TagFilter)"
     ft <- #{peek TagFilterEtc, filter.type} p :: IO #{type TMR_FilterType}
     case ft of
-      #{const TMR_FILTER_TYPE_TAG_DATA} ->
+      #{const TMR_FILTER_TYPE_TAG_DATA} -> do
+        putStrLnE "(peeking TagFilterEPC)"
         TagFilterEPC <$> #{peek TagFilterEtc, filter.u.tagData} p
-      #{const TMR_FILTER_TYPE_GEN2_SELECT} ->
+      #{const TMR_FILTER_TYPE_GEN2_SELECT} -> do
+        putStrLnE "(peeking TagFilterGen2)"
         TagFilterGen2
-        <$> (toBool' <$> #{peek TagFilterEtc, filter.u.gen2Select.invert} p)
-        <*> #{peek TagFilterEtc, filter.u.gen2Select.bank} p
-        <*> #{peek TagFilterEtc, filter.u.gen2Select.bitPointer} p
-        <*> #{peek TagFilterEtc, filter.u.gen2Select.maskBitLength} p
-        <*> peekMask p
+          <$> traceShowId (toBool' <$> #{peek TagFilterEtc, filter.u.gen2Select.invert} p)
+          <*> traceShowId (#{peek TagFilterEtc, filter.u.gen2Select.bank} p)
+          <*> traceShowId (#{peek TagFilterEtc, filter.u.gen2Select.bitPointer} p)
+          <*> traceShowId (#{peek TagFilterEtc, filter.u.gen2Select.maskBitLength} p)
+          <*> traceShowId (peekMask p)
 
 peekMask :: Ptr TagFilter -> IO ByteString
 peekMask p = do
