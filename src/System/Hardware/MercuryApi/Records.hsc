@@ -31,7 +31,6 @@ import Foreign
       copyArray,
       allocaArray )
 import Foreign.C ( CString )
-import System.IO ( hPutStrLn, stderr )
 
 import System.Hardware.MercuryApi.Enums
 
@@ -162,14 +161,11 @@ gpiListInfo rp =
 readPlanTypeSimple :: #{type TMR_ReadPlanType}
 readPlanTypeSimple = #{const TMR_READ_PLAN_TYPE_SIMPLE}
 
-putStrLnE = hPutStrLn stderr
-
 instance Storable ReadPlan where
   sizeOf _ = #{size ReadPlanEtc}
   alignment _ = 8
 
   poke p x = do
-    putStrLnE "(started poking readplan)"
     #{poke ReadPlanEtc, plan.type} p readPlanTypeSimple
     #{poke ReadPlanEtc, plan.weight} p (rpWeight x)
     #{poke ReadPlanEtc, plan.enableAutonomousRead} p
@@ -199,7 +195,6 @@ instance Storable ReadPlan where
                             Just ps -> (cTrue, ps)
     #{poke ReadPlanEtc, plan.u.simple.triggerRead.enable} p enable
     pokeList16 (gpiListInfo p) ports
-    putStrLnE "(finished poking readplan)"
 
   peek p = do
     weight <- #{peek ReadPlanEtc, plan.weight} p
