@@ -341,6 +341,7 @@ peekMask :: Ptr TagFilter -> IO ByteString
 peekMask p = do
   bitLength <- #{peek TagFilterEtc, filter.u.gen2Select.maskBitLength} p :: IO Word32
   let len = fromIntegral $ (bitLength + 7) `div` 8
+  putStrLnE $ "len = " ++ show len ++ ", ptr = " ++ show (#{ptr TagFilterEtc, filter.u.gen2Select.mask} p)
   maskPtr <- #{peek TagFilterEtc, filter.u.gen2Select.mask} p
   B.packCStringLen (maskPtr, len)
 
