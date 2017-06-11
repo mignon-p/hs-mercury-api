@@ -282,21 +282,17 @@ instance Storable TagFilter where
   alignment _ = 8
 
   poke p (TagFilterEPC td) = do
-    putStrLnE "(starting poke for TagFilterEPC)"
     #{poke TagFilterEtc, filter.type} p
       (#{const TMR_FILTER_TYPE_TAG_DATA} :: #{type TMR_FilterType})
     #{poke TagFilterEtc, filter.u.tagData} p td
-    putStrLnE "(finished poke of TagFilterEPC)"
 
   poke p tf@(TagFilterGen2 {}) = do
-    putStrLnE "(starting poke of TagFilterGen2)"
     #{poke TagFilterEtc, filter.type} p
       (#{const TMR_FILTER_TYPE_GEN2_SELECT} :: #{type TMR_FilterType})
     #{poke TagFilterEtc, filter.u.gen2Select.invert} p (fromBool' $ tfInvert tf)
     #{poke TagFilterEtc, filter.u.gen2Select.bank} p (tfFilterOn tf)
     #{poke TagFilterEtc, filter.u.gen2Select.bitPointer} p (tfBitPointer tf)
     #{poke TagFilterEtc, filter.u.gen2Select.maskBitLength} p (tfMaskBitLength tf)
-    putStrLnE "(halfway through poke of TagFilterGen2)"
     let maskLenBytes = fromIntegral $ (tfMaskBitLength tf + 7) `div` 8
         origLen = B.length (tfMask tf)
         bs = if origLen < maskLenBytes
@@ -306,7 +302,6 @@ instance Storable TagFilter where
       len' <- castLen' #{const GLUE_MAX_MASK} "tfMask" len
       copyArray (#{ptr TagFilterEtc, mask} p) cs (fromIntegral len')
     #{poke TagFilterEtc, filter.u.gen2Select.mask} p (#{ptr TagFilterEtc, mask} p)
-    putStrLnE "(finished poke of TagFilterGen2)"
 
   peek p = do
     ft <- #{peek TagFilterEtc, filter.type} p :: IO #{type TMR_FilterType}
