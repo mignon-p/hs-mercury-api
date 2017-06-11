@@ -736,8 +736,11 @@ paramSetBasics rdr rgn pwr ant = do
 -- while leaving the rest of the read plan unchanged.
 paramSetReadPlanFilter :: Reader -> Maybe TagFilter -> IO ()
 paramSetReadPlanFilter rdr filt = do
+  putStrLnE "(paramSetReadPlanFilter: paramGet)"
   plan <- paramGet rdr PARAM_READ_PLAN
+  putStrLnE "(paramSetReadPlanFilter: paramSet)"
   paramSet rdr PARAM_READ_PLAN plan { rpFilter = filt }
+  putStrLnE "(paramSetReadPlanFilter: done)"
 
 -- | Sets the 'rpTagop' field of the 'PARAM_READ_PLAN' parameter,
 -- while leaving the rest of the read plan unchanged.
