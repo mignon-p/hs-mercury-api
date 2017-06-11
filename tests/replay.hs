@@ -148,10 +148,8 @@ testReadUser rdr ts = do
 testWrite :: TestFunc
 testWrite rdr ts = do
   setRegionAndPower rdr
-  putStrLnE "(modifying read plan)"
   TMR.paramSetReadPlanFilter rdr (Just emptyUserDataFilter)
 
-  putStrLnE "(TMR.read)"
   tags <- TMR.read rdr 1000
   check ts $ return $ length tags
   let trd = maximumBy (comparing TMR.trRssi) tags
@@ -164,13 +162,10 @@ testWrite rdr ts = do
                 , TMR.opWordAddress = 0
                 , TMR.opData = words
                 }
-  putStrLnE "(TMR.executeTagOp)"
   check ts $ TMR.executeTagOp rdr opWrite (Just epcFilt)
 
-  putStrLnE "(modifying read plan)"
   TMR.paramSetReadPlanFilter rdr Nothing
   TMR.paramSetReadPlanTagop rdr (Just readUser)
-  putStrLnE "(TMR.read)"
   tags2 <- TMR.read rdr 1000
   check ts $ return $ length tags2
   forM_ tags2 $ \tag -> do
