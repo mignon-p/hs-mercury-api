@@ -10,7 +10,7 @@ name:                mercury-api
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.1.0.0
+version:             0.1.0.1
 
 -- A short (one-line) description of the package.
 synopsis:            Haskell binding to Mercury API for ThingMagic RFID readers
