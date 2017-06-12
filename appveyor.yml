@@ -15,6 +15,13 @@ environment:
 
 platform: x64
 
+cache:
+  - "%STACK_ROOT%" # stack root
+  - "%LOCALAPPDATA%\\Programs\\stack" # ghc & msys
+  - "%LOCAL_BIN%"
+  - "%APPDATA%\\cabal"
+  - "%APPDATA%\\ghc"
+
 build: off
 
 before_test:
