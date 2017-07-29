@@ -5,6 +5,8 @@ Linux:
 Windows:
 [![Build status](https://ci.appveyor.com/api/projects/status/aywuy9y05ow8wja2/branch/master?svg=true)](https://ci.appveyor.com/project/ppelleti/hs-mercury-api/branch/master)
 
+## Description
+
 This package is a Haskell binding to the [Mercury API][5] C API for
 [ThingMagic][6] RFID readers.  It is especially geared toward
 the [SparkFun Simultaneous RFID Reader][1], which uses ThingMagic's
@@ -67,6 +69,80 @@ main = do
 
 Additional examples are available in the `examples` directory.
 
+## How to build
+
+This package is mostly of interest to Haskell programmers, and if
+you're a Haskell programmer, you already know how to build it with
+`stack` or `cabal`.
+
+However, some of the utilities like `tmr-firmware` might be of
+interest to non-Haskellers, so here is how to build them if you don't
+know anything about Haskell:
+
+* Install [stack][11].
+
+* Clone this repository.
+
+* Run `stack --install-ghc install` at the top level of the repository.
+
+* Add `~/.local/bin` to your `$PATH`.
+
+Now the following utilities will be available in your `$PATH`:
+
+```
+tmr-firmware - write a new firmware image to reader
+
+Usage: tmr-firmware [-u|--uri URI] [-t|--transport-listener] [FILENAME]
+  If run without firmware file, just print current firmware version. Firmware
+  file can be downloaded from:
+  http://www.thingmagic.com/index.php/download-nano-firmware
+
+Available options:
+  -h,--help                Show this help text
+  -u,--uri URI             Reader to connect to (default tmr:///dev/ttyUSB0)
+  -t,--transport-listener  Print bytes sent on serial port
+
+
+tmr-params - print parameters
+
+Usage: tmr-params [-u|--uri URI] [-t|--transport-listener]
+
+Available options:
+  -h,--help                Show this help text
+  -u,--uri URI             Reader to connect to (default tmr:///dev/ttyUSB0)
+  -t,--transport-listener  Print bytes sent on serial port
+
+
+tmr-read - read tags
+
+Usage: tmr-read [-u|--uri URI] [-r|--region REGION] [-p|--power CENTI-DBM]
+                [-t|--transport-listener] [-l|--long]
+
+Available options:
+  -h,--help                Show this help text
+  -u,--uri URI             Reader to connect to (default tmr:///dev/ttyUSB0)
+  -r,--region REGION       Regulatory region (default na2)
+  -p,--power CENTI-DBM     Power level (0-2700, default 2300)
+  -t,--transport-listener  Print bytes sent on serial port
+  -l,--long                Print lots of information per tag
+
+
+tmr-write - write a string to user data of tag
+
+Usage: tmr-write [-u|--uri URI] [-r|--region REGION] [-p|--power CENTI-DBM]
+                 [-t|--transport-listener] [-R|--rewrite] STRING
+
+Available options:
+  -h,--help                Show this help text
+  -u,--uri URI             Reader to connect to (default tmr:///dev/ttyUSB0)
+  -r,--region REGION       Regulatory region (default na2)
+  -p,--power CENTI-DBM     Power level (0-2700, default 2300)
+  -t,--transport-listener  Print bytes sent on serial port
+  -R,--rewrite             Write to a tag even if written before
+```
+
+## Resources
+
 Additional resources:
 
 * [RFID Basics][8]
@@ -88,3 +164,4 @@ Mercury API in other languages:
 [8]: https://learn.sparkfun.com/tutorials/rfid-basics
 [9]: https://github.com/ppelleti/hs-mercury-api/blob/master/UPGRADING.md
 [10]: https://github.com/gotthardp/python-mercuryapi
+[11]: https://docs.haskellstack.org/en/stable/README/#how-to-install
