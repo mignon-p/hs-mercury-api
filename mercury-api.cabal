@@ -57,6 +57,7 @@ extra-source-files:  ChangeLog.md
                    , README.md
                    , UPGRADING.md
                    , examples/LICENSE-FOR-EXAMPLES
+                   , stack.yaml
                    , tests/*.result
                    , tests/*.transport
                    , cbits/api/*.h
