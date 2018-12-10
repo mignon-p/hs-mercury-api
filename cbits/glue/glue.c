@@ -6,7 +6,7 @@
 #include <string.h>
 #include <time.h>
 #ifndef _WIN32
-#include <xlocale.h>
+#include <locale.h>
 #endif
 #include <HsFFI.h>
 
