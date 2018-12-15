@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#ifndef _WIN32
+#if defined(__APPLE__)
+#include <xlocale.h>
+#elif !defined(_WIN32)
 #include <locale.h>
 #endif
 #include <HsFFI.h>
